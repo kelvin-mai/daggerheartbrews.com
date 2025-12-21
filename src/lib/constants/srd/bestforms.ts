@@ -548,7 +548,7 @@ ${beastform.advantage ? `<p><strong>Gain advantage on:</strong> ${beastform.adva
 ${beastform.features
   .map(
     (feat) => `<p><strong><em>${feat.name}</em></strong> ${feat.description}</p>
-${feat.extra && feat.extra}
+${feat.extra ? feat.extra : ''}
 `,
   )
   .join('')}
