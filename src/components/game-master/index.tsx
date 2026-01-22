@@ -288,7 +288,7 @@ export const GameMasterBattle = () => {
     },
     { number: '-2', description: 'Using 2 or more solo adversaries' },
     { number: '-2', description: 'Adding 1d4 damage to all adversaries' },
-    { number: '-1', description: 'Using an adversary from a lower tier' },
+    { number: '+1', description: 'Using an adversary from a lower tier' },
     {
       number: '+1',
       description: 'Not using Hords, Leaders, Bruisers or Solos',
