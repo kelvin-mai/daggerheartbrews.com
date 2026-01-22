@@ -287,7 +287,7 @@ export const GameMasterBattle = () => {
       description: 'Intending a less difficult or shorter fight',
     },
     { number: '-2', description: 'Using 2 or more solo adversaries' },
-    { number: '-2', description: 'Adding 1d4 damage to all adversaries' },
+    { number: '-2', description: 'Add 1d4 (or a static +2) to all adversary damage rolls' },
     { number: '+1', description: 'Using an adversary from a lower tier' },
     {
       number: '+1',
