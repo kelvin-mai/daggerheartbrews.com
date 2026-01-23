@@ -291,7 +291,7 @@ export const GameMasterBattle = () => {
     { number: '+1', description: 'Using an adversary from a lower tier' },
     {
       number: '+1',
-      description: 'Not using Hords, Leaders, Bruisers or Solos',
+      description: 'Not using Hordes, Leaders, Bruisers or Solos',
     },
     { number: '+2', description: 'Intending a more dangerous or longer fight' },
   ];
