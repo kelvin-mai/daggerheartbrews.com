@@ -5,7 +5,9 @@ export const timestamps = {
   createdAt: timestamp('created_at')
     .notNull()
     .default(sql`now()`),
-  updatedAt: timestamp('updated_at'),
+  updatedAt: timestamp('updated_at')
+    .notNull()
+    .default(sql`now()`),
 };
 
 export const uuidPrimaryKey = {

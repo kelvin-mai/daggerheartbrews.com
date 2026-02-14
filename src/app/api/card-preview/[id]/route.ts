@@ -12,7 +12,7 @@ export async function POST(
 ) {
   try {
     const id = (await params).id;
-    const body: { card: CardDetails; userCard?: UserCard } = await req.json();
+    const body: { card: CardDetails; userCard?: UserCard; public?: boolean } = await req.json();
     const session = await auth.api.getSession({
       headers: await headers(),
     });

@@ -5,7 +5,7 @@ import * as React from 'react';
 import { formatBytes, useFileUpload } from '@/hooks/use-file-upload';
 import { Button } from '@/components/ui/button';
 import { UploadIcon, X } from 'lucide-react';
-import { useCardActions, useCardStore } from '@/store';
+import { useAdversaryActions, useAdversaryStore } from '@/store';
 import {
   type Area,
   ImageCropper,
@@ -64,11 +64,11 @@ const getCroppedImage = async (
   }
 };
 
-export const ImageForm = () => {
+export const AdversaryImageForm = () => {
   const {
-    card: { image },
-  } = useCardStore();
-  const { setCardDetails } = useCardActions();
+    adversary: { image },
+  } = useAdversaryStore();
+  const { setAdversaryDetails } = useAdversaryActions();
   const [{ files }, { removeFile, openFileDialog, getInputProps }] =
     useFileUpload({ accept: 'image/*' });
   const [file] = files;
@@ -76,11 +76,11 @@ export const ImageForm = () => {
 
   React.useEffect(() => {
     if (file?.preview) {
-      setCardDetails({ image: file.preview });
+      setAdversaryDetails({ image: file.preview });
     }
-  }, [file]);
+  }, [file, setAdversaryDetails]);
 
-  // Load existing image when editing a card
+  // Load existing image when editing an adversary
   React.useEffect(() => {
     if (image && !file) {
       setExistingImagePreview(image);
@@ -95,14 +95,14 @@ export const ImageForm = () => {
       if (blob) {
         const cropped = await fileToBase64(blob);
         if (image !== cropped) {
-          setCardDetails({ image: cropped });
+          setAdversaryDetails({ image: cropped });
         }
       }
     }
   };
 
   return (
-    <FormContainer title='Card Image' collapsible defaultOpen>
+    <FormContainer title='Adversary Image' collapsible defaultOpen>
       <div className='space-y-2'>
         <div className='flex flex-col gap-2'>
           <Button
@@ -168,7 +168,7 @@ export const ImageForm = () => {
                 size='icon'
                 variant='ghost'
                 onClick={() => {
-                  setCardDetails({ image: undefined });
+                  setAdversaryDetails({ image: undefined });
                   setExistingImagePreview(null);
                 }}
                 aria-label='Remove existing image'

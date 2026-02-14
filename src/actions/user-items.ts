@@ -14,7 +14,7 @@ import type { AdversaryDetails, CardDetails, User } from '@/lib/types';
 
 export const limitCardInserts = async ({
   session,
-  limit = 10,
+  limit = 100,
 }: {
   session: { user: User };
   limit?: number;
@@ -43,7 +43,7 @@ export const insertCard = async ({
       .returning();
     const [userCard] = await tx
       .insert(userCards)
-      .values({ userId: session.user.id, cardPreviewId: card.id })
+      .values({ userId: session.user.id, cardPreviewId: card.id, public: true })
       .returning();
     return { card, userCard };
   });
@@ -55,7 +55,7 @@ export const updateCard = async ({
   session,
 }: {
   id: string;
-  body: { card: CardDetails };
+  body: { card: CardDetails; public?: boolean };
   session: { user: User };
 }) => {
   return await db.transaction(async (tx) => {
@@ -66,7 +66,7 @@ export const updateCard = async ({
       .returning();
     const [userCard] = await tx
       .update(userCards)
-      .set({ updatedAt: new Date() })
+      .set({ updatedAt: new Date(), ...(typeof body.public === 'boolean' ? { public: body.public } : {}) })
       .where(
         and(
           eq(userCards.userId, session.user.id),
@@ -80,7 +80,7 @@ export const updateCard = async ({
 
 export const limitAdversaryInserts = async ({
   session,
-  limit = 10,
+  limit = 100,
 }: {
   session: { user: User };
   limit?: number;
@@ -112,7 +112,7 @@ export const insertAdversary = async ({
       .returning();
     const [userAdversary] = await tx
       .insert(userAdversaries)
-      .values({ userId: session.user.id, adversaryPreviewId: adversary.id })
+      .values({ userId: session.user.id, adversaryPreviewId: adversary.id, public: true })
       .returning();
     return { adversary, userAdversary };
   });
@@ -124,7 +124,7 @@ export const updateAdversary = async ({
   session,
 }: {
   id: string;
-  body: { adversary: AdversaryDetails };
+  body: { adversary: AdversaryDetails; public?: boolean };
   session: { user: User };
 }) => {
   return await db.transaction(async (tx) => {
@@ -135,7 +135,7 @@ export const updateAdversary = async ({
       .returning();
     const [userAdversary] = await tx
       .update(userAdversaries)
-      .set({ updatedAt: new Date() })
+      .set({ updatedAt: new Date(), ...(typeof body.public === 'boolean' ? { public: body.public } : {}) })
       .where(
         and(
           eq(userAdversaries.userId, session.user.id),

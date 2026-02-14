@@ -13,6 +13,7 @@ import {
   SubClassPropertiesForm,
 } from './properties';
 import { RulesForm } from './rules';
+import { CardBackForm } from './card-back';
 
 export const CardCreationForms = () => {
   const store = useCardStore();
@@ -36,6 +37,7 @@ export const CardCreationForms = () => {
       {type === 'class' && <ClassPropertiesForm />}
       {type === 'subclass' && <SubClassPropertiesForm />}
       <RulesForm />
+      <CardBackForm />
     </div>
   );
 };

@@ -30,7 +30,7 @@ export const ResponsiveDialog: React.FC<ResponsiveDialogProps> = ({
         <DrawerTrigger asChild>
           <Button {...props}>{label}</Button>
         </DrawerTrigger>
-        <DrawerContent>
+        <DrawerContent className='max-h-[95vh] overflow-auto'>
           <DrawerTitle className='my-2 text-center'>{label}</DrawerTitle>
           {children}
         </DrawerContent>
@@ -42,7 +42,7 @@ export const ResponsiveDialog: React.FC<ResponsiveDialogProps> = ({
       <DialogTrigger asChild>
         <Button {...props}>{label}</Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className='w-auto max-w-[1100px]'>
         <DialogTitle className='text-center'>{label}</DialogTitle>
         {children}
       </DialogContent>

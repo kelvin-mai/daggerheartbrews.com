@@ -13,6 +13,7 @@ export type CardState = {
   userCard?: UserCard;
   card: CardDetails;
   preview?: React.RefObject<HTMLElement | null>;
+  cardBackPreview?: React.RefObject<HTMLElement | null>;
   classes?: CardClassOption[];
   domains?: CardDomainOption[];
 };
@@ -33,6 +34,7 @@ export type CardComputed = {
 export type CardActions = {
   setLoading(loading: boolean): void;
   setPreviewRef(ref: React.RefObject<HTMLDivElement | null>): void;
+  setCardBackPreviewRef(ref: React.RefObject<HTMLDivElement | null>): void;
   setCardTypeDefaults(type: CardType): void;
   setCardDetails(details: Partial<CardDetails>): void;
   setUserCard(userCard?: UserCard): void;
@@ -45,6 +47,7 @@ export type CardActions = {
 
 export type CardEffects = {
   downloadImage(): void;
+  downloadCardBackImage(): void;
   loadOptions(): void;
   saveCardPreview(): Promise<void>;
 };

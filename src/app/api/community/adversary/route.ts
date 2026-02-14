@@ -7,6 +7,7 @@ import {
   notInArray,
   or,
   ne,
+  ilike,
   type SQL,
 } from 'drizzle-orm';
 import { NextResponse, type NextRequest } from 'next/server';
@@ -30,6 +31,7 @@ export async function GET(request: NextRequest) {
       : 10;
     const tierParam = searchParams.get('tier');
     const roleParam = searchParams.get('role');
+    const nameParam = searchParams.get('q');
     const tiers = tierParam
       ? tierParam
           .split(',')
@@ -91,6 +93,7 @@ export async function GET(request: NextRequest) {
     const composedFilters = [baseFilter] as SQL<unknown>[];
     if (tierFilter) composedFilters.push(tierFilter);
     if (roleFilter) composedFilters.push(roleFilter);
+    if (nameParam) composedFilters.push(ilike(adversaryPreviews.name, `%${nameParam}%`));
     const whereFilter =
       composedFilters.length === 1 ? baseFilter : and(...composedFilters);
 

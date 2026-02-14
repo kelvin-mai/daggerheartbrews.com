@@ -18,11 +18,14 @@ export default function Page() {
       </p>
       <div className='my-4 grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3'>
         {ancestries.map((ancestry) => (
-          <CardDisplayPreview
-            key={ancestry.name}
-            card={ancestry}
-            settings={initialSettings}
-          />
+          <div key={ancestry.name} className='flex justify-center'>
+            <div className='[&>div>div:first-child]:origin-top [&>div>div:first-child]:scale-[0.45] [&>div>div:first-child]:-mb-[578px] [&>div>button]:w-[340px] [&>div>button]:mx-auto [&>div>button]:mt-3'>
+              <CardDisplayPreview
+                card={ancestry}
+                settings={initialSettings}
+              />
+            </div>
+          </div>
         ))}
       </div>
     </>

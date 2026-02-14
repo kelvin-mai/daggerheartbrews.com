@@ -13,13 +13,14 @@ import {
 } from '@/store';
 import { AdversaryPreviewStatblock } from './statblock';
 import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
 import { SavePreviewButton } from '@/components/common';
 
 export const AdversaryCreationPreview = () => {
   const router = useRouter();
   const [pending, setPending] = React.useState(false);
-  const { adversary } = useAdversaryStore();
-  const { setPreviewStatblockRef } = useAdversaryActions();
+  const { adversary, userAdversary } = useAdversaryStore();
+  const { setPreviewStatblockRef, setUserAdversary } = useAdversaryActions();
   const { downloadStatblock, saveAdversaryPreview } = useAdversaryEffects();
 
   const ref = React.useRef<HTMLDivElement>(null);
@@ -63,6 +64,16 @@ export const AdversaryCreationPreview = () => {
           {pending && <Loader2 className='animate-spin' />}
           Save
         </SavePreviewButton>
+      </div>
+      <div className='flex w-full items-center justify-between rounded-md border p-3'>
+        <label htmlFor='adversary-public' className='text-sm font-medium'>Public Visibility</label>
+        <Switch
+          id='adversary-public'
+          checked={userAdversary?.public ?? true}
+          onCheckedChange={(checked) => {
+            setUserAdversary({ ...(userAdversary || ({} as UserAdversary)), public: checked });
+          }}
+        />
       </div>
     </div>
   );

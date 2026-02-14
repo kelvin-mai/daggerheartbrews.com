@@ -11,9 +11,48 @@ const downloadImage =
     const { name, type } = card;
     try {
       if (preview?.current) {
-        await toPng(preview.current, { cacheBust: true }).then((data) => {
+        // Wait a bit to ensure all images are loaded
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        await toPng(preview.current, { 
+          cacheBust: true, 
+          pixelRatio: 1,
+          includeQueryParams: true,
+          skipFonts: false,
+          skipAutoScale: false,
+          backgroundColor: '#ffffff'
+        }).then((data) => {
           const link = document.createElement('a');
           link.download = `daggerheart-${type}-${name}.png`;
+          link.href = data;
+          link.click();
+        });
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+const downloadCardBackImage =
+  (get: ZustandGet<CardStore>): CardEffects['downloadCardBackImage'] =>
+  async () => {
+    const { cardBackPreview, card } = get();
+    const { name, type } = card;
+    try {
+      if (cardBackPreview?.current) {
+        // Wait a bit to ensure all images are loaded
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        await toPng(cardBackPreview.current, {
+          cacheBust: true,
+          pixelRatio: 1,
+          includeQueryParams: true,
+          skipFonts: false,
+          skipAutoScale: false,
+          backgroundColor: '#ffffff'
+        }).then((data) => {
+          const link = document.createElement('a');
+          link.download = `daggerheart-${type}-${name}-back.png`;
           link.href = data;
           link.click();
         });
@@ -50,12 +89,18 @@ const loadOptions =
 const saveCardPreview =
   (get: ZustandGet<CardStore>): CardEffects['saveCardPreview'] =>
   async () => {
-    const { card, userCard } = get();
+    const { card, userCard, settings } = get();
+    // Include card back settings in the card data
+    const cardWithSettings = {
+      ...card,
+      cardBack: settings.cardBack,
+      customCardBackLogo: settings.customCardBackLogo,
+    };
     const res = await fetch(
       `/api/card-preview/${userCard?.cardPreviewId && card.id && userCard?.cardPreviewId === card.id ? card.id : ''}`,
       {
         method: 'POST',
-        body: JSON.stringify({ card, userCard }),
+        body: JSON.stringify({ card: cardWithSettings, userCard, public: typeof userCard?.public === 'boolean' ? userCard.public : undefined }),
       },
     );
     const data = await res.json();
@@ -69,6 +114,7 @@ export const createEffects = (
   get: ZustandGet<CardStore>,
 ) => ({
   downloadImage: downloadImage(get),
+  downloadCardBackImage: downloadCardBackImage(get),
   loadOptions: loadOptions(get),
   saveCardPreview: saveCardPreview(get),
 });

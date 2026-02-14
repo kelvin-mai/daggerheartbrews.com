@@ -4,18 +4,23 @@ export const Stress = ({ stress }: { stress?: number }) => {
       <div
         className='absolute'
         style={{
-          right: '24px',
-          top: '24px',
+          right: '53px',
+          top: '53px',
         }}
       >
         <img
           src='/assets/card/stress-cost-bg.webp'
-          style={{ height: '32px', width: '32px' }}
+          style={{ height: '70px', width: '70px' }}
         />
       </div>
       <div
-        className='absolute text-sm text-white'
-        style={{ right: '40px', top: '29px' }}
+        className='absolute text-white'
+        style={{ 
+          right: '88px', 
+          top: '65px',
+          fontSize: '30px',
+          fontWeight: 'bold'
+        }}
       >
         {stress}
       </div>

@@ -8,19 +8,19 @@ import { cn, getBrightness } from '@/lib/utils';
 const imgStyle = (type: CardType): React.CSSProperties => {
   switch (type) {
     case 'ancestry':
-      return { top: '-34px', height: '65px', objectFit: 'contain' };
+      return { top: '-75px', height: '143px', objectFit: 'contain' };
     case 'community':
-      return { top: '-76px', height: '80px' };
+      return { top: '-167px', height: '176px' };
     case 'equipment':
-      return { top: '-76px', height: '80px' };
+      return { top: '-167px', height: '176px' };
     case 'domain':
-      return { top: '-14px', height: '30px' };
+      return { top: '-31px', height: '66px' };
     case 'transformation':
-      return { top: '-24px', height: '30px' };
+      return { top: '-53px', height: '66px' };
     case 'class':
     case 'subclass':
     default:
-      return { top: '-14px', height: '30px' };
+      return { top: '-31px', height: '66px' };
   }
 };
 
@@ -28,40 +28,41 @@ const titleStyle = (type: CardType): React.CSSProperties => {
   switch (type) {
     case 'ancestry':
       return {
-        top: '10px',
-        right: '14px',
-        letterSpacing: '2px',
-        fontSize: '12px',
+        top: '14px',
+        right: '34px',
+        letterSpacing: '4px',
+        fontSize: '28px',
       };
     case 'community':
       return {
-        right: '32px',
-        top: '-32px',
-        letterSpacing: '1px',
-        fontSize: '12px',
+        right: '85px',
+        top: '-70px',
+        letterSpacing: '2px',
+        fontSize: '22px',
       };
     case 'equipment':
       return {
-        left: '34px',
-        top: '-32px',
-        letterSpacing: '1px',
-        fontSize: '12px',
+        left: '97px',
+        top: '-70px',
+        letterSpacing: '2px',
+        fontSize: '22px',
       };
     case 'transformation':
       return {
-        top: '-19px',
-        left: '22px',
-        letterSpacing: '1px',
-        fontSize: '11px',
+        top: '-47px',
+        left: '56px',
+        letterSpacing: '2px',
+        fontSize: '22px',
       };
     case 'domain':
     case 'class':
     case 'subclass':
       return {
         left: '50%',
-        top: '-6px',
+        top: '-17px',
         transform: 'translateX(-50%)',
         fontWeight: 700,
+        fontSize: '23px',
       };
   }
 };
@@ -92,9 +93,9 @@ export const Divider: React.FC<DivederProps> = ({ card }) => {
           style={{
             background,
             left: '50%',
-            top: '-12px',
-            height: '30px',
-            width: '300px',
+            top: '-26px',
+            height: '66px',
+            width: '660px',
             transform: 'translateX(-50%)',
           }}
         />
@@ -106,7 +107,7 @@ export const Divider: React.FC<DivederProps> = ({ card }) => {
       />
       <div
         className={cn(
-          'absolute z-10 text-xs tracking-[1px] uppercase',
+          'absolute z-10 tracking-[1px] uppercase',
           type === 'domain' &&
             dividerBadge &&
             getBrightness(domainPrimaryColor) < 128

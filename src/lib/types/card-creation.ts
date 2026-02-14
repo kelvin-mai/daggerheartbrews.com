@@ -42,6 +42,8 @@ export type CardSettings = {
   artist: boolean;
   credits: boolean;
   placeholderImage: boolean;
+  cardBack: 'default' | 'custom';
+  customCardBackLogo?: string;
 };
 
 export type CardDetails = {
@@ -71,4 +73,6 @@ export type CardDetails = {
   domainSecondary?: string;
   domainSecondaryColor?: string;
   domainSecondaryIcon?: string;
+  cardBack?: 'default' | 'custom';
+  customCardBackLogo?: string;
 };

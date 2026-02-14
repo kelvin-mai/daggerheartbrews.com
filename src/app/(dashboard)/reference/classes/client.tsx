@@ -18,7 +18,11 @@ export const CardClassPreview: React.FC<{ card: CardDetails }> = ({ card }) => {
   };
   return (
     <div className='flex flex-col items-center space-y-2'>
-      <CardPreview card={card} settings={initialSettings} />
+      <div className='flex justify-center overflow-hidden h-[472px]'>
+        <div className='scale-[0.45] origin-top'>
+          <CardPreview card={card} settings={initialSettings} />
+        </div>
+      </div>
       <div className='flex w-full gap-2'>
         <Button className='grow hover:cursor-pointer' asChild>
           <Link href={`/reference/classes/${card.name}`}>View Class</Link>

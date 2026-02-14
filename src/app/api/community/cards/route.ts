@@ -1,4 +1,4 @@
-import { and, desc, count, eq, inArray } from 'drizzle-orm';
+import { and, desc, count, eq, inArray, ilike } from 'drizzle-orm';
 import { NextResponse, type NextRequest } from 'next/server';
 
 import { db } from '@/lib/database';
@@ -15,6 +15,7 @@ export async function GET(request: NextRequest) {
       ? Number(searchParams.get('page-size'))
       : 10;
     const typeParam = searchParams.get('type');
+    const nameParam = searchParams.get('q');
     const types = typeParam
       ? typeParam
           .split(',')
@@ -27,7 +28,10 @@ export async function GET(request: NextRequest) {
     const typeFilter = types.length
       ? inArray(cardPreviews.type, types)
       : undefined;
-    const whereFilter = typeFilter ? and(baseFilter, typeFilter) : baseFilter;
+    const nameFilter = nameParam ? ilike(cardPreviews.name, `%${nameParam}%`) : undefined;
+    let whereFilter = baseFilter as any;
+    if (typeFilter) whereFilter = and(whereFilter, typeFilter);
+    if (nameFilter) whereFilter = and(whereFilter, nameFilter);
 
     // Count with the same filter conditions
     const [result] = await db

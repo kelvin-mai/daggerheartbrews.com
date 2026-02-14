@@ -44,6 +44,8 @@ export const cardPreviews = pgTable('card_previews', {
   domainSecondary: text('domain_secondary'),
   domainSecondaryColor: text('domain_secondary_color'),
   domainSecondaryIcon: text('domain_secondary_icon'),
+  cardBack: text('card_back').default('default'),
+  customCardBackLogo: text('custom_card_back_logo'),
 });
 
 export const adversaryPreviews = pgTable('adversary_previews', {

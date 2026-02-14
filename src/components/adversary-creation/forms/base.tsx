@@ -26,7 +26,7 @@ export const BaseForm = () => {
           <div className='w-full space-y-2'>
             <Label htmlFor='type'>Type</Label>
             <Select
-              value={type}
+              value={type ?? ''}
               onValueChange={(v) => setAdversaryDetails({ type: v })}
             >
               <SelectTrigger id='type' className='w-full capitalize'>
@@ -49,7 +49,7 @@ export const BaseForm = () => {
             id='name'
             type='text'
             placeholder='Adversary Name'
-            value={name}
+            value={name ?? ''}
             onChange={(e) => setAdversaryDetails({ name: e.target.value })}
           />
         </div>
@@ -58,7 +58,7 @@ export const BaseForm = () => {
             id='difficulty'
             className='grow'
             placeholder='Difficulty'
-            value={difficulty}
+            value={difficulty ?? ''}
             onChange={(e) =>
               setAdversaryDetails({ difficulty: e.target.value })
             }
@@ -92,7 +92,7 @@ export const BaseForm = () => {
           label='Short Description'
           type='text'
           placeholder='Short Description'
-          value={description}
+          value={description ?? ''}
           onChange={(e) => setAdversaryDetails({ description: e.target.value })}
         />
         <FormInput
@@ -100,7 +100,7 @@ export const BaseForm = () => {
           label={type === 'adversary' ? 'Motives & Tactics' : 'Impulses'}
           type='text'
           placeholder={type === 'adversary' ? 'Motives & Tactics' : 'Impulses'}
-          value={subDescription}
+          value={subDescription ?? ''}
           onChange={(e) =>
             setAdversaryDetails({ subDescription: e.target.value })
           }

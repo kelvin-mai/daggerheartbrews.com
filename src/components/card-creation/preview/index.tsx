@@ -21,8 +21,14 @@ import {
   Thresholds,
 } from './template/core';
 import { SettingsForm } from '../forms';
+import { Switch } from '@/components/ui/switch';
 
 type CardPreviewProps = React.ComponentProps<'div'> & {
+  card: CardDetails;
+  settings: CardSettings;
+};
+
+type CardBackPreviewProps = React.ComponentProps<'div'> & {
   card: CardDetails;
   settings: CardSettings;
 };
@@ -36,7 +42,7 @@ export const CardPreview: React.FC<CardPreviewProps> = ({
   return (
     <div
       className={cn(
-        'aspect-card w-[340px] overflow-hidden',
+        'aspect-card w-[750px] overflow-hidden',
         settings.border && 'rounded-lg border-2 border-amber-300 shadow',
         className,
       )}
@@ -56,36 +62,41 @@ export const CardPreview: React.FC<CardPreviewProps> = ({
               src={card.image}
             />
           ) : settings.placeholderImage ? (
-            <div className='flex h-[250px] w-full items-center justify-center'>
+            <div className='flex h-[550px] w-full items-center justify-center'>
               <DaggerheartBrewsIcon
-                style={{ height: '64px', width: '64px', color: '#737373' }}
+                style={{ height: '141px', width: '141px', color: '#737373' }}
               />
             </div>
           ) : null}
         </div>
-        <div className='flex-start absolute bottom-9 flex min-h-[200px] w-full flex-col items-center gap-1.5 bg-white'>
+        <div className='flex-start absolute bottom-20 flex min-h-[440px] w-full flex-col items-center gap-3 bg-white'>
           <Divider card={card} />
           <p
             className={cn(
-              'font-eveleth-clean z-20 w-full px-6 pt-4',
+              'font-eveleth-clean z-20 w-full px-13 pt-9',
               ['ancestry', 'community'].includes(card.type)
-                ? 'text-2xl'
-                : 'text-center text-base',
+                ? 'text-4xl'
+                : 'text-center',
             )}
+            style={{
+              fontSize: ['domain', 'class', 'subclass', 'equipment', 'transformation'].includes(card.type)
+                ? '24px' // ~30% larger than ~18px (text-lg)
+                : undefined,
+            }}
           >
             {card.name}
           </p>
           {['class', 'subclass', 'equipment'].includes(card.type) ? (
             <p
               className='font-semibold capitalize italic'
-              style={{ fontSize: '12px' }}
+              style={{ fontSize: '26px' }}
             >
               {card.subtitle}
             </p>
           ) : null}
           <div
-            className='z-20 w-full space-y-2 px-6 leading-none text-pretty'
-            style={{ fontSize: 12 }}
+            className='z-20 w-full space-y-4 px-13 leading-none text-pretty'
+            style={{ fontSize: 26 }}
             dangerouslySetInnerHTML={{ __html: card.text || '' }}
           />
           <Thresholds
@@ -94,32 +105,32 @@ export const CardPreview: React.FC<CardPreviewProps> = ({
           />
         </div>
         <div
-          className='absolute flex items-end gap-0.5 italic'
+          className='absolute flex items-end gap-1 italic'
           style={{
-            bottom: '8px',
-            left: '10px',
-            fontSize: '10px',
+            bottom: '18px',
+            left: '22px',
+            fontSize: '22px',
           }}
         >
           {settings.artist && (
             <>
               <Image
-                className='size-3.5'
+                className='size-8'
                 src='/assets/images/quill-icon.png'
                 alt='Artist Quill'
-                width={14}
-                height={14}
+                width={31}
+                height={31}
               />
               {card.artist}
             </>
           )}
         </div>
         <div
-          className='absolute flex items-end gap-0.5 italic'
+          className='absolute flex items-end gap-1 italic'
           style={{
-            bottom: '8px',
-            right: '10px',
-            fontSize: '8px',
+            bottom: '18px',
+            right: '22px',
+            fontSize: '18px',
             color: '#110f1c80',
           }}
         >
@@ -127,11 +138,11 @@ export const CardPreview: React.FC<CardPreviewProps> = ({
             <>
               {card.credits}
               <Image
-                className='size-5'
+                className='size-11'
                 src='/assets/images/dh-cgl-logo.png'
                 alt='Daggerheart Compatible Logo'
-                width={20}
-                height={20}
+                width={44}
+                height={44}
               />
             </>
           )}
@@ -141,10 +152,54 @@ export const CardPreview: React.FC<CardPreviewProps> = ({
   );
 };
 
+export const CardBackPreview = React.forwardRef<HTMLDivElement, CardBackPreviewProps>(({
+  className,
+  card,
+  settings,
+  ...props
+}, ref) => {
+  return (
+    <div
+      ref={ref}
+      className={cn(
+        'aspect-card w-[750px] overflow-hidden',
+        settings.border && 'rounded-lg border-2 border-amber-300 shadow',
+        className,
+      )}
+      {...props}
+    >
+      <div className='relative flex h-full flex-col bg-white text-black'>
+        {/* Background Image */}
+        <div className='relative h-full w-full'>
+          <Image
+            src={settings.cardBack === 'custom' ? '/assets/card/dh-card-back-2.png' : '/assets/card/dh-card-back-1.png'}
+            alt={`${card.name} card back`}
+            fill
+            className='object-cover'
+          />
+          
+          {/* Overlay Logo for Custom Card Back */}
+          {settings.cardBack === 'custom' && settings.customCardBackLogo && (
+            <div className='absolute inset-0 flex items-center justify-center'>
+              <div className='w-[290px] h-[290px] rounded-full overflow-hidden shadow-lg'>
+                <img
+                  src={settings.customCardBackLogo}
+                  alt='Custom back logo'
+                  className='h-full w-full object-contain'
+                />
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+});
+
 export const CardCreationPreview = () => {
   const router = useRouter();
-  const { card, settings } = useCardStore();
-  const { setPreviewRef } = useCardActions();
+  const { card, settings, userCard } = useCardStore();
+  const { setPreviewRef, setUserCard } = useCardActions();
   const { downloadImage, saveCardPreview } = useCardEffects();
   const [pending, setPending] = React.useState(false);
 
@@ -185,6 +240,26 @@ export const CardCreationPreview = () => {
           {pending && <Loader2 className='animate-spin' />}
           Save
         </SavePreviewButton>
+      </div>
+      <div className='flex w-full items-center justify-between rounded-md border p-3'>
+        <label htmlFor='card-public' className='text-sm font-medium'>Public Visibility</label>
+        <Switch
+          id='card-public'
+          checked={userCard?.public ?? true}
+          onCheckedChange={async (checked) => {
+            // Update local store so value is retained on save
+            setUserCard({ ...(userCard || ({} as UserCard)), public: checked });
+            // If editing existing, persist immediately
+            if (userCard?.id) {
+              try {
+                await fetch('/api/community/cards/visibility', {
+                  method: 'PUT',
+                  body: JSON.stringify({ public: checked, userCardId: userCard.id }),
+                });
+              } catch {}
+            }
+          }}
+        />
       </div>
       <SettingsForm />
     </div>

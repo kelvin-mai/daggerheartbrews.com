@@ -89,6 +89,11 @@ export const PersonalCard: React.FC<PersonalCardProps> = ({
     }
   };
   const deleteCard = async () => {
+    const confirmed = window.confirm(
+      `Are you sure you want to delete "${cardPreview.name || 'Untitled'}"? This action cannot be undone.`
+    );
+    if (!confirmed) return;
+    
     try {
       const res = await fetch(`/api/community/cards/${userCard.id}`, {
         method: 'DELETE',
@@ -97,11 +102,33 @@ export const PersonalCard: React.FC<PersonalCardProps> = ({
       if (!data.success) {
         throw Error('Something went wrong');
       }
-      toast.success('Success');
+      toast.success('Card deleted successfully');
     } catch (e) {
       toast.error('Something went wrong. Unable to delete card.');
     }
     router.refresh();
+  };
+  const cloneCard = async () => {
+    try {
+      const res = await fetch('/api/card-preview', {
+        method: 'POST',
+        body: JSON.stringify({
+          card: {
+            ...cardPreview,
+            id: undefined as unknown as string, // ensure new id server-side
+            name: `Clone of ${cardPreview.name || 'Untitled'}`,
+          },
+        }),
+      });
+      const data = await res.json();
+      if (!data.success) {
+        throw Error('Unable to clone card');
+      }
+      toast.success('Card cloned successfully');
+      router.refresh();
+    } catch (e) {
+      toast.error('Something went wrong. Unable to clone card.');
+    }
   };
   return (
     <div className='bg-card rounded-lg border p-4' {...props}>
@@ -136,12 +163,17 @@ export const PersonalCard: React.FC<PersonalCardProps> = ({
                   artist: true,
                   credits: true,
                   placeholderImage: true,
+                  cardBack: 'default',
+                  customCardBackLogo: undefined,
                 }}
               />
             </div>
           </ResponsiveDialog>
           <Button variant='secondary' onClick={handleTemplate}>
             Edit
+          </Button>
+          <Button variant='outline' onClick={cloneCard}>
+            Clone
           </Button>
           <Button variant='destructive' onClick={deleteCard}>
             Delete
@@ -197,7 +229,34 @@ export const PersonalAdversary: React.FC<PersonalAdversaryProps> = ({
       setVisibility(!nextVisibility);
     }
   };
+  const cloneAdversary = async () => {
+    try {
+      const res = await fetch('/api/adversary-preview', {
+        method: 'POST',
+        body: JSON.stringify({
+          adversary: {
+            ...adversaryPreview,
+            id: undefined as unknown as string,
+            name: `Clone of ${adversaryPreview.name || 'Untitled'}`,
+          },
+        }),
+      });
+      const data = await res.json();
+      if (!data.success) {
+        throw Error('Unable to clone adversary');
+      }
+      toast.success('Adversary cloned successfully');
+      router.refresh();
+    } catch (e) {
+      toast.error('Something went wrong. Unable to clone adversary.');
+    }
+  };
   const deleteAdversary = async () => {
+    const confirmed = window.confirm(
+      `Are you sure you want to delete "${adversaryPreview.name || 'Untitled'}"? This action cannot be undone.`
+    );
+    if (!confirmed) return;
+    
     try {
       const res = await fetch(`/api/community/adversary/${userAdversary.id}`, {
         method: 'DELETE',
@@ -206,7 +265,7 @@ export const PersonalAdversary: React.FC<PersonalAdversaryProps> = ({
       if (!data.success) {
         throw Error('Something went wrong');
       }
-      toast.success('Success');
+      toast.success('Adversary deleted successfully');
     } catch (e) {
       toast.error('Something went wrong. Unable to delete adversary.');
     }
@@ -242,6 +301,9 @@ export const PersonalAdversary: React.FC<PersonalAdversaryProps> = ({
           </ResponsiveDialog>
           <Button variant='secondary' onClick={handleTemplate}>
             Edit
+          </Button>
+          <Button variant='outline' onClick={cloneAdversary}>
+            Clone
           </Button>
           <Button variant='destructive' onClick={deleteAdversary}>
             Delete

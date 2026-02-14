@@ -73,6 +73,10 @@ export const nav: NavCategory[] = [
         name: 'Homebrew',
         url: '/profile/homebrew',
       },
+      {
+        name: 'Printing Studio',
+        url: '/profile/printing-studio',
+      },
     ],
   },
 ];

@@ -15,7 +15,7 @@ export async function POST(
 ) {
   try {
     const id = (await params).id;
-    const body: { adversary: AdversaryDetails; userAdversary?: UserAdversary } =
+    const body: { adversary: AdversaryDetails; userAdversary?: UserAdversary; public?: boolean } =
       await req.json();
     const session = await auth.api.getSession({
       headers: await headers(),

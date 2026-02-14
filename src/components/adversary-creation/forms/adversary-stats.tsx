@@ -47,7 +47,7 @@ export const AdversaryStatsForm = () => {
               ],
             },
           ]}
-          value={subtype}
+          value={subtype ?? ''}
           onChange={(v) => setAdversaryDetails({ subtype: v })}
         />
       </div>
@@ -57,7 +57,7 @@ export const AdversaryStatsForm = () => {
             id='hp'
             label='Hit Points'
             className='grow'
-            value={hp}
+            value={hp ?? ''}
             min={0}
             max={99}
             onChange={(e) =>
@@ -67,7 +67,7 @@ export const AdversaryStatsForm = () => {
           <FormInput
             id='stress'
             className='grow'
-            value={stress}
+            value={stress ?? ''}
             min={0}
             max={99}
             onChange={(e) =>
@@ -80,26 +80,26 @@ export const AdversaryStatsForm = () => {
             <Label>Thresholds</Label>
             <div className='flex gap-2'>
               <Input
-                value={thresholds[0]}
+                value={thresholds?.[0] ?? ''}
                 type='number'
                 placeholder='Major'
                 min={0}
                 max={99}
                 onChange={(e) =>
                   setAdversaryDetails({
-                    thresholds: [Number(e.target.value), thresholds[1]],
+                    thresholds: [Number(e.target.value), thresholds?.[1] ?? 0],
                   })
                 }
               />
               <Input
-                value={thresholds[1]}
+                value={thresholds?.[1] ?? ''}
                 type='number'
                 placeholder='Severe'
                 min={0}
                 max={99}
                 onChange={(e) =>
                   setAdversaryDetails({
-                    thresholds: [thresholds[0], Number(e.target.value)],
+                    thresholds: [thresholds?.[0] ?? 0, Number(e.target.value)],
                   })
                 }
               />
@@ -109,7 +109,7 @@ export const AdversaryStatsForm = () => {
         <FormInput
           id='experience'
           placeholder='Something Cool +2'
-          value={experience}
+          value={experience ?? ''}
           onChange={(e) => setAdversaryDetails({ experience: e.target.value })}
         />
         <div className='grid grid-cols-2 gap-2'>
@@ -118,7 +118,7 @@ export const AdversaryStatsForm = () => {
             label='Weapon Name'
             placeholder='Warhammer'
             type='text'
-            value={weapon}
+            value={weapon ?? ''}
             onChange={(e) => setAdversaryDetails({ weapon: e.target.value })}
           />
           <FormInput
@@ -126,7 +126,7 @@ export const AdversaryStatsForm = () => {
             label='Attack Bonus'
             placeholder='+2'
             type='text'
-            value={attack}
+            value={attack ?? ''}
             onChange={(e) => setAdversaryDetails({ attack: e.target.value })}
           />
         </div>
@@ -149,7 +149,7 @@ export const AdversaryStatsForm = () => {
                   ],
                 },
               ]}
-              value={distance}
+              value={distance ?? ''}
               onChange={(v) => setAdversaryDetails({ distance: v })}
             />
           </div>
@@ -157,7 +157,7 @@ export const AdversaryStatsForm = () => {
             id='damage-amount'
             label='Damage Amount'
             placeholder='2d12 + 3'
-            value={damageAmount}
+            value={damageAmount ?? ''}
             onChange={(e) =>
               setAdversaryDetails({ damageAmount: e.target.value })
             }
@@ -173,7 +173,7 @@ export const AdversaryStatsForm = () => {
                   options: ['physical', 'magical', 'tech'],
                 },
               ]}
-              value={damageType}
+              value={damageType ?? ''}
               onChange={(v) => setAdversaryDetails({ damageType: v })}
             />
           </div>

@@ -13,6 +13,8 @@ const initialState: CardState = {
     artist: true,
     credits: true,
     placeholderImage: true,
+    cardBack: 'default',
+    customCardBackLogo: undefined,
   },
   card: {
     name: '',
@@ -31,6 +33,8 @@ const initialState: CardState = {
     domainPrimaryColor: '#000000',
     domainSecondary: 'custom',
     domainSecondaryColor: '#000000',
+    cardBack: 'default',
+    customCardBackLogo: undefined,
   },
 };
 

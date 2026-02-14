@@ -38,6 +38,7 @@ export const CommunityAdversaries = () => {
   });
   const [selectedTiers, setSelectedTiers] = React.useState<number[]>([]);
   const [selectedRoles, setSelectedRoles] = React.useState<string[]>([]);
+  const [query, setQuery] = React.useState('');
   const predefinedRoles = [
     'bruiser',
     'horde',
@@ -56,17 +57,20 @@ export const CommunityAdversaries = () => {
     pageSize,
     tiers,
     roles,
+    q = '',
   }: {
     page: number;
     pageSize: number;
     tiers?: number[];
     roles?: string[];
+    q?: string;
   }) => {
     setLoading(true);
     const tierQuery = tiers && tiers.length > 0 ? `&tier=${tiers.join(',')}` : '';
     const rolesQuery = roles && roles.length > 0 ? `&role=${roles.join(',')}` : '';
+    const qQuery = q && q.length > 0 ? `&q=${encodeURIComponent(q)}` : '';
     const res = await fetch(
-      `/api/community/adversary?page=${page}&page-size=${pageSize}${tierQuery}${rolesQuery}`,
+      `/api/community/adversary?page=${page}&page-size=${pageSize}${tierQuery}${rolesQuery}${qQuery}`,
     );
     const data: ApiResponse<Data[], Meta> = await res.json();
     setAdversaries(data.data);
@@ -89,7 +93,7 @@ export const CommunityAdversaries = () => {
   }, [selectedTiers, selectedRoles]);
 
   React.useEffect(() => {
-    loadData({ page: 1, pageSize: 10, tiers: [], roles: [] });
+    loadData({ page: 1, pageSize: 10, tiers: [], roles: [], q: '' });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -198,6 +202,17 @@ export const CommunityAdversaries = () => {
             })}
           </DropdownMenuContent>
         </DropdownMenu>
+        <input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              loadData({ page: 1, pageSize: pagination.pageSize, tiers: selectedTiers, roles: selectedRoles, q: query });
+            }
+          }}
+          placeholder='Search by name'
+          className='h-9 w-64 rounded-md border px-3 text-sm'
+        />
       </div>
       {adversaries.map((adversary) => (
         <CommunityAdversary
@@ -218,6 +233,7 @@ export const CommunityAdversaries = () => {
               pageSize: pagination.pageSize,
               tiers: selectedTiers,
               roles: selectedRoles,
+              q: query,
             })
           }
           buttonProps={{ variant: 'ghost' }}
@@ -226,7 +242,7 @@ export const CommunityAdversaries = () => {
             pageSize={pagination.pageSize}
             total={pagination.total}
             onPageSize={(pageSize) =>
-              loadData({ page: 1, pageSize, tiers: selectedTiers, roles: selectedRoles })
+              loadData({ page: 1, pageSize, tiers: selectedTiers, roles: selectedRoles, q: query })
             }
             buttonProps={{ variant: 'ghost' }}
           />

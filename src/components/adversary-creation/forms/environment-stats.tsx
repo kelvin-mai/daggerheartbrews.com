@@ -24,7 +24,7 @@ export const EnvironmentStatsForm = () => {
               options: ['exploration', 'social', 'traversal', 'event'],
             },
           ]}
-          value={subtype}
+          value={subtype ?? ''}
           onChange={(v) => setAdversaryDetails({ subtype: v })}
         />
       </div>
@@ -33,7 +33,7 @@ export const EnvironmentStatsForm = () => {
           id='adversaries'
           label='Potential Adversaries'
           placeholder='Any'
-          value={potential}
+          value={potential ?? ''}
           onChange={(e) => setAdversaryDetails({ potential: e.target.value })}
         />
       </CollapsibleContent>

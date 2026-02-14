@@ -29,20 +29,24 @@ export const CommunityCards = () => {
     total: 100,
   });
   const [selectedTypes, setSelectedTypes] = React.useState<string[]>([]);
+  const [query, setQuery] = React.useState('');
 
   const loadData = async ({
     page,
     pageSize,
     types,
+    q = '',
   }: {
     page: number;
     pageSize: number;
     types?: string[];
+    q?: string;
   }) => {
     setLoading(true);
     const typeQuery = types && types.length > 0 ? `&type=${types.join(',')}` : '';
+    const qQuery = q && q.length > 0 ? `&q=${encodeURIComponent(q)}` : '';
     const res = await fetch(
-      `/api/community/cards?page=${page}&page-size=${pageSize}${typeQuery}`,
+      `/api/community/cards?page=${page}&page-size=${pageSize}${typeQuery}${qQuery}`,
     );
     const data: ApiResponse<Data[], Meta> = await res.json();
     setCards(data.data);
@@ -64,7 +68,7 @@ export const CommunityCards = () => {
   }, [selectedTypes]);
 
   React.useEffect(() => {
-    loadData({ page: 1, pageSize: 10, types: [] });
+    loadData({ page: 1, pageSize: 10, types: [], q: '' });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -123,6 +127,17 @@ export const CommunityCards = () => {
             })}
           </DropdownMenuContent>
         </DropdownMenu>
+        <input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              loadData({ page: 1, pageSize: pagination.pageSize, types: selectedTypes, q: query });
+            }
+          }}
+          placeholder='Search by name'
+          className='h-9 w-64 rounded-md border px-3 text-sm'
+        />
       </div>
       {cards.map((card) => (
         <CommunityCard
@@ -142,6 +157,7 @@ export const CommunityCards = () => {
               page,
               pageSize: pagination.pageSize,
               types: selectedTypes,
+              q: query,
             })
           }
           buttonProps={{ variant: 'ghost' }}
@@ -153,7 +169,8 @@ export const CommunityCards = () => {
               loadData({
                 page: 1,
                 pageSize,
-                types: selectedTypes,
+              types: selectedTypes,
+              q: query,
               })
             }
             buttonProps={{ variant: 'ghost' }}

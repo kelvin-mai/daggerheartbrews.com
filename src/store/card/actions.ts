@@ -65,8 +65,25 @@ const setCardTypeDefaults =
 
 const setCardDetails =
   (set: ZustandSet<CardState>): CardActions['setCardDetails'] =>
-  (details) =>
-    set((state) => ({ ...state, card: { ...state.card, ...details } }));
+  (details) => {
+    set((state) => {
+      // Filter out undefined values to prevent overwriting existing data
+      const filteredDetails = Object.fromEntries(
+        Object.entries(details).filter(([_, value]) => value !== undefined)
+      );
+      
+      return { 
+        ...state, 
+        card: { ...state.card, ...filteredDetails },
+        // Load card back settings from card data if available
+        settings: {
+          ...state.settings,
+          cardBack: details.cardBack || state.settings.cardBack || 'default',
+          customCardBackLogo: details.customCardBackLogo || state.settings.customCardBackLogo || undefined,
+        }
+      };
+    });
+  };
 
 const setUserCard =
   (set: ZustandSet<CardState>): CardActions['setUserCard'] =>
@@ -93,6 +110,8 @@ export const createActions = (
   setLoading: (loading: boolean) => set({ loading }),
   setPreviewRef: (ref: React.RefObject<HTMLDivElement | null>) =>
     set({ preview: ref }),
+  setCardBackPreviewRef: (ref: React.RefObject<HTMLDivElement | null>) =>
+    set({ cardBackPreview: ref }),
   setCardTypeDefaults: setCardTypeDefaults(set, get),
   setCardDetails: setCardDetails(set),
   setUserCard: setUserCard(set),

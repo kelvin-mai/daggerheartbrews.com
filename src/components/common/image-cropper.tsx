@@ -35,7 +35,7 @@ export const ImageCropperImage: React.FC<
     <Cropper.Image
       data-slot='cropper-image'
       className={cn(
-        'pointer-events-none h-full w-full object-cover',
+        'pointer-events-none h-full w-full object-contain',
         className,
       )}
       {...props}

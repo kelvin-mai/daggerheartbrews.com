@@ -1,6 +1,6 @@
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { eq } from 'drizzle-orm';
+import { eq, desc } from 'drizzle-orm';
 import { ChevronDown } from 'lucide-react';
 
 import type {
@@ -37,7 +37,8 @@ export default async function Page() {
     .select()
     .from(userCards)
     .leftJoin(cardPreviews, eq(userCards.cardPreviewId, cardPreviews.id))
-    .where(eq(userCards.userId, session.user.id));
+    .where(eq(userCards.userId, session.user.id))
+    .orderBy(desc(userCards.updatedAt), desc(userCards.createdAt));
 
   const adversaryData = await db
     .select()
@@ -46,7 +47,8 @@ export default async function Page() {
       adversaryPreviews,
       eq(userAdversaries.adversaryPreviewId, adversaryPreviews.id),
     )
-    .where(eq(userAdversaries.userId, session.user.id));
+    .where(eq(userAdversaries.userId, session.user.id))
+    .orderBy(desc(userAdversaries.updatedAt), desc(userAdversaries.createdAt));
   return (
     <div className='mb-4 space-y-4'>
       <Collapsible className='bg-card group/collapsible rounded-lg border px-4 py-2'>

@@ -45,6 +45,9 @@ import { Badge } from '../ui/badge';
 const AppSidebarFooter = () => {
   const { isMobile } = useSidebar();
   const { data } = useSession();
+  const [mounted, setMounted] = React.useState(false);
+  React.useEffect(() => setMounted(true), []);
+  const isAuthed = mounted && !!data?.user;
 
   const handleLogout = async () => {
     await logout({
@@ -63,25 +66,22 @@ const AppSidebarFooter = () => {
     <SidebarFooter>
       <SidebarMenu>
         <SidebarMenuItem>
-          {data?.user ? (
+          {isAuthed ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton size='lg'>
                   <Avatar className='size-8 rounded-lg'>
-                    <AvatarImage
-                      src={data.user.image ?? undefined}
-                      alt={data.user.name}
-                    />
+                    <AvatarImage src={data.user?.image ?? undefined} alt={data.user?.name || 'User'} />
                     <AvatarFallback className='uppercase'>
-                      {data.user.name.charAt(0) ?? '?'}
+                      {data.user?.name?.charAt(0) ?? '?'}
                     </AvatarFallback>
                   </Avatar>
                   <div className='grid flex-1 text-left text-sm leading-tight'>
                     <span className='truncate font-medium'>
-                      {data.user.name}
+                      {data.user?.name || ''}
                     </span>
                     <span className='text-muted-foreground truncate text-xs'>
-                      {data.user.email}
+                      {data.user?.email || ''}
                     </span>
                   </div>
                   <MoreVertical className='ml-auto size-4' />
@@ -96,20 +96,17 @@ const AppSidebarFooter = () => {
                 <DropdownMenuLabel>
                   <div className='flex items-center gap-2'>
                     <Avatar className='size-8 rounded-lg'>
-                      <AvatarImage
-                        src={data.user.image ?? undefined}
-                        alt={data.user.name}
-                      />
+                    <AvatarImage src={data.user?.image ?? undefined} alt={data.user?.name || 'User'} />
                       <AvatarFallback className='uppercase'>
-                        {data.user.name.charAt(0) ?? '?'}
+                        {data.user?.name?.charAt(0) ?? '?'}
                       </AvatarFallback>
                     </Avatar>
                     <div className='grid flex-1 text-left text-sm leading-tight'>
                       <span className='truncate font-medium'>
-                        {data.user.name}
+                      {data.user?.name || ''}
                       </span>
                       <span className='text-muted-foreground truncate text-xs'>
-                        {data.user.email}
+                      {data.user?.email || ''}
                       </span>
                     </div>
                   </div>
@@ -144,12 +141,15 @@ const AppSidebarFooter = () => {
 const AppSidebarContent = () => {
   const pathname = usePathname();
   const { data } = useSession();
+  const [mounted, setMounted] = React.useState(false);
+  React.useEffect(() => setMounted(true), []);
+  const isAuthed = mounted && !!data?.user;
   return (
     <SidebarContent>
       {nav
         .filter(
           (category) =>
-            !category.requireAuth || (category.requireAuth && data?.user),
+            !category.requireAuth || (category.requireAuth && isAuthed),
         )
         .map((category) => (
           <SidebarGroup key={category.name}>
@@ -201,7 +201,7 @@ type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {};
 
 export const AppSidebar: React.FC<AppSidebarProps> = ({ ...props }) => {
   return (
-    <Sidebar variant='inset' {...props}>
+    <Sidebar variant='inset' collapsible='icon' {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuButton size='lg' asChild>

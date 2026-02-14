@@ -67,17 +67,19 @@ export const FilteredBeastforms = ({
             .map((beastform) => (
               <motion.div
                 key={beastform.name}
-                className='break-inside-avoid'
+                className='break-inside-avoid flex justify-center'
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.15 }}
                 layout
               >
-                <CardDisplayPreview
-                  card={beastform}
-                  settings={initialSettings}
-                />
+                <div className='[&>div>div:first-child]:origin-top [&>div>div:first-child]:scale-[0.45] [&>div>div:first-child]:-mb-[578px] [&>div>button]:w-[340px] [&>div>button]:mx-auto [&>div>button]:mt-3'>
+                  <CardDisplayPreview
+                    card={beastform}
+                    settings={initialSettings}
+                  />
+                </div>
               </motion.div>
             ))}
         </AnimatePresence>

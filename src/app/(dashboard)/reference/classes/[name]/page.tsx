@@ -40,30 +40,34 @@ export default async function Page({ params }: PageProps) {
         {name}
       </h1>
       <div className='my-4 flex flex-col gap-4 lg:flex-row'>
-        <CardDisplayPreview
-          card={{
-            name,
-            type: 'class',
-            subtitle: 'Class Features',
-            image: `/assets/images/srd/class/${current.subclasses[0].image}`,
-            artist: current.subclasses[0].artist,
-            evasion: current.startEvasion,
-            domainPrimary: current.domains[0],
-            domainPrimaryColor: domainColor(current.domains[0]),
-            domainSecondary: current.domains[1],
-            domainSecondaryColor: domainColor(current.domains[1]),
-            text: current.features
-              .map(
-                (feat) => `
-              <p><strong><em>${feat.name}: </em></strong>${feat.description}</p>
-              ${feat.extra ? feat.extra : ''}
-              `,
-              )
-              .join(''),
-            credits: 'Daggerheart © Darrington Press 2025',
-          }}
-          settings={initialSettings}
-        />
+        <div className='flex justify-center overflow-hidden h-[472px]'>
+          <div className='scale-[0.45] origin-top'>
+            <CardDisplayPreview
+              card={{
+                name,
+                type: 'class',
+                subtitle: 'Class Features',
+                image: `/assets/images/srd/class/${current.subclasses[0].image}`,
+                artist: current.subclasses[0].artist,
+                evasion: current.startEvasion,
+                domainPrimary: current.domains[0],
+                domainPrimaryColor: domainColor(current.domains[0]),
+                domainSecondary: current.domains[1],
+                domainSecondaryColor: domainColor(current.domains[1]),
+                text: current.features
+                  .map(
+                    (feat) => `
+                  <p><strong><em>${feat.name}: </em></strong>${feat.description}</p>
+                  ${feat.extra ? feat.extra : ''}
+                  `,
+                  )
+                  .join(''),
+                credits: 'Daggerheart © Darrington Press 2025',
+              }}
+              settings={initialSettings}
+            />
+          </div>
+        </div>
         <div className='space-y-2'>
           <p className='text-muted-foreground'>{current.flavor}</p>
           <div className='bg-accent text-foreground border-accent-foreground border-t border-b p-4'>
@@ -128,82 +132,94 @@ export default async function Page({ params }: PageProps) {
             <p className='text-muted-foreground pl-2'>{sc.description}</p>
             <CollapsibleContent className='mt-2 space-y-2'>
               <div className='grid grid-cols-1 gap-2 lg:grid-cols-2 xl:grid-cols-3'>
-                <CardDisplayPreview
-                  card={{
-                    name: sc.name,
-                    type: 'subclass',
-                    subtype: current.name,
-                    subtitle: 'Foundation',
-                    image: `/assets/images/srd/class/${sc.image}`,
-                    artist: sc.artist,
-                    domainPrimary: current.domains[0],
-                    domainPrimaryColor: domainColor(current.domains[0]),
-                    domainSecondary: current.domains[1],
-                    domainSecondaryColor: domainColor(current.domains[1]),
-                    text: [
-                      ...(sc.trait
-                        ? [
-                            `<p style="text-align: center;"><strong>SPELLCAST: </strong> ${sc.trait.toUpperCase()}</p>`,
-                          ]
-                        : []),
-                      ...sc.foundation.map(
-                        (
-                          feat,
-                        ) => `<p><em><strong>${feat.name}: </strong></em>${feat.description}</p>
-                  ${feat.extra ? feat.extra : ''}`,
-                      ),
-                    ].join(''),
-                  }}
-                  settings={initialSettings}
-                />
+                <div className='flex justify-center overflow-hidden h-[472px]'>
+                  <div className='scale-[0.45] origin-top'>
+                    <CardDisplayPreview
+                      card={{
+                        name: sc.name,
+                        type: 'subclass',
+                        subtype: current.name,
+                        subtitle: 'Foundation',
+                        image: `/assets/images/srd/class/${sc.image}`,
+                        artist: sc.artist,
+                        domainPrimary: current.domains[0],
+                        domainPrimaryColor: domainColor(current.domains[0]),
+                        domainSecondary: current.domains[1],
+                        domainSecondaryColor: domainColor(current.domains[1]),
+                        text: [
+                          ...(sc.trait
+                            ? [
+                                `<p style="text-align: center;"><strong>SPELLCAST: </strong> ${sc.trait.toUpperCase()}</p>`,
+                              ]
+                            : []),
+                          ...sc.foundation.map(
+                            (
+                              feat,
+                            ) => `<p><em><strong>${feat.name}: </strong></em>${feat.description}</p>
+                      ${feat.extra ? feat.extra : ''}`,
+                          ),
+                        ].join(''),
+                      }}
+                      settings={initialSettings}
+                    />
+                  </div>
+                </div>
 
-                <CardDisplayPreview
-                  card={{
-                    name: sc.name,
-                    type: 'subclass',
-                    subtype: current.name,
-                    subtitle: 'Specialization',
-                    image: `/assets/images/srd/class/${sc.image}`,
-                    artist: sc.artist,
-                    domainPrimary: current.domains[0],
-                    domainPrimaryColor: domainColor(current.domains[0]),
-                    domainSecondary: current.domains[1],
-                    domainSecondaryColor: domainColor(current.domains[1]),
-                    text: sc.specialization
-                      .map(
-                        (
-                          feat,
-                        ) => `<p><em><strong>${feat.name}: </strong></em>${feat.description}</p>
-                  ${feat.extra ? feat.extra : ''}`,
-                      )
-                      .join(''),
-                  }}
-                  settings={initialSettings}
-                />
+                <div className='flex justify-center overflow-hidden h-[472px]'>
+                  <div className='scale-[0.45] origin-top'>
+                    <CardDisplayPreview
+                      card={{
+                        name: sc.name,
+                        type: 'subclass',
+                        subtype: current.name,
+                        subtitle: 'Specialization',
+                        image: `/assets/images/srd/class/${sc.image}`,
+                        artist: sc.artist,
+                        domainPrimary: current.domains[0],
+                        domainPrimaryColor: domainColor(current.domains[0]),
+                        domainSecondary: current.domains[1],
+                        domainSecondaryColor: domainColor(current.domains[1]),
+                        text: sc.specialization
+                          .map(
+                            (
+                              feat,
+                            ) => `<p><em><strong>${feat.name}: </strong></em>${feat.description}</p>
+                      ${feat.extra ? feat.extra : ''}`,
+                          )
+                          .join(''),
+                      }}
+                      settings={initialSettings}
+                    />
+                  </div>
+                </div>
 
-                <CardDisplayPreview
-                  card={{
-                    name: sc.name,
-                    type: 'subclass',
-                    subtype: current.name,
-                    subtitle: 'Mastery',
-                    image: `/assets/images/srd/class/${sc.image}`,
-                    artist: sc.artist,
-                    domainPrimary: current.domains[0],
-                    domainPrimaryColor: domainColor(current.domains[0]),
-                    domainSecondary: current.domains[1],
-                    domainSecondaryColor: domainColor(current.domains[1]),
-                    text: sc.mastery
-                      .map(
-                        (
-                          feat,
-                        ) => `<p><em><strong>${feat.name}: </strong></em>${feat.description}</p>
-                  ${feat.extra ? feat.extra : ''}`,
-                      )
-                      .join(''),
-                  }}
-                  settings={initialSettings}
-                />
+                <div className='flex justify-center overflow-hidden h-[472px]'>
+                  <div className='scale-[0.45] origin-top'>
+                    <CardDisplayPreview
+                      card={{
+                        name: sc.name,
+                        type: 'subclass',
+                        subtype: current.name,
+                        subtitle: 'Mastery',
+                        image: `/assets/images/srd/class/${sc.image}`,
+                        artist: sc.artist,
+                        domainPrimary: current.domains[0],
+                        domainPrimaryColor: domainColor(current.domains[0]),
+                        domainSecondary: current.domains[1],
+                        domainSecondaryColor: domainColor(current.domains[1]),
+                        text: sc.mastery
+                          .map(
+                            (
+                              feat,
+                            ) => `<p><em><strong>${feat.name}: </strong></em>${feat.description}</p>
+                      ${feat.extra ? feat.extra : ''}`,
+                          )
+                          .join(''),
+                      }}
+                      settings={initialSettings}
+                    />
+                  </div>
+                </div>
               </div>
               {sc.AdditoanlSection ? <sc.AdditoanlSection /> : null}
             </CollapsibleContent>

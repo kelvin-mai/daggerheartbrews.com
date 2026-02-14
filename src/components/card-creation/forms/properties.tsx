@@ -21,7 +21,7 @@ import {
 
 export const DomainPropertiesForm = () => {
   const {
-    card: { subtype, stress, level, domainPrimary, domainPrimaryColor },
+    card: { subtype, stress, level, domainPrimary, domainPrimaryColor, domainPrimaryIcon },
   } = useCardStore();
   const { domainColor, domainIncludes } = useCardComputed();
   const { setCardDetails } = useCardActions();
@@ -53,6 +53,7 @@ export const DomainPropertiesForm = () => {
             setCardDetails({ domainPrimaryColor: v, domainSecondaryColor: v })
           }
           onIconChange={(v) => setCardDetails({ domainPrimaryIcon: v })}
+          existingIcon={domainPrimaryIcon}
         />
         <CollapsibleContent className='flex gap-2'>
           <div className='w-full space-y-2'>
@@ -105,6 +106,8 @@ export const ClassPropertiesForm = () => {
       domainSecondary,
       domainPrimaryColor,
       domainSecondaryColor,
+      domainPrimaryIcon,
+      domainSecondaryIcon,
     },
   } = useCardStore();
   const { domainColor, domainIncludes, classColors, classDomains } =
@@ -223,6 +226,7 @@ export const ClassPropertiesForm = () => {
                       })
                 }
                 onIconChange={(v) => setCardDetails({ domainPrimaryIcon: v })}
+                existingIcon={domainPrimaryIcon}
               />
               <DomainSelect
                 id='domain'
@@ -242,6 +246,7 @@ export const ClassPropertiesForm = () => {
                     : setCardDetails({ domainSecondary: 'custom' })
                 }
                 onIconChange={(v) => setCardDetails({ domainSecondaryIcon: v })}
+                existingIcon={domainSecondaryIcon}
               />
             </>
           ) : null}
@@ -261,6 +266,8 @@ export const SubClassPropertiesForm = () => {
       domainSecondary,
       domainPrimaryColor,
       domainSecondaryColor,
+      domainPrimaryIcon,
+      domainSecondaryIcon,
     },
   } = useCardStore();
   const { classColors, classDomains, domainColor, domainIncludes } =
@@ -363,6 +370,7 @@ export const SubClassPropertiesForm = () => {
             }
             onColorChange={(v) => setCardDetails({ domainPrimaryColor: v })}
             onIconChange={(v) => setCardDetails({ domainPrimaryIcon: v })}
+            existingIcon={domainPrimaryIcon}
           />
           <DomainSelect
             id='domain'
@@ -380,6 +388,7 @@ export const SubClassPropertiesForm = () => {
             }
             onColorChange={(v) => setCardDetails({ domainSecondaryColor: v })}
             onIconChange={(v) => setCardDetails({ domainSecondaryIcon: v })}
+            existingIcon={domainSecondaryIcon}
           />
         </div>
       ) : null}

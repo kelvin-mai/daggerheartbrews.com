@@ -34,6 +34,7 @@ type DomainSelectProps = {
   color?: string;
   onColorChange: (value: string) => void;
   onIconChange: (value?: string) => void;
+  existingIcon?: string;
 };
 
 export const DomainSelect: React.FC<DomainSelectProps> = ({
@@ -45,6 +46,7 @@ export const DomainSelect: React.FC<DomainSelectProps> = ({
   color,
   onColorChange,
   onIconChange,
+  existingIcon,
 }) => {
   const [open, setOpen] = React.useState(false);
   const { domains } = useCardStore();
@@ -159,7 +161,7 @@ export const DomainSelect: React.FC<DomainSelectProps> = ({
       </Popover>
       {value === 'custom' && (
         <div className='flex gap-2'>
-          <CustomDomainLogo onChange={onIconChange} />
+          <CustomDomainLogo onChange={onIconChange} existingLogo={existingIcon} />
           <CustomDomainColor color={color} setColor={onColorChange} />
         </div>
       )}
@@ -167,21 +169,32 @@ export const DomainSelect: React.FC<DomainSelectProps> = ({
   );
 };
 
-const CustomDomainLogo: React.FC<{ onChange: (v?: string) => void }> = ({
+const CustomDomainLogo: React.FC<{ 
+  onChange: (v?: string) => void;
+  existingLogo?: string;
+}> = ({
   onChange,
+  existingLogo,
 }) => {
   const [{ files }, { removeFile, openFileDialog, getInputProps }] =
     useFileUpload({ accept: 'image/*' });
   const [file] = files;
+  const [existingLogoPreview, setExistingLogoPreview] = React.useState<string | null>(null);
+
   React.useEffect(() => {
-    if (onChange) {
-      if (file?.preview) {
-        fileToBase64(file.file as File).then((data) => onChange(data));
-      } else {
-        onChange(undefined);
-      }
+    if (onChange && file?.preview) {
+      fileToBase64(file.file as File).then((data) => onChange(data));
     }
   }, [file]);
+
+  // Load existing logo when editing a card
+  React.useEffect(() => {
+    if (existingLogo && !file) {
+      setExistingLogoPreview(existingLogo);
+    } else if (!existingLogo || file) {
+      setExistingLogoPreview(null);
+    }
+  }, [existingLogo, file]);
   return (
     <>
       {file ? (
@@ -206,6 +219,35 @@ const CustomDomainLogo: React.FC<{ onChange: (v?: string) => void }> = ({
             variant='ghost'
             onClick={() => removeFile(file.id)}
             aria-label='Remove file'
+          >
+            <X aria-hidden='true' />
+          </Button>
+        </div>
+      ) : existingLogoPreview ? (
+        <div className='dark:bg-input/30 flex grow items-center justify-between gap-2 rounded-md border bg-white p-2'>
+          <div className='flex items-center gap-4 overflow-hidden'>
+            <div className='bg-accent aspect-square shrink-0 rounded'>
+              <img
+                className='size-10 rounded-[inherit] object-cover'
+                src={existingLogoPreview}
+                alt='Existing logo'
+              />
+            </div>
+            <div>
+              <p className='truncate text-sm font-medium'>Existing logo</p>
+              <p className='text-muted-foreground text-sm'>
+                Previously uploaded
+              </p>
+            </div>
+          </div>
+          <Button
+            size='icon'
+            variant='ghost'
+            onClick={() => {
+              onChange(undefined);
+              setExistingLogoPreview(null);
+            }}
+            aria-label='Remove existing logo'
           >
             <X aria-hidden='true' />
           </Button>
