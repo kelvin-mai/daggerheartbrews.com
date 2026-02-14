@@ -2,7 +2,13 @@
 
 import * as React from 'react';
 
-import type { ApiResponse, CardDetails, User, UserCard } from '@/lib/types';
+import type {
+  ApiResponse,
+  CardDetails,
+  PaginationMeta,
+  User,
+  UserCard,
+} from '@/lib/types';
 import { Pagination, PaginationPageSizeDropdown } from '@/components/common';
 import { Skeleton } from '@/components/ui/skeleton';
 import { CommunityCard } from '@/components/post';
@@ -18,7 +24,6 @@ import {
 import { ChevronDown } from 'lucide-react';
 
 type Data = { userCard: UserCard; user: User; cardPreview: CardDetails };
-type Meta = { page: number; pageSize: number; total: number };
 
 export const CommunityCards = () => {
   const [loading, setLoading] = React.useState(false);
@@ -44,7 +49,7 @@ export const CommunityCards = () => {
     const res = await fetch(
       `/api/community/cards?page=${page}&page-size=${pageSize}${typeQuery}`,
     );
-    const data: ApiResponse<Data[], Meta> = await res.json();
+    const data: ApiResponse<Data[], PaginationMeta> = await res.json();
     setCards(data.data);
     setPagination({
       currentPage: data.meta.page,

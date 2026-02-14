@@ -3,6 +3,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 
 import type { AdversaryDetails, UserAdversary } from '@/lib/types';
 import { auth } from '@/lib/auth';
+import { formatAPIError } from '@/lib/utils';
 import {
   insertAdversary,
   limitAdversaryInserts,
@@ -35,7 +36,7 @@ export async function POST(
     return NextResponse.json(
       {
         success: false,
-        error: e,
+        error: formatAPIError(e),
       },
       {
         status: 500,

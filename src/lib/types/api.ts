@@ -7,3 +7,9 @@ export type ApiResponse<T = any, M = undefined> = {
   meta: M;
   errors?: ReturnType<typeof formatAPIError>;
 };
+
+export type PaginationMeta = {
+  page: number;
+  pageSize: number;
+  total: number;
+};

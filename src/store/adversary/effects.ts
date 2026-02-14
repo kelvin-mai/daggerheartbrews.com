@@ -1,5 +1,4 @@
-import { toPng } from '@jpinsonneau/html-to-image';
-
+import { downloadElementAsImage } from '@/lib/utils';
 import type { ZustandGet, ZustandSet } from '../types';
 import type { AdversaryEffects, AdversaryState, AdversaryStore } from './types';
 
@@ -12,13 +11,9 @@ export const createEffects = (
     const { name, type } = adversary;
     try {
       if (previewStatblock?.current) {
-        await toPng(previewStatblock.current, { cacheBust: true }).then(
-          (data) => {
-            const link = document.createElement('a');
-            link.download = `daggerheart-${type}-${name}.png`;
-            link.href = data;
-            link.click();
-          },
+        await downloadElementAsImage(
+          previewStatblock.current,
+          `daggerheart-${type}-${name}`,
         );
       }
     } catch (e) {

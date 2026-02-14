@@ -4,7 +4,7 @@ export type AdversaryState = {
   loading: boolean;
   userAdversary?: UserAdversary;
   adversary: AdversaryDetails;
-  previewStatblock?: React.RefObject<HTMLElement | null>;
+  previewStatblock?: React.RefObject<HTMLDivElement | null>;
 };
 
 export type AdversaryActions = {

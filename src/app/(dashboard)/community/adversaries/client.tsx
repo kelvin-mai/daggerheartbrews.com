@@ -5,6 +5,7 @@ import * as React from 'react';
 import type {
   AdversaryDetails,
   ApiResponse,
+  PaginationMeta,
   User,
   UserAdversary,
 } from '@/lib/types';
@@ -26,7 +27,6 @@ type Data = {
   user: User;
   adversaryPreview: AdversaryDetails;
 };
-type Meta = { page: number; pageSize: number; total: number };
 
 export const CommunityAdversaries = () => {
   const [loading, setLoading] = React.useState(false);
@@ -68,7 +68,7 @@ export const CommunityAdversaries = () => {
     const res = await fetch(
       `/api/community/adversary?page=${page}&page-size=${pageSize}${tierQuery}${rolesQuery}`,
     );
-    const data: ApiResponse<Data[], Meta> = await res.json();
+    const data: ApiResponse<Data[], PaginationMeta> = await res.json();
     setAdversaries(data.data);
     setPagination({
       currentPage: data.meta.page,

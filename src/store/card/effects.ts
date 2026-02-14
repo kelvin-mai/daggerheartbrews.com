@@ -1,6 +1,5 @@
-import { toPng } from '@jpinsonneau/html-to-image';
-
 import type { CardClassOption, CardDomainOption } from '@/lib/types';
+import { downloadElementAsImage } from '@/lib/utils';
 import type { ZustandGet, ZustandSet } from '../types';
 import type { CardEffects, CardState, CardStore } from './types';
 
@@ -11,12 +10,10 @@ const downloadImage =
     const { name, type } = card;
     try {
       if (preview?.current) {
-        await toPng(preview.current, { cacheBust: true }).then((data) => {
-          const link = document.createElement('a');
-          link.download = `daggerheart-${type}-${name}.png`;
-          link.href = data;
-          link.click();
-        });
+        await downloadElementAsImage(
+          preview.current,
+          `daggerheart-${type}-${name}`,
+        );
       }
     } catch (e) {
       console.error(e);

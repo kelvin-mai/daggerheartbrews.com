@@ -12,7 +12,7 @@ export type CardState = {
   settings: CardSettings;
   userCard?: UserCard;
   card: CardDetails;
-  preview?: React.RefObject<HTMLElement | null>;
+  preview?: React.RefObject<HTMLDivElement | null>;
   classes?: CardClassOption[];
   domains?: CardDomainOption[];
 };
