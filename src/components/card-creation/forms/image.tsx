@@ -64,22 +64,79 @@ const getCroppedImage = async (
   }
 };
 
+type ImageCropPreviewProps = {
+  src?: string;
+  name?: string;
+  subtitle: string;
+  onRemove: () => void;
+};
+
+const ImageCropPreview: React.FC<ImageCropPreviewProps> = ({
+  src,
+  name,
+  subtitle,
+  onRemove,
+}) => (
+  <div className='dark:bg-input/30 flex items-center justify-between gap-2 rounded-md border bg-white p-2'>
+    <div className='flex items-center gap-4 overflow-hidden'>
+      <div className='bg-accent aspect-square shrink-0 rounded'>
+        <img
+          className='size-10 rounded-[inherit] object-cover'
+          src={src}
+          alt={name}
+        />
+      </div>
+      <div>
+        <p className='truncate text-sm font-medium'>{name}</p>
+        <p className='text-muted-foreground text-sm'>{subtitle}</p>
+      </div>
+    </div>
+    <Button
+      size='icon'
+      variant='ghost'
+      onClick={onRemove}
+      aria-label='Remove image'
+    >
+      <X aria-hidden='true' />
+    </Button>
+  </div>
+);
+
 export const ImageForm = () => {
   const {
     card: { image },
   } = useCardStore();
   const { setCardDetails } = useCardActions();
-  const [{ files }, { removeFile, openFileDialog, getInputProps }] =
+  const [{ files }, { removeFile, openFileDialog, getInputProps, addFiles }] =
     useFileUpload({ accept: 'image/*' });
   const [file] = files;
+  const hasInitialized = React.useRef(false);
 
   React.useEffect(() => {
-    setCardDetails({ image: file?.preview || undefined });
+    if (image && !hasInitialized.current && files.length === 0) {
+      hasInitialized.current = true;
+      fetch(image)
+        .then((res) => res.blob())
+        .then((blob) => {
+          const file = new File([blob], 'card-image.png', {
+            type: 'image/png',
+          });
+          addFiles([file]);
+        })
+        .catch((err) => console.error('Failed to load image:', err));
+    }
+  }, [image, files.length, addFiles]);
+
+  React.useEffect(() => {
+    if (file?.preview) {
+      setCardDetails({ image: file.preview });
+    }
   }, [file]);
 
   const handleCropChange = async (area: Area | null) => {
-    if (area && file?.preview) {
-      const blob = await getCroppedImage(file.preview, area);
+    const src = file?.preview;
+    if (area && src) {
+      const blob = await getCroppedImage(src, area);
       if (blob) {
         const cropped = await fileToBase64(blob);
         if (image !== cropped) {
@@ -108,33 +165,15 @@ export const ImageForm = () => {
             tabIndex={-1}
           />
           {file ? (
-            <div className='dark:bg-input/30 flex items-center justify-between gap-2 rounded-md border bg-white p-2'>
-              <div className='flex items-center gap-4 overflow-hidden'>
-                <div className='bg-accent aspect-square shrink-0 rounded'>
-                  <img
-                    className='size-10 rounded-[inherit] object-cover'
-                    src={file.preview}
-                    alt={file.file.name}
-                  />
-                </div>
-                <div>
-                  <p className='truncate text-sm font-medium'>
-                    {file.file.name}
-                  </p>
-                  <p className='text-muted-foreground text-sm'>
-                    {formatBytes(file.file.size)}
-                  </p>
-                </div>
-              </div>
-              <Button
-                size='icon'
-                variant='ghost'
-                onClick={() => removeFile(file.id)}
-                aria-label='Remove file'
-              >
-                <X aria-hidden='true' />
-              </Button>
-            </div>
+            <ImageCropPreview
+              src={file.preview}
+              name={file.file.name}
+              subtitle={formatBytes(file.file.size)}
+              onRemove={() => {
+                removeFile(file.id);
+                setCardDetails({ image: '' });
+              }}
+            />
           ) : null}
         </div>
         <CollapsibleContent>
