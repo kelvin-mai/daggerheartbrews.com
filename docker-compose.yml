@@ -9,3 +9,8 @@ services:
     environment:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: brews
+    healthcheck:
+      test: ['CMD', 'pg_isready -U postgres']
+      interval: 10s
+      timeout: 5s
+      retries: 5
