@@ -49,7 +49,7 @@ const renderDomainIcon = (
   icon?: string,
 ) => {
   if (!check && icon) {
-    return <img src={icon} style={{ height: '32px', width: '32px' }} />;
+    return <img src={icon} style={{ height: '32px', width: '32px' }} alt='' />;
   }
 
   const Icon = getDomainIcon(domain);
@@ -96,6 +96,7 @@ export const Banner = ({
             height: '120px',
             width: '63px',
           }}
+          alt=''
         />
       </div>
 

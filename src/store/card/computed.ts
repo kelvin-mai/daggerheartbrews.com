@@ -4,7 +4,7 @@ import type { CardComputed, CardStore } from './types';
 export const createComputed = (get: ZustandGet<CardStore>): CardComputed => ({
   domainColor: (domain: string) => {
     const { domains } = get();
-    return domains?.find((d) => d.name === domain)?.color!;
+    return domains?.find((d) => d.name === domain)?.color ?? '';
   },
   domainIncludes: (domain: string) => {
     const { domains } = get();
@@ -14,8 +14,8 @@ export const createComputed = (get: ZustandGet<CardStore>): CardComputed => ({
     const { classes } = get();
     const selected = classes?.find((c) => c.name === className);
     return {
-      primary: selected?.domainPrimary!,
-      secondary: selected?.domainSecondary!,
+      primary: selected?.domainPrimary ?? '',
+      secondary: selected?.domainSecondary ?? '',
     };
   },
   classColors: (className: string) => {
@@ -25,8 +25,8 @@ export const createComputed = (get: ZustandGet<CardStore>): CardComputed => ({
     } = get();
     const selected = classes?.find((c) => c.name === className);
     return {
-      primary: domainColor(selected?.domainPrimary!),
-      secondary: domainColor(selected?.domainSecondary!),
+      primary: domainColor(selected?.domainPrimary ?? ''),
+      secondary: domainColor(selected?.domainSecondary ?? ''),
     };
   },
 });

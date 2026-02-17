@@ -11,6 +11,7 @@ export const Stress = ({ stress }: { stress?: number }) => {
         <img
           src='/assets/card/stress-cost-bg.webp'
           style={{ height: '32px', width: '32px' }}
+          alt=''
         />
       </div>
       <div

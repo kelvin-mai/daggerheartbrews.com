@@ -98,7 +98,7 @@ export const PersonalCard: React.FC<PersonalCardProps> = ({
         throw Error('Something went wrong');
       }
       toast.success('Success');
-    } catch (e) {
+    } catch {
       toast.error('Something went wrong. Unable to delete card.');
     }
     router.refresh();
@@ -207,7 +207,7 @@ export const PersonalAdversary: React.FC<PersonalAdversaryProps> = ({
         throw Error('Something went wrong');
       }
       toast.success('Success');
-    } catch (e) {
+    } catch {
       toast.error('Something went wrong. Unable to delete adversary.');
     }
     router.refresh();

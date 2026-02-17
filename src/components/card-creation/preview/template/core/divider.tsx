@@ -103,6 +103,7 @@ export const Divider: React.FC<DivederProps> = ({ card }) => {
         src={`/assets/card/divider-${type === 'subclass' ? 'class' : type}.webp`}
         className='absolute w-full'
         style={imgStyle(type)}
+        alt=''
       />
       <div
         className={cn(

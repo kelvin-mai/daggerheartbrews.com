@@ -54,6 +54,7 @@ export const CardPreview: React.FC<CardPreviewProps> = ({
             <img
               className='object-center-top -z-10 w-full object-cover'
               src={card.image}
+              alt='Card artwork'
             />
           ) : settings.placeholderImage ? (
             <div className='flex h-[250px] w-full items-center justify-center'>

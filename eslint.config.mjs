@@ -27,6 +27,18 @@ const eslintConfig = [
       ],
     },
   },
+  {
+    // Allow <img> in preview components (needed for canvas rendering)
+    files: [
+      'src/components/card-creation/preview/**/*.{ts,tsx}',
+      'src/components/adversary-creation/preview/**/*.{ts,tsx}',
+      'src/components/card-creation/forms/domain-select.tsx',
+      'src/components/card-creation/forms/image.tsx',
+    ],
+    rules: {
+      '@next/next/no-img-element': 'off',
+    },
+  },
 ];
 
 export default eslintConfig;

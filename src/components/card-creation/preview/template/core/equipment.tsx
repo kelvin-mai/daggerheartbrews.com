@@ -8,7 +8,7 @@ export const Equipment = () => {
     <>
       {tierEnabled && (
         <div className='absolute' style={{ left: '24px', top: '24px' }}>
-          <img className='size-10' src='/assets/card/level-bg.webp' />
+          <img className='size-10' src='/assets/card/level-bg.webp' alt='' />
           <div className='absolute inset-0 flex items-center justify-center'>
             <p
               className='z-10 font-bold text-black'
@@ -23,7 +23,7 @@ export const Equipment = () => {
       )}
       {armorEnabled && (
         <div className='absolute' style={{ right: '24px', top: '24px' }}>
-          <img className='size-10' src='/assets/card/dh-armor-bg.webp' />
+          <img className='size-10' src='/assets/card/dh-armor-bg.webp' alt='' />
           <div className='absolute inset-0 flex items-center justify-center'>
             <p
               className='z-10 font-bold text-black'
@@ -41,6 +41,7 @@ export const Equipment = () => {
           <img
             className='h-8'
             src={`/assets/card/dh-${hands === 2 ? 'two-hands' : 'one-hand'}.webp`}
+            alt=''
           />
         </div>
       )}
