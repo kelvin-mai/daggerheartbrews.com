@@ -21,6 +21,7 @@ A Next.js web application for creating and sharing homebrew content for the Dagg
 - **Authentication**: Better Auth
 - **State Management**: Zustand
 - **Email**: React Email with Resend
+- **Testing**: Vitest + React Testing Library (unit), Playwright (E2E)
 - **Deployment**: Vercel
 
 ## Getting Started
@@ -35,22 +36,26 @@ A Next.js web application for creating and sharing homebrew content for the Dagg
 ### Installation
 
 1. Clone the repository:
+
 ```bash
 git clone https://github.com/kelvin-mai/daggerheartbrews.com.git
 cd daggerheartbrews.com
 ```
 
 2. Install dependencies:
+
 ```bash
 npm install
 ```
 
 3. Set up environment variables:
+
 ```bash
 cp .env.example .env
 ```
 
 Edit `.env` with your credentials:
+
 - **DATABASE_URL**: PostgreSQL connection string
 - **BETTER_AUTH_SECRET**: Generate with `openssl rand -base64 32`
 - **BETTER_AUTH_URL**: Your app URL (http://localhost:3000 for dev)
@@ -59,6 +64,7 @@ Edit `.env` with your credentials:
 - **RESEND_API_KEY**: From [Resend](https://resend.com/api-keys)
 
 4. Generate and run database migrations:
+
 ```bash
 npm run db:generate
 ```
@@ -66,6 +72,7 @@ npm run db:generate
 Apply migrations manually by running the SQL files in the `sql/` directory against your database.
 
 5. Start the development server:
+
 ```bash
 npm run dev
 ```
@@ -83,7 +90,12 @@ npm start            # Start production server
 npm run lint         # Run ESLint
 npm run lint:fix     # Run ESLint with auto-fix
 npm run format       # Format code with Prettier
+npm run test         # Run unit tests with Vitest
+npm run test:e2e     # Run E2E tests with Playwright
+npm run test:e2e:ui  # Run E2E tests with Playwright UI
 ```
+
+For detailed testing guidance, see [docs/testing.md](docs/testing.md).
 
 ### Database
 
