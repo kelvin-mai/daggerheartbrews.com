@@ -9,6 +9,7 @@
     "start": "next start",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
+    "lint:staged": "lint-staged",
     "format": "prettier --write --cache './src/**/*.{ts,tsx,js,jsx,md,mdx,json}",
     "db:generate": "drizzle-kit generate",
     "migration:generate": "tsx ./scripts/generate-migration.ts",
@@ -96,7 +97,7 @@
   "lint-staged": {
     "*.{ts,tsx,js,jsx}": [
       "prettier --write --cache",
-      "eslint --fix"
+      "next lint --fix"
     ],
     "*.{json,md,mdx}": [
       "prettier --write --cache"

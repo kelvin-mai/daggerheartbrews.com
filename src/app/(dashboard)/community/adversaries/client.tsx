@@ -63,8 +63,10 @@ export const CommunityAdversaries = () => {
     roles?: string[];
   }) => {
     setLoading(true);
-    const tierQuery = tiers && tiers.length > 0 ? `&tier=${tiers.join(',')}` : '';
-    const rolesQuery = roles && roles.length > 0 ? `&role=${roles.join(',')}` : '';
+    const tierQuery =
+      tiers && tiers.length > 0 ? `&tier=${tiers.join(',')}` : '';
+    const rolesQuery =
+      roles && roles.length > 0 ? `&role=${roles.join(',')}` : '';
     const res = await fetch(
       `/api/community/adversary?page=${page}&page-size=${pageSize}${tierQuery}${rolesQuery}`,
     );
@@ -90,7 +92,6 @@ export const CommunityAdversaries = () => {
 
   React.useEffect(() => {
     loadData({ page: 1, pageSize: 10, tiers: [], roles: [] });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (loading) {
@@ -107,7 +108,7 @@ export const CommunityAdversaries = () => {
 
   return (
     <div className='mb-2 space-y-2'>
-      <div className='flex flex-col gap-2 items-start'>
+      <div className='flex flex-col items-start gap-2'>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant='outline' className='capitalize'>
@@ -149,7 +150,8 @@ export const CommunityAdversaries = () => {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant='outline' className='capitalize'>
-              {selectedRoles.length > 0 && selectedRoles.length < predefinedRoles.length
+              {selectedRoles.length > 0 &&
+              selectedRoles.length < predefinedRoles.length
                 ? `Role: ${selectedRoles.join(', ')}`
                 : 'Role: All'}
               <ChevronDown className='text-muted-foreground ml-2 size-4' />
@@ -226,7 +228,12 @@ export const CommunityAdversaries = () => {
             pageSize={pagination.pageSize}
             total={pagination.total}
             onPageSize={(pageSize) =>
-              loadData({ page: 1, pageSize, tiers: selectedTiers, roles: selectedRoles })
+              loadData({
+                page: 1,
+                pageSize,
+                tiers: selectedTiers,
+                roles: selectedRoles,
+              })
             }
             buttonProps={{ variant: 'ghost' }}
           />

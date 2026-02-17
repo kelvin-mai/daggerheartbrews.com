@@ -4,7 +4,7 @@ import type { AdversaryState, AdversaryStore } from './types';
 import { createActions } from './actions';
 import { createEffects } from './effects';
 
-const initialState: AdversaryState = {
+export const initialState: AdversaryState = {
   loading: true,
   adversary: {
     name: '',

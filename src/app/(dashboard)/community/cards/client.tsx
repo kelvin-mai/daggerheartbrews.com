@@ -45,7 +45,8 @@ export const CommunityCards = () => {
     types?: string[];
   }) => {
     setLoading(true);
-    const typeQuery = types && types.length > 0 ? `&type=${types.join(',')}` : '';
+    const typeQuery =
+      types && types.length > 0 ? `&type=${types.join(',')}` : '';
     const res = await fetch(
       `/api/community/cards?page=${page}&page-size=${pageSize}${typeQuery}`,
     );
@@ -70,7 +71,6 @@ export const CommunityCards = () => {
 
   React.useEffect(() => {
     loadData({ page: 1, pageSize: 10, types: [] });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (loading) {
@@ -91,7 +91,8 @@ export const CommunityCards = () => {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant='outline' className='capitalize'>
-              {selectedTypes.length > 0 && selectedTypes.length < cardTypes.length
+              {selectedTypes.length > 0 &&
+              selectedTypes.length < cardTypes.length
                 ? `Type: ${selectedTypes.join(', ')}`
                 : 'Type: All'}
               <ChevronDown className='text-muted-foreground ml-2 size-4' />
