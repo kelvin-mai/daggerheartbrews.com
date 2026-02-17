@@ -1,4 +1,5 @@
 import {
+  AdUnit,
   BuyMeCofffeeBanner,
   DCGLCompatibilityBanner,
   ThemeToggle,
@@ -29,6 +30,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <section className='container mb-4 space-y-2'>
           <DCGLCompatibilityBanner className='text-muted-foreground grid-cols-1 text-sm lg:grid-cols-2 dark:text-black' />
           <BuyMeCofffeeBanner />
+          <AdUnit slot='DASHBOARD_BOTTOM' format='auto' />
         </section>
         <Footer />
       </SidebarInset>

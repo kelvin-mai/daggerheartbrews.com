@@ -2,6 +2,7 @@ import Link from 'next/link';
 
 import Image from 'next/image';
 import {
+  AdUnit,
   BuyMeCofffeeBanner,
   DCGLCompatibilityBanner,
 } from '@/components/common';
@@ -59,6 +60,7 @@ export default async function Home() {
 
           <DCGLCompatibilityBanner className='text-black' />
           <BuyMeCofffeeBanner />
+          <AdUnit slot='HOME_BOTTOM' format='auto' />
         </div>
       </main>
 
