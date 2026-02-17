@@ -5,7 +5,7 @@ import { createActions } from './actions';
 import { createEffects } from './effects';
 import { createComputed } from './computed';
 
-const initialState: CardState = {
+export const initialState: CardState = {
   loading: true,
   settings: {
     border: true,
