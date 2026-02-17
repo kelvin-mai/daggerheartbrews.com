@@ -11,7 +11,8 @@
     "lint:fix": "next lint --fix",
     "format": "prettier --write --cache './src/**/*.{ts,tsx,js,jsx,md,mdx,json}",
     "db:generate": "drizzle-kit generate",
-    "migration:generate": "tsx ./scripts/generate-migration.ts"
+    "migration:generate": "tsx ./scripts/generate-migration.ts",
+    "prepare": "husky"
   },
   "dependencies": {
     "@jpinsonneau/html-to-image": "^1.11.13",
@@ -72,6 +73,8 @@
     "drizzle-kit": "^0.31.1",
     "eslint": "^9",
     "eslint-config-next": "15.3.2",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
     "prettier": "^3.5.3",
     "prettier-plugin-tailwindcss": "^0.6.11",
     "react-email": "^4.0.15",
@@ -80,5 +83,14 @@
     "tsx": "^4.19.4",
     "tw-animate-css": "^1.3.0",
     "typescript": "^5"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": [
+      "prettier --write --cache",
+      "eslint --fix"
+    ],
+    "*.{json,md,mdx}": [
+      "prettier --write --cache"
+    ]
   }
 }
