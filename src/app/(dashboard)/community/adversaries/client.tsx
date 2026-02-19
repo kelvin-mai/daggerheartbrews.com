@@ -108,7 +108,7 @@ export const CommunityAdversaries = () => {
 
   return (
     <div className='mb-2 space-y-2'>
-      <div className='flex flex-col items-start gap-2'>
+      <div className='flex flex-row items-start gap-2'>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant='outline' className='capitalize'>
