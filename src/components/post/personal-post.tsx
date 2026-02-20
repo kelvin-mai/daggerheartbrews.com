@@ -3,7 +3,14 @@
 import React from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { ImageIcon } from 'lucide-react';
+import {
+  Eye,
+  EyeOff,
+  ImageIcon,
+  MoreHorizontal,
+  Pencil,
+  Trash2,
+} from 'lucide-react';
 
 import type {
   AdversaryDetails,
@@ -16,39 +23,15 @@ import { Button } from '../ui/button';
 import { ResponsiveDialog } from '../common';
 import { CardPreview } from '../card-creation/preview';
 import { AdversaryPreviewStatblock } from '../adversary-creation/preview/statblock';
-import { Switch } from '../ui/switch';
-import { cn } from '@/lib/utils';
+import { Badge } from '../ui/badge';
 import { toast } from 'sonner';
-
-type VisibilityToggleProps = React.ComponentProps<'div'> & {
-  visiblility: boolean;
-  onVisibilityChange: (checked: boolean) => void;
-};
-
-const VisibilityToggle: React.FC<VisibilityToggleProps> = ({
-  className,
-  visiblility,
-  onVisibilityChange,
-  ...props
-}) => {
-  return (
-    <div
-      className={cn(
-        'bg-card flex items-center justify-between rounded-md border p-4',
-        className,
-      )}
-      {...props}
-    >
-      <div>
-        <p>Public Visibility</p>
-        <p className='text-muted-foreground'>
-          Mark this item as public to showcase to the community.
-        </p>
-      </div>
-      <Switch checked={visiblility} onCheckedChange={onVisibilityChange} />
-    </div>
-  );
-};
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '../ui/dropdown-menu';
 
 type PersonalCardProps = React.ComponentProps<'div'> & {
   cardPreview: CardDetails;
@@ -61,7 +44,7 @@ export const PersonalCard: React.FC<PersonalCardProps> = ({
   ...props
 }) => {
   const router = useRouter();
-  const [visiblility, setVisibility] = React.useState(userCard.public);
+  const [visibility, setVisibility] = React.useState(userCard.public);
   const { setUserCard, setCardDetails } = useCardActions();
   const handleTemplate = () => {
     setUserCard(userCard);
@@ -69,7 +52,7 @@ export const PersonalCard: React.FC<PersonalCardProps> = ({
     router.push('/card/create');
   };
   const updateVisibility = async () => {
-    const nextVisibility = !visiblility;
+    const nextVisibility = !visibility;
     try {
       setVisibility(nextVisibility);
       const res = await fetch(`/api/community/cards/${userCard.id}`, {
@@ -104,55 +87,88 @@ export const PersonalCard: React.FC<PersonalCardProps> = ({
     router.refresh();
   };
   return (
-    <div className='bg-card rounded-lg border p-4' {...props}>
-      <div className='flex items-start'>
-        <div className='flex items-center gap-4'>
-          {cardPreview.image ? (
-            <Image
-              src={cardPreview.image}
-              alt={`Preview image ${userCard.id}`}
-              className='overflow-hidden rounded'
-              width={32}
-              height={32}
-            />
-          ) : (
-            <ImageIcon className='text-muted-foreground size-8' />
-          )}
-          <div>
-            <p className='font-bold'>{cardPreview.name || 'Untitled'}</p>
-            <p className='text-muted-foreground text-sm'>
-              <span className='capitalize'>{cardPreview.type}</span>
-            </p>
-          </div>
-        </div>
-        <div className='ml-auto flex flex-col gap-2'>
-          <ResponsiveDialog label='Preview'>
-            <div className='flex items-center justify-center'>
-              <CardPreview
-                card={cardPreview}
-                settings={{
-                  border: true,
-                  boldRulesText: true,
-                  artist: true,
-                  credits: true,
-                  placeholderImage: true,
-                }}
-              />
-            </div>
-          </ResponsiveDialog>
-          <Button variant='secondary' onClick={handleTemplate}>
-            Edit
-          </Button>
-          <Button variant='destructive' onClick={deleteCard}>
-            Delete
-          </Button>
-        </div>
+    <div
+      className='group flex items-center gap-3 rounded-lg border bg-background p-3 transition-colors hover:bg-accent/30'
+      {...props}
+    >
+      <div className='flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-md bg-muted'>
+        {cardPreview.image ? (
+          <Image
+            src={cardPreview.image}
+            alt={`Preview image for ${cardPreview.name || 'card'}`}
+            className='size-10 object-cover'
+            width={40}
+            height={40}
+          />
+        ) : (
+          <ImageIcon className='text-muted-foreground size-5' />
+        )}
       </div>
-      <VisibilityToggle
-        className='mt-2'
-        visiblility={visiblility}
-        onVisibilityChange={updateVisibility}
-      />
+
+      <div className='min-w-0 flex-1'>
+        <div className='flex items-center gap-2'>
+          <p className='truncate font-medium'>
+            {cardPreview.name || 'Untitled'}
+          </p>
+          <Badge
+            variant={visibility ? 'default' : 'outline'}
+            className='shrink-0 text-[10px]'
+          >
+            {visibility ? 'Public' : 'Draft'}
+          </Badge>
+        </div>
+        <p className='text-muted-foreground text-sm capitalize'>
+          {cardPreview.type}
+        </p>
+      </div>
+
+      <div className='flex shrink-0 items-center gap-1'>
+        <ResponsiveDialog label='Preview' variant='ghost' size='sm'>
+          <div className='flex items-center justify-center'>
+            <CardPreview
+              card={cardPreview}
+              settings={{
+                border: true,
+                boldRulesText: true,
+                artist: true,
+                credits: true,
+                placeholderImage: true,
+              }}
+            />
+          </div>
+        </ResponsiveDialog>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant='ghost' size='sm' className='size-8 p-0'>
+              <MoreHorizontal className='size-4' />
+              <span className='sr-only'>More actions</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align='end'>
+            <DropdownMenuItem onClick={handleTemplate}>
+              <Pencil className='size-4' />
+              Edit
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={updateVisibility}>
+              {visibility ? (
+                <EyeOff className='size-4' />
+              ) : (
+                <Eye className='size-4' />
+              )}
+              {visibility ? 'Make Draft' : 'Make Public'}
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onClick={deleteCard}
+              className='text-destructive focus:text-destructive'
+            >
+              <Trash2 className='size-4' />
+              Delete
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
     </div>
   );
 };
@@ -167,7 +183,7 @@ export const PersonalAdversary: React.FC<PersonalAdversaryProps> = ({
   userAdversary,
   ...props
 }) => {
-  const [visiblility, setVisibility] = React.useState(userAdversary.public);
+  const [visibility, setVisibility] = React.useState(userAdversary.public);
   const { setAdversaryDetails, setUserAdversary } = useAdversaryActions();
   const router = useRouter();
   const handleTemplate = () => {
@@ -176,7 +192,7 @@ export const PersonalAdversary: React.FC<PersonalAdversaryProps> = ({
     router.push('/adversary/create');
   };
   const updateVisibility = async () => {
-    const nextVisibility = !visiblility;
+    const nextVisibility = !visibility;
     try {
       setVisibility(nextVisibility);
       const res = await fetch(`/api/community/adversary/${userAdversary.id}`, {
@@ -213,46 +229,79 @@ export const PersonalAdversary: React.FC<PersonalAdversaryProps> = ({
     router.refresh();
   };
   return (
-    <div className='bg-card rounded-lg border p-4' {...props}>
-      <div className='flex items-start'>
-        <div className='flex items-center gap-4'>
-          {adversaryPreview.image ? (
-            <Image
-              src={adversaryPreview.image}
-              alt={`Preview image ${userAdversary.id}`}
-              className='overflow-hidden rounded'
-              width={32}
-              height={32}
-            />
-          ) : (
-            <ImageIcon className='text-muted-foreground size-8' />
-          )}
-          <div>
-            <p className='font-bold'>{adversaryPreview.name || 'Untitled'}</p>
-            <p className='text-muted-foreground text-sm'>
-              <span className='capitalize'>{adversaryPreview.type}</span>
-            </p>
-          </div>
-        </div>
-        <div className='ml-auto flex flex-col gap-2'>
-          <ResponsiveDialog label='Preview'>
-            <div className='flex items-center justify-center'>
-              <AdversaryPreviewStatblock adversary={adversaryPreview} />
-            </div>
-          </ResponsiveDialog>
-          <Button variant='secondary' onClick={handleTemplate}>
-            Edit
-          </Button>
-          <Button variant='destructive' onClick={deleteAdversary}>
-            Delete
-          </Button>
-        </div>
+    <div
+      className='group flex items-center gap-3 rounded-lg border bg-background p-3 transition-colors hover:bg-accent/30'
+      {...props}
+    >
+      <div className='flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-md bg-muted'>
+        {adversaryPreview.image ? (
+          <Image
+            src={adversaryPreview.image}
+            alt={`Preview image for ${adversaryPreview.name || 'adversary'}`}
+            className='size-10 object-cover'
+            width={40}
+            height={40}
+          />
+        ) : (
+          <ImageIcon className='text-muted-foreground size-5' />
+        )}
       </div>
-      <VisibilityToggle
-        className='mt-2'
-        visiblility={visiblility}
-        onVisibilityChange={updateVisibility}
-      />
+
+      <div className='min-w-0 flex-1'>
+        <div className='flex items-center gap-2'>
+          <p className='truncate font-medium'>
+            {adversaryPreview.name || 'Untitled'}
+          </p>
+          <Badge
+            variant={visibility ? 'default' : 'outline'}
+            className='shrink-0 text-[10px]'
+          >
+            {visibility ? 'Public' : 'Draft'}
+          </Badge>
+        </div>
+        <p className='text-muted-foreground text-sm capitalize'>
+          {adversaryPreview.type}
+        </p>
+      </div>
+
+      <div className='flex shrink-0 items-center gap-1'>
+        <ResponsiveDialog label='Preview' variant='ghost' size='sm'>
+          <div className='flex items-center justify-center'>
+            <AdversaryPreviewStatblock adversary={adversaryPreview} />
+          </div>
+        </ResponsiveDialog>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant='ghost' size='sm' className='size-8 p-0'>
+              <MoreHorizontal className='size-4' />
+              <span className='sr-only'>More actions</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align='end'>
+            <DropdownMenuItem onClick={handleTemplate}>
+              <Pencil className='size-4' />
+              Edit
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={updateVisibility}>
+              {visibility ? (
+                <EyeOff className='size-4' />
+              ) : (
+                <Eye className='size-4' />
+              )}
+              {visibility ? 'Make Draft' : 'Make Public'}
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onClick={deleteAdversary}
+              className='text-destructive focus:text-destructive'
+            >
+              <Trash2 className='size-4' />
+              Delete
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
     </div>
   );
 };
