@@ -20,7 +20,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Skull } from 'lucide-react';
 
 type Data = {
   userAdversary: UserAdversary;
@@ -239,8 +239,17 @@ export const CommunityAdversaries = () => {
           />
         </Pagination>
       ) : (
-        <div className='bg-card text-muted-foreground rounded-lg border p-4'>
-          <p>There are currently no public cards. Please check back later.</p>
+        <div className='bg-card flex flex-col items-center gap-3 rounded-lg border py-12 text-center'>
+          <div className='flex size-12 items-center justify-center rounded-full bg-muted'>
+            <Skull className='text-muted-foreground size-6' />
+          </div>
+          <div>
+            <p className='font-medium'>No public adversaries yet</p>
+            <p className='text-muted-foreground text-sm'>
+              There are currently no public adversaries. Please check back
+              later.
+            </p>
+          </div>
         </div>
       )}
     </div>

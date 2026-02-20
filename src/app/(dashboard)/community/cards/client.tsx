@@ -21,7 +21,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Layers } from 'lucide-react';
 
 type Data = { userCard: UserCard; user: User; cardPreview: CardDetails };
 
@@ -166,8 +166,16 @@ export const CommunityCards = () => {
           />
         </Pagination>
       ) : (
-        <div className='bg-card text-muted-foreground rounded-lg border p-4'>
-          <p>There are currently no public cards. Please check back later.</p>
+        <div className='bg-card flex flex-col items-center gap-3 rounded-lg border py-12 text-center'>
+          <div className='flex size-12 items-center justify-center rounded-full bg-muted'>
+            <Layers className='text-muted-foreground size-6' />
+          </div>
+          <div>
+            <p className='font-medium'>No public cards yet</p>
+            <p className='text-muted-foreground text-sm'>
+              There are currently no public cards. Please check back later.
+            </p>
+          </div>
         </div>
       )}
     </div>
