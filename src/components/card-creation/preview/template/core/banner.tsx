@@ -49,11 +49,11 @@ const renderDomainIcon = (
   icon?: string,
 ) => {
   if (!check && icon) {
-    return <img src={icon} style={{ height: '32px', width: '32px' }} alt='' />;
+    return <img className='size-[9.41cqw]' src={icon} alt='' />;
   }
 
   const Icon = getDomainIcon(domain);
-  return <Icon style={{ height: '32px', width: '32px', color }} />;
+  return <Icon className='size-[9.41cqw]' style={{ color }} />;
 };
 
 export const Banner = ({
@@ -83,31 +83,19 @@ export const Banner = ({
   );
   return (
     <>
-      <div
-        className='absolute z-40'
-        style={{
-          top: '-4px',
-          left: '24px',
-        }}
-      >
+      <div className='absolute -top-[1.18cqw] left-[7.06cqw] z-40'>
         <img
+          className='h-[35.29cqw] w-[18.53cqw]'
           src='/assets/card/banner.webp'
-          style={{
-            height: '120px',
-            width: '63px',
-          }}
           alt=''
         />
       </div>
 
-      <div
-        className='absolute z-50'
-        style={{ transform: 'translateX(-50%)', left: '56px', top: '16px' }}
-      >
+      <div className='absolute top-[4.71cqw] left-[16.47cqw] z-50 -translate-x-1/2'>
         {type === 'domain' ? (
           <p
-            className='font-eveleth-clean'
-            style={{ fontSize: '26px', color: foregroundColor }}
+            className='font-eveleth-clean text-[7.65cqw]'
+            style={{ color: foregroundColor }}
           >
             {level}
           </p>
@@ -117,32 +105,21 @@ export const Banner = ({
         ) : null}
       </div>
 
-      <div
-        className='absolute z-50'
-        style={{ transform: 'translateX(-50%)', left: '56px', top: '54px' }}
-      >
+      <div className='absolute top-[15.88cqw] left-[16.47cqw] z-50 -translate-x-1/2'>
         {['class', 'subclass'].includes(type) ? SecondaryIcon : PrimaryIcon}
       </div>
 
       <div
-        className={cn('clip-card-banner-fg absolute z-30')}
-        style={{
-          left: '26px',
-          top: '-4px',
-          height: '120px',
-          width: '59px',
-          background: domainPrimaryColor,
-        }}
+        className={cn(
+          'clip-card-banner-fg absolute -top-[1.18cqw] left-[7.65cqw] z-30 h-[35.29cqw] w-[17.35cqw]',
+        )}
+        style={{ background: domainPrimaryColor }}
       />
       <div
-        className={cn('clip-card-banner-bg absolute z-20')}
-        style={{
-          left: '26px',
-          top: '-4px',
-          height: '120px',
-          width: '59px',
-          background: domainSecondaryColor,
-        }}
+        className={cn(
+          'clip-card-banner-bg absolute -top-[1.18cqw] left-[7.65cqw] z-20 h-[35.29cqw] w-[17.35cqw]',
+        )}
+        style={{ background: domainSecondaryColor }}
       />
     </>
   );

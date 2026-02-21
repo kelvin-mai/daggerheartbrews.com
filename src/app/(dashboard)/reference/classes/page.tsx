@@ -16,7 +16,7 @@ export default function Page() {
       <p className='text-muted-foreground'>
         Reference to classes available in the System Reference Document
       </p>
-      <div className='my-4 grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3'>
+      <div className='my-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
         {classes.map((cl) => (
           <CardClassPreview
             key={cl.name}

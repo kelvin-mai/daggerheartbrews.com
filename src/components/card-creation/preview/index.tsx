@@ -36,7 +36,7 @@ export const CardPreview: React.FC<CardPreviewProps> = ({
   return (
     <div
       className={cn(
-        'aspect-card w-[340px] overflow-hidden',
+        'aspect-card [container-type:inline-size] w-full overflow-hidden',
         settings.border && 'rounded-lg border-2 border-amber-300 shadow',
         className,
       )}
@@ -57,36 +57,30 @@ export const CardPreview: React.FC<CardPreviewProps> = ({
               alt='Card artwork'
             />
           ) : settings.placeholderImage ? (
-            <div className='flex h-[250px] w-full items-center justify-center'>
-              <DaggerheartBrewsIcon
-                style={{ height: '64px', width: '64px', color: '#737373' }}
-              />
+            <div className='flex h-[73.53cqw] w-full items-center justify-center'>
+              <DaggerheartBrewsIcon className='size-[18.82cqw] text-[#737373]' />
             </div>
           ) : null}
         </div>
-        <div className='flex-start absolute bottom-9 flex min-h-[200px] w-full flex-col items-center gap-1.5 bg-white'>
+        <div className='flex-start absolute bottom-[10.59cqw] flex min-h-[58.82cqw] w-full flex-col items-center gap-[1.76cqw] bg-white'>
           <Divider card={card} />
           <p
             className={cn(
-              'font-eveleth-clean z-20 w-full px-6 pt-4',
+              'font-eveleth-clean z-20 w-full px-[7.06cqw] pt-[4.71cqw]',
               ['ancestry', 'community'].includes(card.type)
-                ? 'text-2xl'
-                : 'text-center text-base',
+                ? 'text-[7.06cqw]'
+                : 'text-center text-[4.71cqw]',
             )}
           >
             {card.name}
           </p>
           {['class', 'subclass', 'equipment'].includes(card.type) ? (
-            <p
-              className='font-semibold capitalize italic'
-              style={{ fontSize: '12px' }}
-            >
+            <p className='text-[3.53cqw] font-semibold capitalize italic'>
               {card.subtitle}
             </p>
           ) : null}
           <div
-            className='z-20 w-full space-y-2 px-6 leading-none text-pretty'
-            style={{ fontSize: 12 }}
+            className='z-20 w-full space-y-[2.35cqw] px-[7.06cqw] text-[3.53cqw] leading-none text-pretty'
             dangerouslySetInnerHTML={{ __html: card.text || '' }}
           />
           <Thresholds
@@ -94,18 +88,11 @@ export const CardPreview: React.FC<CardPreviewProps> = ({
             thresholdsEnabled={card.thresholdsEnabled}
           />
         </div>
-        <div
-          className='absolute flex items-end gap-0.5 italic'
-          style={{
-            bottom: '8px',
-            left: '10px',
-            fontSize: '10px',
-          }}
-        >
+        <div className='absolute bottom-[2.35cqw] left-[2.94cqw] flex items-end gap-[0.59cqw] text-[2.94cqw] italic'>
           {settings.artist && (
             <>
               <Image
-                className='size-3.5'
+                className='size-[4.12cqw]'
                 src='/assets/images/quill-icon.png'
                 alt='Artist Quill'
                 width={14}
@@ -116,19 +103,14 @@ export const CardPreview: React.FC<CardPreviewProps> = ({
           )}
         </div>
         <div
-          className='absolute flex items-end gap-0.5 italic'
-          style={{
-            bottom: '8px',
-            right: '10px',
-            fontSize: '8px',
-            color: '#110f1c80',
-          }}
+          className='absolute right-[2.94cqw] bottom-[2.35cqw] flex items-end gap-[0.59cqw] text-[2.35cqw] italic'
+          style={{ color: '#110f1c80' }}
         >
           {settings.credits && (
             <>
               {card.credits}
               <Image
-                className='size-5'
+                className='size-[5.88cqw]'
                 src='/assets/images/dh-cgl-logo.png'
                 alt='Daggerheart Compatible Logo'
                 width={20}
@@ -171,7 +153,7 @@ export const CardCreationPreview = () => {
   };
 
   return (
-    <div className='flex flex-col items-center space-y-2'>
+    <div className='flex w-[340px] flex-col items-center space-y-2'>
       <CardPreview ref={ref} card={card} settings={settings} />
       <div className='flex w-full gap-2'>
         <Button className='grow' onClick={downloadImage}>

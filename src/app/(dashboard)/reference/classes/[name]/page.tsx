@@ -39,7 +39,7 @@ export default async function Page({ params }: PageProps) {
       <h1 className='font-eveleth-clean dark:text-primary-foreground text-2xl font-bold'>
         {name}
       </h1>
-      <div className='my-4 flex flex-col gap-4 lg:flex-row'>
+      <div className='my-4 flex flex-col gap-4 sm:grid sm:grid-cols-2 lg:grid-cols-[1fr_2fr]'>
         <CardDisplayPreview
           card={{
             name,

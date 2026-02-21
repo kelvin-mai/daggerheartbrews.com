@@ -5,64 +5,38 @@ import * as React from 'react';
 import type { CardDetails, CardType } from '@/lib/types';
 import { cn, getBrightness } from '@/lib/utils';
 
-const imgStyle = (type: CardType): React.CSSProperties => {
+const imgClasses = (type: CardType): string => {
   switch (type) {
     case 'ancestry':
-      return { top: '-34px', height: '65px', objectFit: 'contain' };
+      return '-top-[10cqw] h-[19.12cqw] object-contain';
     case 'community':
-      return { top: '-76px', height: '80px' };
     case 'equipment':
-      return { top: '-76px', height: '80px' };
+      return '-top-[22.35cqw] h-[23.53cqw]';
     case 'domain':
-      return { top: '-14px', height: '30px' };
+      return '-top-[4.12cqw] h-[8.82cqw]';
     case 'transformation':
-      return { top: '-24px', height: '30px' };
+      return '-top-[7.06cqw] h-[8.82cqw]';
     case 'class':
     case 'subclass':
     default:
-      return { top: '-14px', height: '30px' };
+      return '-top-[4.12cqw] h-[8.82cqw]';
   }
 };
 
-const titleStyle = (type: CardType): React.CSSProperties => {
+const titleClasses = (type: CardType): string => {
   switch (type) {
     case 'ancestry':
-      return {
-        top: '10px',
-        right: '14px',
-        letterSpacing: '2px',
-        fontSize: '12px',
-      };
+      return 'top-[2.94cqw] right-[4.12cqw] tracking-[0.59cqw] text-[3.53cqw]';
     case 'community':
-      return {
-        right: '32px',
-        top: '-32px',
-        letterSpacing: '1px',
-        fontSize: '12px',
-      };
+      return '-top-[9.41cqw] right-[9.41cqw] tracking-[0.29cqw] text-[3.53cqw]';
     case 'equipment':
-      return {
-        left: '34px',
-        top: '-32px',
-        letterSpacing: '1px',
-        fontSize: '12px',
-      };
+      return '-top-[9.41cqw] left-[10cqw] tracking-[0.29cqw] text-[3.53cqw]';
     case 'transformation':
-      return {
-        top: '-19px',
-        left: '22px',
-        letterSpacing: '1px',
-        fontSize: '11px',
-      };
+      return '-top-[5.59cqw] left-[6.47cqw] tracking-[0.29cqw] text-[3.24cqw]';
     case 'domain':
     case 'class':
     case 'subclass':
-      return {
-        left: '50%',
-        top: '-6px',
-        transform: 'translateX(-50%)',
-        fontWeight: 700,
-      };
+      return 'left-1/2 -top-[1.76cqw] -translate-x-1/2 font-bold text-[3.53cqw]';
   }
 };
 
@@ -88,26 +62,19 @@ export const Divider: React.FC<DivederProps> = ({ card }) => {
     <>
       {dividerBadge ? (
         <div
-          className={cn('clip-card-divider absolute')}
-          style={{
-            background,
-            left: '50%',
-            top: '-12px',
-            height: '30px',
-            width: '300px',
-            transform: 'translateX(-50%)',
-          }}
+          className='clip-card-divider absolute -top-[3.53cqw] left-1/2 h-[8.82cqw] w-[88.24cqw] -translate-x-1/2'
+          style={{ background }}
         />
       ) : null}
       <img
         src={`/assets/card/divider-${type === 'subclass' ? 'class' : type}.webp`}
-        className='absolute w-full'
-        style={imgStyle(type)}
+        className={cn('absolute w-full', imgClasses(type))}
         alt=''
       />
       <div
         className={cn(
-          'absolute z-10 text-xs tracking-[1px] uppercase',
+          'absolute z-10 uppercase',
+          titleClasses(type),
           type === 'domain' &&
             dividerBadge &&
             getBrightness(domainPrimaryColor) < 128
@@ -115,7 +82,6 @@ export const Divider: React.FC<DivederProps> = ({ card }) => {
             : 'text-black',
           ['class', 'subclass'].includes(type) && 'text-[#fef790]',
         )}
-        style={titleStyle(type)}
       >
         {subtypeText}
       </div>
