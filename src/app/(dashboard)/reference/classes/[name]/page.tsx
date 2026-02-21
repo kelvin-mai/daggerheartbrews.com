@@ -112,22 +112,22 @@ export default async function Page({ params }: PageProps) {
         {current.subclasses.map((sc) => (
           <Collapsible
             key={sc.name}
-            className='bg-card group/collapsible rounded-lg border px-4 py-2'
+            className='bg-card group/collapsible rounded-lg border'
             defaultOpen
           >
             <CollapsibleTrigger asChild>
-              <Button
-                variant='ghost'
-                className='font-eveleth-clean w-full items-center justify-between text-lg hover:cursor-pointer'
+              <button
+                type='button'
+                className='font-eveleth-clean hover:bg-accent/50 flex w-full cursor-pointer items-center gap-3 px-4 py-3 text-lg transition-colors'
               >
                 <Label>{sc.name}</Label>
-                <ChevronDown className='size-4 transition-transform group-data-[state=open]/collapsible:rotate-180' />
-                <span className='sr-only'>Toggle</span>
-              </Button>
+                <ChevronDown className='text-muted-foreground ml-auto size-4 transition-transform group-data-[state=open]/collapsible:rotate-180' />
+                <span className='sr-only'>Toggle subclass section</span>
+              </button>
             </CollapsibleTrigger>
-            <p className='text-muted-foreground pl-2'>{sc.description}</p>
-            <CollapsibleContent className='mt-2 space-y-2'>
-              <div className='grid grid-cols-1 gap-2 lg:grid-cols-2 xl:grid-cols-3'>
+            <p className='text-muted-foreground px-4 py-3'>{sc.description}</p>
+            <CollapsibleContent>
+              <div className='grid grid-cols-1 gap-2 border-t px-4 py-3 lg:grid-cols-2 xl:grid-cols-3'>
                 <CardDisplayPreview
                   card={{
                     name: sc.name,
