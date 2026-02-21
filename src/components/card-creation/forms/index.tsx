@@ -18,7 +18,7 @@ export const CardCreationForms = () => {
   const store = useCardStore();
   const {
     loading,
-    card: { type },
+    card: { type, id: cardId },
   } = store;
   const { loadOptions } = useCardEffects();
   React.useEffect(() => {
@@ -30,7 +30,7 @@ export const CardCreationForms = () => {
   return (
     <div className='grow space-y-2'>
       <BaseForm />
-      <ImageForm />
+      <ImageForm key={cardId ?? 'new'} />
       {type === 'equipment' && <EquipmentPropertiesForm />}
       {type === 'domain' && <DomainPropertiesForm />}
       {type === 'class' && <ClassPropertiesForm />}

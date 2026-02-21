@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -177,19 +178,14 @@ export const CardCreationPreview = () => {
 export const CardDisplayPreview: React.FC<
   CardPreviewProps & { userCard?: UserCard }
 > = ({ card, userCard, settings }) => {
-  const { setCardDetails, setUserCard } = useCardActions();
-  const router = useRouter();
-  const handleClick = () => {
-    setUserCard(userCard);
-    setCardDetails(card);
-    router.push('/card/create');
-  };
   return (
     <div className='flex flex-col items-center space-y-2'>
       <CardPreview card={card} settings={settings} />
-      <Button className='w-full' onClick={handleClick}>
-        Edit
-      </Button>
+      {userCard && (
+        <Button className='w-full' asChild>
+          <Link href={`/card/edit/${userCard.id}`}>Edit</Link>
+        </Button>
+      )}
     </div>
   );
 };

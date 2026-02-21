@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ImageIcon } from 'lucide-react';
 
@@ -11,7 +12,6 @@ import type {
   UserAdversary,
   UserCard,
 } from '@/lib/types';
-import { useAdversaryActions, useCardActions } from '@/store';
 import { Button } from '../ui/button';
 import { ResponsiveDialog } from '../common';
 import { CardPreview } from '../card-creation/preview';
@@ -62,12 +62,6 @@ export const PersonalCard: React.FC<PersonalCardProps> = ({
 }) => {
   const router = useRouter();
   const [visiblility, setVisibility] = React.useState(userCard.public);
-  const { setUserCard, setCardDetails } = useCardActions();
-  const handleTemplate = () => {
-    setUserCard(userCard);
-    setCardDetails(cardPreview);
-    router.push('/card/create');
-  };
   const updateVisibility = async () => {
     const nextVisibility = !visiblility;
     try {
@@ -140,8 +134,8 @@ export const PersonalCard: React.FC<PersonalCardProps> = ({
               />
             </div>
           </ResponsiveDialog>
-          <Button variant='secondary' onClick={handleTemplate}>
-            Edit
+          <Button variant='secondary' asChild>
+            <Link href={`/card/edit/${userCard.id}`}>Edit</Link>
           </Button>
           <Button variant='destructive' onClick={deleteCard}>
             Delete
@@ -168,13 +162,7 @@ export const PersonalAdversary: React.FC<PersonalAdversaryProps> = ({
   ...props
 }) => {
   const [visiblility, setVisibility] = React.useState(userAdversary.public);
-  const { setAdversaryDetails, setUserAdversary } = useAdversaryActions();
   const router = useRouter();
-  const handleTemplate = () => {
-    setUserAdversary(userAdversary);
-    setAdversaryDetails(adversaryPreview);
-    router.push('/adversary/create');
-  };
   const updateVisibility = async () => {
     const nextVisibility = !visiblility;
     try {
@@ -240,8 +228,8 @@ export const PersonalAdversary: React.FC<PersonalAdversaryProps> = ({
               <AdversaryPreviewStatblock adversary={adversaryPreview} />
             </div>
           </ResponsiveDialog>
-          <Button variant='secondary' onClick={handleTemplate}>
-            Edit
+          <Button variant='secondary' asChild>
+            <Link href={`/adversary/edit/${userAdversary.id}`}>Edit</Link>
           </Button>
           <Button variant='destructive' onClick={deleteAdversary}>
             Delete

@@ -1,5 +1,6 @@
 import { CardCreationForms } from '@/components/card-creation/forms';
 import { CardCreationPreview } from '@/components/card-creation/preview';
+import { CardCreateInitializer } from './initializer';
 
 export const metadata = {
   title: 'Create Card',
@@ -9,6 +10,7 @@ export const metadata = {
 export default function Page() {
   return (
     <>
+      <CardCreateInitializer />
       <h1 className='font-eveleth-clean dark:text-primary-foreground text-2xl font-bold'>
         Create a card
       </h1>

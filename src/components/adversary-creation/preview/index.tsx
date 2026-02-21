@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -76,18 +77,11 @@ type AdversaryDisplayPreviewProps = {
 export const AdversaryDisplayPreview: React.FC<
   AdversaryDisplayPreviewProps
 > = ({ adversary, userAdversary }) => {
-  const { setAdversaryDetails, setUserAdversary } = useAdversaryActions();
-  const router = useRouter();
-  const handleClick = () => {
-    setAdversaryDetails(adversary);
-    setUserAdversary(userAdversary);
-    router.push('/adversary/create');
-  };
   return (
     <div className='flex flex-col items-center space-y-2'>
       <AdversaryPreviewStatblock adversary={adversary} />
-      <Button className='w-full' onClick={handleClick}>
-        Edit
+      <Button className='w-full' asChild>
+        <Link href={`/adversary/edit/${userAdversary.id}`}>Edit</Link>
       </Button>
     </div>
   );
