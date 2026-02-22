@@ -127,7 +127,7 @@ export default async function Page({ params }: PageProps) {
             </CollapsibleTrigger>
             <p className='text-muted-foreground px-4 py-3'>{sc.description}</p>
             <CollapsibleContent>
-              <div className='grid grid-cols-1 gap-2 border-t px-4 py-3 lg:grid-cols-2 xl:grid-cols-3'>
+              <div className='grid grid-cols-1 gap-2 border-t px-4 py-3 lg:grid-cols-3'>
                 <CardDisplayPreview
                   card={{
                     name: sc.name,

@@ -52,12 +52,13 @@ export const nav: NavCategory[] = [
         url: '/reference/classes',
       },
       {
-        name: 'Environments',
-        url: '/reference/environments',
-      },
-      {
         name: 'Beastforms',
         url: '/reference/beastforms',
+      },
+      { type: 'divider' as const },
+      {
+        name: 'Environments',
+        url: '/reference/environments',
       },
     ],
   },

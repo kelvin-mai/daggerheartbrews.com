@@ -27,6 +27,7 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
+  SidebarSeparator,
   useSidebar,
 } from '../ui/sidebar';
 import {
@@ -159,7 +160,8 @@ const AppSidebarContent = () => {
                   <CollapsibleTrigger asChild>
                     <SidebarMenuButton
                       isActive={category.children
-                        ?.map((item) => item.url)
+                        ?.filter((item) => item.type !== 'divider')
+                        .map((item) => item.url)
                         .includes(pathname)}
                     >
                       {category.name}
@@ -172,21 +174,27 @@ const AppSidebarContent = () => {
                 </SidebarMenuItem>
                 <CollapsibleContent>
                   <SidebarMenuSub>
-                    {category.children?.map((item) => (
-                      <SidebarMenuSubItem key={item.name}>
-                        <SidebarMenuSubButton
-                          asChild
-                          isActive={pathname === item.url}
-                        >
-                          <Link href={item.url}>
-                            {item.name}
-                            {item.badge && (
-                              <Badge className='capitalize'>{item.badge}</Badge>
-                            )}
-                          </Link>
-                        </SidebarMenuSubButton>
-                      </SidebarMenuSubItem>
-                    ))}
+                    {category.children?.map((item, index) =>
+                      item.type === 'divider' ? (
+                        <SidebarSeparator key={index} className='mx-0 my-1' />
+                      ) : (
+                        <SidebarMenuSubItem key={item.name}>
+                          <SidebarMenuSubButton
+                            asChild
+                            isActive={pathname === item.url}
+                          >
+                            <Link href={item.url}>
+                              {item.name}
+                              {item.badge && (
+                                <Badge className='capitalize'>
+                                  {item.badge}
+                                </Badge>
+                              )}
+                            </Link>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                      ),
+                    )}
                   </SidebarMenuSub>
                 </CollapsibleContent>
               </Collapsible>

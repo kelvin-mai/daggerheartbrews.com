@@ -12,7 +12,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
     ...nav
       .flatMap((category) => category.children)
-      .filter((i) => i !== undefined)
+      .filter((i) => i !== undefined && i.type !== 'divider')
       .map((item) => ({
         url: url(item.url),
         lastModified: new Date(),
