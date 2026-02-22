@@ -7,10 +7,13 @@ export const metadata = {
   description: 'Create your very own Daggerheart Adversary or Environment!',
 };
 
-export default function Page() {
+type Props = { searchParams: Promise<{ template?: string }> };
+
+export default async function Page({ searchParams }: Props) {
+  const { template } = await searchParams;
   return (
     <>
-      <AdversaryCreateInitializer />
+      <AdversaryCreateInitializer isTemplate={template === 'true'} />
       <h1 className='font-eveleth-clean dark:text-primary-foreground text-2xl font-bold'>
         Create an Adversary
       </h1>

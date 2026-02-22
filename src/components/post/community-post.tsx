@@ -30,12 +30,11 @@ export const CommunityCard: React.FC<CommunityCardProps> = ({
   userCard,
   ...props
 }) => {
-  const { setCardDetails, setUserCard } = useCardActions();
+  const { setCardDetails } = useCardActions();
   const router = useRouter();
   const handleTemplate = () => {
-    setUserCard(userCard);
     setCardDetails(cardPreview);
-    router.push('/card/create');
+    router.push('/card/create?template=true');
   };
   return (
     <div className='bg-card flex items-start rounded-lg border p-4' {...props}>
@@ -94,12 +93,11 @@ export const CommunityAdversary: React.FC<CommunityAdversaryProps> = ({
   userAdversary,
   ...props
 }) => {
-  const { setAdversaryDetails, setUserAdversary } = useAdversaryActions();
+  const { setAdversaryDetails } = useAdversaryActions();
   const router = useRouter();
   const handleTemplate = () => {
-    setUserAdversary(userAdversary);
     setAdversaryDetails(adversaryPreview);
-    router.push('/adversary/create');
+    router.push('/adversary/create?template=true');
   };
   return (
     <div className='bg-card flex items-start rounded-lg border p-4' {...props}>

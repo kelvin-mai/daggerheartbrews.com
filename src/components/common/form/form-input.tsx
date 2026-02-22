@@ -6,13 +6,13 @@ import { cn } from '@/lib/utils';
 
 export const FormInput: React.FC<
   React.ComponentProps<'input'> & { id: string; label?: string }
-> = ({ id, label, className, ...props }) => {
+> = ({ id, label, className, value, ...props }) => {
   return (
     <div className={cn('space-y-2', className)}>
       <Label htmlFor={id}>
         {label || <span className='capitalize'>{id}</span>}
       </Label>
-      <Input id={id} {...props} />
+      <Input id={id} value={value || ''} {...props} />
     </div>
   );
 };
