@@ -4,11 +4,11 @@
   "license": "MIT",
   "homepage": "https://daggerheartbrews.com",
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint --dir src --dir test",
-    "lint:fix": "next lint --fix --dir src --dir test",
+    "lint": "eslint src test",
+    "lint:fix": "eslint --fix src test",
     "lint:staged": "lint-staged",
     "format": "prettier --write --cache './src/**/*.{ts,tsx,js,jsx,md,mdx,json}",
     "db:generate": "drizzle-kit generate",
@@ -52,14 +52,14 @@
     "drizzle-orm": "^0.44.1",
     "lucide-react": "^0.511.0",
     "motion": "^12.16.0",
-    "next": "15.3.8",
+    "next": "16.1.6",
     "next-themes": "^0.4.6",
     "nodemailer": "^7.0.3",
     "pg": "^8.16.0",
     "postgres": "^3.4.7",
-    "react": "link:@vercel/analytics/react",
+    "react": "19.2.4",
     "react-colorful": "^5.6.1",
-    "react-dom": "^19.0.0",
+    "react-dom": "19.2.4",
     "resend": "^4.5.1",
     "sonner": "^2.0.3",
     "tailwind-merge": "^3.3.0",
@@ -68,7 +68,6 @@
     "zustand": "^5.0.5"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3",
     "@playwright/test": "^1.58.2",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^6.9.1",
@@ -77,14 +76,14 @@
     "@types/node": "^20",
     "@types/nodemailer": "^6.4.17",
     "@types/pg": "^8.15.2",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
     "@types/sanitize-html": "^2.16.0",
     "@vitejs/plugin-react": "^5.1.4",
     "@vitest/coverage-v8": "4.0.18",
     "drizzle-kit": "^0.31.1",
     "eslint": "^9",
-    "eslint-config-next": "15.3.2",
+    "eslint-config-next": "16.1.6",
     "husky": "^9.1.7",
     "jsdom": "^28.1.0",
     "lint-staged": "^16.2.7",
@@ -101,10 +100,16 @@
   "lint-staged": {
     "*.{ts,tsx,js,jsx}": [
       "prettier --write --cache",
-      "next lint --fix"
+      "eslint --fix"
     ],
     "*.{json,md,mdx}": [
       "prettier --write --cache"
     ]
+  },
+  "pnpm": {
+    "overrides": {
+      "@types/react": "19.2.14",
+      "@types/react-dom": "19.2.3"
+    }
   }
 }

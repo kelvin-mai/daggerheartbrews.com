@@ -2,7 +2,7 @@ import path from 'path';
 
 const buildEslintCommand = (filenames) => {
   const files = filenames.map((f) => path.relative(process.cwd(), f));
-  return `next lint --fix --file ${files.join(' --file ')}`;
+  return `eslint --fix ${files.join(' ')}`;
 };
 
 export default {
