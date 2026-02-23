@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 
 import type {
   ApiResponse,
@@ -25,55 +26,38 @@ import { ChevronDown } from 'lucide-react';
 
 type Data = { userCard: UserCard; user: User; cardPreview: CardDetails };
 
+async function fetchCards({
+  page,
+  pageSize,
+  types,
+}: {
+  page: number;
+  pageSize: number;
+  types: string[];
+}): Promise<ApiResponse<Data[], PaginationMeta>> {
+  const typeQuery = types.length > 0 ? `&type=${types.join(',')}` : '';
+  const res = await fetch(
+    `/api/community/cards?page=${page}&page-size=${pageSize}${typeQuery}`,
+  );
+  return res.json();
+}
+
 export const CommunityCards = () => {
-  const [loading, setLoading] = React.useState(false);
-  const [cards, setCards] = React.useState<Data[]>([]);
-  const [pagination, setPagination] = React.useState({
-    currentPage: 1,
-    pageSize: 10,
-    total: 100,
-  });
+  const [currentPage, setCurrentPage] = React.useState(1);
+  const [pageSize, setPageSize] = React.useState(10);
   const [selectedTypes, setSelectedTypes] = React.useState<string[]>([]);
 
-  const loadData = async ({
-    page,
-    pageSize,
-    types,
-  }: {
-    page: number;
-    pageSize: number;
-    types?: string[];
-  }) => {
-    setLoading(true);
-    const typeQuery =
-      types && types.length > 0 ? `&type=${types.join(',')}` : '';
-    const res = await fetch(
-      `/api/community/cards?page=${page}&page-size=${pageSize}${typeQuery}`,
-    );
-    const data: ApiResponse<Data[], PaginationMeta> = await res.json();
-    setCards(data.data);
-    setPagination({
-      currentPage: data.meta.page,
-      pageSize: data.meta.pageSize,
-      total: data.meta.total,
-    });
-    setLoading(false);
-  };
+  const { data, isLoading } = useQuery({
+    queryKey: ['community-cards', currentPage, pageSize, selectedTypes],
+    queryFn: () =>
+      fetchCards({ page: currentPage, pageSize, types: selectedTypes }),
+    placeholderData: keepPreviousData,
+  });
 
-  React.useEffect(() => {
-    loadData({
-      page: 1,
-      pageSize: pagination.pageSize,
-      types: selectedTypes,
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedTypes]);
+  const cards = data?.data ?? [];
+  const total = data?.meta.total ?? 0;
 
-  React.useEffect(() => {
-    loadData({ page: 1, pageSize: 10, types: [] });
-  }, []);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className='mb-4 space-y-2'>
         {Array(10)
@@ -104,6 +88,7 @@ export const CommunityCards = () => {
               checked={selectedTypes.length === cardTypes.length}
               onCheckedChange={(c) => {
                 setSelectedTypes(c ? [...cardTypes] : []);
+                setCurrentPage(1);
               }}
               className='capitalize'
             >
@@ -120,6 +105,7 @@ export const CommunityCards = () => {
                       if (c) return Array.from(new Set([...prev, t]));
                       return prev.filter((x) => x !== t);
                     });
+                    setCurrentPage(1);
                   }}
                   className='capitalize'
                 >
@@ -141,27 +127,18 @@ export const CommunityCards = () => {
       {cards.length > 0 ? (
         <Pagination
           className='justify-end'
-          currentPage={pagination.currentPage}
-          pages={Math.ceil(pagination.total / pagination.pageSize)}
-          onPage={(page) =>
-            loadData({
-              page,
-              pageSize: pagination.pageSize,
-              types: selectedTypes,
-            })
-          }
+          currentPage={currentPage}
+          pages={Math.ceil(total / pageSize)}
+          onPage={setCurrentPage}
           buttonProps={{ variant: 'ghost' }}
         >
           <PaginationPageSizeDropdown
-            pageSize={pagination.pageSize}
-            total={pagination.total}
-            onPageSize={(pageSize) =>
-              loadData({
-                page: 1,
-                pageSize,
-                types: selectedTypes,
-              })
-            }
+            pageSize={pageSize}
+            total={total}
+            onPageSize={(size) => {
+              setPageSize(size);
+              setCurrentPage(1);
+            }}
             buttonProps={{ variant: 'ghost' }}
           />
         </Pagination>

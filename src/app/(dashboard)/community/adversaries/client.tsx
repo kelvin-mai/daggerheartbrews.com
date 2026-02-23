@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 
 import type {
   AdversaryDetails,
@@ -20,7 +21,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Skull } from 'lucide-react';
 
 type Data = {
   userAdversary: UserAdversary;
@@ -28,73 +29,66 @@ type Data = {
   adversaryPreview: AdversaryDetails;
 };
 
+const predefinedRoles = [
+  'bruiser',
+  'horde',
+  'leader',
+  'minion',
+  'ranged',
+  'skulk',
+  'social',
+  'solo',
+  'standard',
+  'support',
+];
+
+async function fetchAdversaries({
+  page,
+  pageSize,
+  tiers,
+  roles,
+}: {
+  page: number;
+  pageSize: number;
+  tiers: number[];
+  roles: string[];
+}): Promise<ApiResponse<Data[], PaginationMeta>> {
+  const tierQuery = tiers.length > 0 ? `&tier=${tiers.join(',')}` : '';
+  const rolesQuery = roles.length > 0 ? `&role=${roles.join(',')}` : '';
+  const res = await fetch(
+    `/api/community/adversary?page=${page}&page-size=${pageSize}${tierQuery}${rolesQuery}`,
+  );
+  return res.json();
+}
+
 export const CommunityAdversaries = () => {
-  const [loading, setLoading] = React.useState(false);
-  const [adversaries, setAdversaries] = React.useState<Data[]>([]);
-  const [pagination, setPagination] = React.useState({
-    currentPage: 1,
-    pageSize: 10,
-    total: 100,
-  });
+  const [currentPage, setCurrentPage] = React.useState(1);
+  const [pageSize, setPageSize] = React.useState(10);
   const [selectedTiers, setSelectedTiers] = React.useState<number[]>([]);
   const [selectedRoles, setSelectedRoles] = React.useState<string[]>([]);
-  const predefinedRoles = [
-    'bruiser',
-    'horde',
-    'leader',
-    'minion',
-    'ranged',
-    'skulk',
-    'social',
-    'solo',
-    'standard',
-    'support',
-  ];
 
-  const loadData = async ({
-    page,
-    pageSize,
-    tiers,
-    roles,
-  }: {
-    page: number;
-    pageSize: number;
-    tiers?: number[];
-    roles?: string[];
-  }) => {
-    setLoading(true);
-    const tierQuery =
-      tiers && tiers.length > 0 ? `&tier=${tiers.join(',')}` : '';
-    const rolesQuery =
-      roles && roles.length > 0 ? `&role=${roles.join(',')}` : '';
-    const res = await fetch(
-      `/api/community/adversary?page=${page}&page-size=${pageSize}${tierQuery}${rolesQuery}`,
-    );
-    const data: ApiResponse<Data[], PaginationMeta> = await res.json();
-    setAdversaries(data.data);
-    setPagination({
-      currentPage: data.meta.page,
-      pageSize: data.meta.pageSize,
-      total: data.meta.total,
-    });
-    setLoading(false);
-  };
+  const { data, isLoading } = useQuery({
+    queryKey: [
+      'community-adversaries',
+      currentPage,
+      pageSize,
+      selectedTiers,
+      selectedRoles,
+    ],
+    queryFn: () =>
+      fetchAdversaries({
+        page: currentPage,
+        pageSize,
+        tiers: selectedTiers,
+        roles: selectedRoles,
+      }),
+    placeholderData: keepPreviousData,
+  });
 
-  React.useEffect(() => {
-    loadData({
-      page: 1,
-      pageSize: pagination.pageSize,
-      tiers: selectedTiers,
-      roles: selectedRoles,
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedTiers, selectedRoles]);
+  const adversaries = data?.data ?? [];
+  const total = data?.meta.total ?? 0;
 
-  React.useEffect(() => {
-    loadData({ page: 1, pageSize: 10, tiers: [], roles: [] });
-  }, []);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className='mb-4 space-y-2'>
         {Array(10)
@@ -124,6 +118,7 @@ export const CommunityAdversaries = () => {
               checked={selectedTiers.length === 5}
               onCheckedChange={(c) => {
                 setSelectedTiers(c ? [1, 2, 3, 4, 5] : []);
+                setCurrentPage(1);
               }}
             >
               All
@@ -139,6 +134,7 @@ export const CommunityAdversaries = () => {
                       if (c) return Array.from(new Set([...prev, tier]));
                       return prev.filter((x) => x !== tier);
                     });
+                    setCurrentPage(1);
                   }}
                 >
                   {tier}
@@ -163,6 +159,7 @@ export const CommunityAdversaries = () => {
               checked={selectedRoles.length === predefinedRoles.length}
               onCheckedChange={(c) => {
                 setSelectedRoles(c ? [...predefinedRoles] : []);
+                setCurrentPage(1);
               }}
               className='capitalize'
             >
@@ -175,6 +172,7 @@ export const CommunityAdversaries = () => {
                   if (c) return Array.from(new Set([...prev, 'custom']));
                   return prev.filter((x) => x !== 'custom');
                 });
+                setCurrentPage(1);
               }}
               className='capitalize'
             >
@@ -191,6 +189,7 @@ export const CommunityAdversaries = () => {
                       if (c) return Array.from(new Set([...prev, r]));
                       return prev.filter((x) => x !== r);
                     });
+                    setCurrentPage(1);
                   }}
                   className='capitalize'
                 >
@@ -212,35 +211,33 @@ export const CommunityAdversaries = () => {
       {adversaries.length > 0 ? (
         <Pagination
           className='justify-end'
-          currentPage={pagination.currentPage}
-          pages={Math.ceil(pagination.total / pagination.pageSize)}
-          onPage={(page) =>
-            loadData({
-              page,
-              pageSize: pagination.pageSize,
-              tiers: selectedTiers,
-              roles: selectedRoles,
-            })
-          }
+          currentPage={currentPage}
+          pages={Math.ceil(total / pageSize)}
+          onPage={setCurrentPage}
           buttonProps={{ variant: 'ghost' }}
         >
           <PaginationPageSizeDropdown
-            pageSize={pagination.pageSize}
-            total={pagination.total}
-            onPageSize={(pageSize) =>
-              loadData({
-                page: 1,
-                pageSize,
-                tiers: selectedTiers,
-                roles: selectedRoles,
-              })
-            }
+            pageSize={pageSize}
+            total={total}
+            onPageSize={(size) => {
+              setPageSize(size);
+              setCurrentPage(1);
+            }}
             buttonProps={{ variant: 'ghost' }}
           />
         </Pagination>
       ) : (
-        <div className='bg-card text-muted-foreground rounded-lg border p-4'>
-          <p>There are currently no public cards. Please check back later.</p>
+        <div className='bg-card flex flex-col items-center gap-3 rounded-lg border py-12 text-center'>
+          <div className='bg-muted flex size-12 items-center justify-center rounded-full'>
+            <Skull className='text-muted-foreground size-6' />
+          </div>
+          <div>
+            <p className='font-medium'>No public adversaries yet</p>
+            <p className='text-muted-foreground text-sm'>
+              There are currently no public adversaries. Please check back
+              later.
+            </p>
+          </div>
         </div>
       )}
     </div>

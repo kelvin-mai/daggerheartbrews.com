@@ -1,14 +1,14 @@
 import type { Metadata } from 'next';
 import { ThemeProvider } from 'next-themes';
-import Script from 'next/script';
 import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 
-import { Toaster } from '@/components/ui/toast';
 import { fontVariables } from '@/lib/fonts';
 import { cn } from '@/lib/utils';
-import '@/styles/globals.css';
+import { QueryProvider } from '@/lib/context';
+import { Toaster } from '@/components/ui/toast';
 import { GoogleAdsense } from '@/components/common';
+import '@/styles/globals.css';
 
 export const metadata: Metadata = {
   title: {
@@ -28,12 +28,14 @@ export default function RootLayout({
   return (
     <html lang='en' suppressHydrationWarning>
       <body className={cn(fontVariables, 'antialiased')}>
-        <ThemeProvider attribute='class' defaultTheme='system' enableSystem>
-          {children}
-          <Analytics />
-          <SpeedInsights />
-          <Toaster />
-        </ThemeProvider>
+        <QueryProvider>
+          <ThemeProvider attribute='class' defaultTheme='system' enableSystem>
+            {children}
+            <Analytics />
+            <SpeedInsights />
+            <Toaster />
+          </ThemeProvider>
+        </QueryProvider>
         <GoogleAdsense />
       </body>
     </html>
