@@ -2,13 +2,13 @@
 
 import * as React from 'react';
 import { AnimatePresence, motion } from 'motion/react';
+import { Search } from 'lucide-react';
 
-import { FormInput } from '@/components/common/form';
 import { MultipleSelector, Option } from '@/components/common';
-import { Label } from '@/components/ui/label';
 import { CardDetails } from '@/lib/types';
 import { CardDisplayPreview } from '@/components/card-creation/preview';
 import { initialSettings } from '@/lib/constants';
+import { Input } from '@/components/ui/input';
 
 export const FilteredBeastforms = ({
   beastforms,
@@ -17,28 +17,42 @@ export const FilteredBeastforms = ({
 }) => {
   const tiers: Option[] = [1, 2, 3, 4].map((n) => ({
     value: String(n),
-    label: String(n),
+    label: `Tier ${n}`,
   }));
   const [searchName, setSearchName] = React.useState<string>('');
   const [selectedTiers, setSelectedTiers] = React.useState<Option[]>([]);
+
+  const filtered = beastforms
+    .filter((b) =>
+      searchName
+        ? b.name.toLowerCase().includes(searchName.toLowerCase())
+        : true,
+    )
+    .filter((b) =>
+      selectedTiers.length > 0
+        ? selectedTiers.map((o) => Number(o.value)).includes(b.tier!)
+        : true,
+    );
+
   return (
-    <div className='pt-2'>
-      <Label className='py-2'>Filter Environments</Label>
-      <div className='grid grid-cols-3 items-center gap-2'>
-        <FormInput
-          id='name'
-          placeholder='Environment Name'
-          value={searchName}
-          onChange={(e) => setSearchName(e.target.value)}
-        />
-        <div className='space-y-2'>
-          <Label>Tier</Label>
+    <div>
+      <div className='mb-6 flex gap-2'>
+        <div className='relative flex-1'>
+          <Search className='text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2' />
+          <Input
+            className='pl-9'
+            placeholder='Search beastforms…'
+            value={searchName}
+            onChange={(e) => setSearchName(e.target.value)}
+          />
+        </div>
+        <div className='w-48 shrink-0'>
           <MultipleSelector
             commandProps={{ label: 'Select Tiers' }}
             defaultOptions={tiers}
             value={selectedTiers}
             onChange={setSelectedTiers}
-            placeholder='Select Tiers'
+            placeholder='Filter by tier'
             emptyIndicator={
               <p className='text-muted-foreground text-center text-sm'>
                 No results
@@ -47,39 +61,28 @@ export const FilteredBeastforms = ({
           />
         </div>
       </div>
-      <div className='my-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
+
+      {filtered.length === 0 && (
+        <div className='text-muted-foreground py-16 text-center text-sm'>
+          No beastforms match your filters
+        </div>
+      )}
+
+      <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
         <AnimatePresence>
-          {beastforms
-            .filter((beastform) =>
-              searchName.length > 0
-                ? beastform.name
-                    .toLowerCase()
-                    .includes(searchName.toLowerCase())
-                : true,
-            )
-            .filter((beastform) =>
-              selectedTiers.length > 0
-                ? selectedTiers
-                    .map((option) => Number(option.value))
-                    .includes(beastform.tier!)
-                : true,
-            )
-            .map((beastform) => (
-              <motion.div
-                key={beastform.name}
-                className='break-inside-avoid'
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.15 }}
-                layout
-              >
-                <CardDisplayPreview
-                  card={beastform}
-                  settings={initialSettings}
-                />
-              </motion.div>
-            ))}
+          {filtered.map((beastform) => (
+            <motion.div
+              key={beastform.name}
+              className='break-inside-avoid'
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.15 }}
+              layout
+            >
+              <CardDisplayPreview card={beastform} settings={initialSettings} />
+            </motion.div>
+          ))}
         </AnimatePresence>
       </div>
     </div>

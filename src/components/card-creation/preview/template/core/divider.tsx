@@ -57,7 +57,6 @@ export const Divider: React.FC<DivederProps> = ({ card }) => {
     : subtype;
   const dividerBadge = ['class', 'subclass', 'domain'].includes(type);
   const background = `linear-gradient(to right, ${domainPrimaryColor}, ${domainSecondaryColor})`;
-  console.log('divider', type);
   return (
     <>
       {dividerBadge ? (

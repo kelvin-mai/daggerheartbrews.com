@@ -1,5 +1,5 @@
-import { CardDisplayPreview } from '@/components/card-creation/preview';
-import { ancestries, initialSettings } from '@/lib/constants';
+import { ancestries } from '@/lib/constants';
+import { FilteredAncestries } from './client';
 
 export const metadata = {
   title: 'Ancestries',
@@ -10,21 +10,20 @@ export const metadata = {
 export default function Page() {
   return (
     <>
-      <h1 className='font-eveleth-clean dark:text-primary-foreground text-2xl font-bold'>
-        Ancestries
-      </h1>
-      <p className='text-muted-foreground'>
-        Reference to ancestries available in the System Reference Document
-      </p>
-      <div className='my-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
-        {ancestries.map((ancestry) => (
-          <CardDisplayPreview
-            key={ancestry.name}
-            card={ancestry}
-            settings={initialSettings}
-          />
-        ))}
+      <div className='mb-6'>
+        <div className='flex items-baseline gap-2'>
+          <h1 className='font-eveleth-clean dark:text-primary-foreground text-2xl font-bold'>
+            Ancestries
+          </h1>
+          <span className='text-muted-foreground text-sm'>
+            {ancestries.length} available
+          </span>
+        </div>
+        <p className='text-muted-foreground mt-0.5 text-sm'>
+          Browse SRD ancestries available for ancestry card creation.
+        </p>
       </div>
+      <FilteredAncestries ancestries={ancestries} />
     </>
   );
 }

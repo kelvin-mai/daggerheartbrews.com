@@ -10,11 +10,16 @@ export const metadata = {
 export default function Page() {
   return (
     <>
-      <h1 className='font-eveleth-clean dark:text-primary-foreground text-2xl font-bold'>
-        Classes
-      </h1>
+      <div className='flex items-baseline gap-2'>
+        <h1 className='font-eveleth-clean dark:text-primary-foreground text-2xl font-bold'>
+          Classes
+        </h1>
+        <span className='text-muted-foreground text-sm'>
+          {classes.length} available
+        </span>
+      </div>
       <p className='text-muted-foreground'>
-        Reference to classes available in the System Reference Document
+        Browse SRD classes available for class card creation
       </p>
       <div className='my-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
         {classes.map((cl) => (
