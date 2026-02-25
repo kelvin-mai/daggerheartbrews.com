@@ -7,7 +7,7 @@ import { fontVariables } from '@/lib/fonts';
 import { cn } from '@/lib/utils';
 import { QueryProvider } from '@/lib/context';
 import { Toaster } from '@/components/ui/toast';
-import { GoogleAdsense } from '@/components/common';
+import { GoogleAdsense, VersionLogger } from '@/components/common';
 import '@/styles/globals.css';
 
 export const metadata: Metadata = {
@@ -34,6 +34,7 @@ export default function RootLayout({
             <Analytics />
             <SpeedInsights />
             <Toaster />
+            <VersionLogger />
           </ThemeProvider>
         </QueryProvider>
         <GoogleAdsense />
