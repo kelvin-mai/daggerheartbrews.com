@@ -49,6 +49,12 @@ export const Footer: React.FC = () => {
               <li>
                 <Link href='/game-master/screen'>GM Screen</Link>
               </li>
+              <li>
+                <Link href='/about'>About</Link>
+              </li>
+              <li>
+                <Link href='/privacy-policy'>Privacy Policy</Link>
+              </li>
             </ul>
           </div>
           <div>
