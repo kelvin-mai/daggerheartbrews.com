@@ -1,14 +1,9 @@
 import * as React from 'react';
-import { ChevronDown } from 'lucide-react';
 
-import { Button } from '@/components/ui/button';
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/components/ui/collapsible';
+import { Collapsible, CollapsibleContent } from '@/components/ui/collapsible';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
+import { CollapsibleSectionTrigger } from '../common';
 
 type GameMasterCollapsibleProps = React.ComponentProps<typeof Collapsible> & {
   label: string;
@@ -22,20 +17,15 @@ export const GameMasterCollapsible: React.FC<GameMasterCollapsibleProps> = ({
 }) => {
   return (
     <Collapsible
-      className={cn('bg-card rounded-sm border px-4 py-2', className)}
+      className={cn('bg-card rounded-sm border', className)}
       {...props}
     >
-      <CollapsibleTrigger asChild>
-        <Button
-          variant='ghost'
-          className='flex w-full items-center justify-between'
-        >
-          <Label>{label}</Label>
-          <ChevronDown />
-          <span className='sr-only'>Toggle</span>
-        </Button>
-      </CollapsibleTrigger>
-      <CollapsibleContent>{children}</CollapsibleContent>
+      <CollapsibleSectionTrigger>
+        <Label className='font-eveleth-clean text-sm'>{label}</Label>
+      </CollapsibleSectionTrigger>
+      <CollapsibleContent className='border-t px-4 py-3'>
+        {children}
+      </CollapsibleContent>
     </Collapsible>
   );
 };

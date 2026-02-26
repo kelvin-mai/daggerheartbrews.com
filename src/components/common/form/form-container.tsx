@@ -1,10 +1,9 @@
 import * as React from 'react';
-import { ChevronDown } from 'lucide-react';
 
-import { Collapsible, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Collapsible } from '@/components/ui/collapsible';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
+import { CollapsibleSectionTrigger } from '../collapsible-section';
 
 type FormContainerProps = React.ComponentProps<typeof Collapsible> & {
   className?: string;
@@ -24,26 +23,20 @@ export const FormContainer: React.FC<FormContainerProps> = ({
   return (
     <Component
       className={cn(
-        'bg-card rounded-sm border px-4 py-2',
+        'bg-card rounded-lg border',
         collapsible && 'group/collapsible',
         className,
       )}
       {...props}
     >
       {collapsible ? (
-        <CollapsibleTrigger asChild>
-          <Button
-            variant='ghost'
-            size='icon'
-            className='flex h-8 w-full items-center justify-between px-2 hover:cursor-pointer'
-          >
-            <Label>{title}</Label>
-            <ChevronDown className='size-4 transition-transform group-data-[state=open]/collapsible:rotate-180' />
-            <span className='sr-only'>Toggle</span>
-          </Button>
-        </CollapsibleTrigger>
+        <CollapsibleSectionTrigger>
+          <Label className='font-eveleth-clean text-xs'>{title}</Label>
+        </CollapsibleSectionTrigger>
       ) : (
-        <Label className='h-8 px-2'>{title}</Label>
+        <div className='hover:bg-accent/50 flex w-full cursor-pointer items-center gap-3 px-4 py-3 transition-colors'>
+          <Label className='font-eveleth-clean text-sm'>{title}</Label>
+        </div>
       )}
       {children}
     </Component>

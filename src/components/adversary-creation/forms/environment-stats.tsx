@@ -13,30 +13,32 @@ export const EnvironmentStatsForm = () => {
   const { setAdversaryDetails } = useAdversaryActions();
   return (
     <FormContainer title='Environment Statistics' collapsible defaultOpen>
-      <div className='space-y-2'>
-        <Label htmlFor='subtype'>Type</Label>
-        <CustomSelect
-          id='subtype'
-          placeholder='Type'
-          options={[
-            {
-              category: 'Types',
-              options: ['exploration', 'social', 'traversal', 'event'],
-            },
-          ]}
-          value={subtype}
-          onChange={(v) => setAdversaryDetails({ subtype: v })}
-        />
+      <div className='border-t px-4 py-3'>
+        <div className='space-y-2'>
+          <Label htmlFor='subtype'>Type</Label>
+          <CustomSelect
+            id='subtype'
+            placeholder='Type'
+            options={[
+              {
+                category: 'Types',
+                options: ['exploration', 'social', 'traversal', 'event'],
+              },
+            ]}
+            value={subtype}
+            onChange={(v) => setAdversaryDetails({ subtype: v })}
+          />
+        </div>
+        <CollapsibleContent className='space-y-2 pt-2'>
+          <FormInput
+            id='adversaries'
+            label='Potential Adversaries'
+            placeholder='Any'
+            value={potential}
+            onChange={(e) => setAdversaryDetails({ potential: e.target.value })}
+          />
+        </CollapsibleContent>
       </div>
-      <CollapsibleContent className='space-y-2 pt-2'>
-        <FormInput
-          id='adversaries'
-          label='Potential Adversaries'
-          placeholder='Any'
-          value={potential}
-          onChange={(e) => setAdversaryDetails({ potential: e.target.value })}
-        />
-      </CollapsibleContent>
     </FormContainer>
   );
 };

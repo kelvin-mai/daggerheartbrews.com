@@ -10,7 +10,7 @@ export const SettingsForm = () => {
   const { setSettings } = useCardActions();
   return (
     <FormContainer className='w-full' title='Settings' collapsible>
-      <CollapsibleContent>
+      <CollapsibleContent className='border-t px-4 py-3'>
         <div className='grid grid-cols-2 gap-2'>
           <FormCheckbox
             id='show-border'

@@ -27,7 +27,7 @@ export const DomainPropertiesForm = () => {
   const { setCardDetails } = useCardActions();
   return (
     <FormContainer title='Domain Properties' collapsible defaultOpen>
-      <div className='space-y-2'>
+      <div className='space-y-2 border-t px-4 py-3'>
         <DomainSelect
           id='domain'
           label='Domain'
@@ -123,7 +123,7 @@ export const ClassPropertiesForm = () => {
     }));
   return (
     <FormContainer title='Class Properties' collapsible defaultOpen>
-      <div className='space-y-2'>
+      <div className='space-y-2 border-t px-4 py-3'>
         <div className='flex gap-2'>
           <div className='grow space-y-2'>
             <Label htmlFor='class-name'>Class</Label>
@@ -278,8 +278,8 @@ export const SubClassPropertiesForm = () => {
       options: classes!.filter((c) => c.source === source).map((c) => c.name),
     }));
   return (
-    <FormContainer title='Subclass Properties' collapsible>
-      <div className='flex gap-2'>
+    <FormContainer title='Subclass Properties'>
+      <div className='flex gap-2 border-t px-4 py-3'>
         <div className='w-full space-y-2'>
           <Label htmlFor='class-name'>Class</Label>
           <CustomSelect
@@ -402,7 +402,7 @@ export const EquipmentPropertiesForm = () => {
   const { setCardDetails } = useCardActions();
   return (
     <FormContainer title='Equipment Properties' collapsible defaultOpen>
-      <CollapsibleContent className='space-y-2'>
+      <CollapsibleContent className='space-y-2 border-t px-4 py-3'>
         <div className='flex gap-2'>
           <div className='grow space-y-2'>
             <Label htmlFor='subtype'>Equipment Type</Label>

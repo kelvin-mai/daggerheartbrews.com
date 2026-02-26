@@ -245,54 +245,56 @@ export const RulesForm = () => {
 
   return (
     <FormContainer title='Rules Text' collapsible defaultOpen>
-      {editor && <RichTextEditor editor={editor} />}
-      <CollapsibleContent className='mt-2'>
-        {thresholds ? (
-          <div className='space-y-2'>
-            <Label>Thresholds</Label>
-            <div className='flex gap-2'>
-              <Input
-                value={thresholds[0]}
-                type='number'
-                min={0}
-                max={99}
-                onChange={(e) =>
-                  setCardDetails({
-                    thresholds: [Number(e.target.value), thresholds[1]],
-                  })
-                }
-              />
-              <Input
-                value={thresholds[1]}
-                type='number'
-                min={0}
-                max={99}
-                onChange={(e) =>
-                  setCardDetails({
-                    thresholds: [thresholds[0], Number(e.target.value)],
-                  })
-                }
-              />
-              <div>
-                <Toggle
-                  pressed={thresholdsEnabled}
-                  onPressedChange={() =>
-                    setCardDetails({ thresholdsEnabled: !thresholdsEnabled })
+      <div className='border-t px-4 py-3'>
+        {editor && <RichTextEditor editor={editor} />}
+        <CollapsibleContent className='mt-2'>
+          {thresholds ? (
+            <div className='space-y-2'>
+              <Label>Thresholds</Label>
+              <div className='flex gap-2'>
+                <Input
+                  value={thresholds[0]}
+                  type='number'
+                  min={0}
+                  max={99}
+                  onChange={(e) =>
+                    setCardDetails({
+                      thresholds: [Number(e.target.value), thresholds[1]],
+                    })
                   }
-                >
-                  <Check />
-                </Toggle>
+                />
+                <Input
+                  value={thresholds[1]}
+                  type='number'
+                  min={0}
+                  max={99}
+                  onChange={(e) =>
+                    setCardDetails({
+                      thresholds: [thresholds[0], Number(e.target.value)],
+                    })
+                  }
+                />
+                <div>
+                  <Toggle
+                    pressed={thresholdsEnabled}
+                    onPressedChange={() =>
+                      setCardDetails({ thresholdsEnabled: !thresholdsEnabled })
+                    }
+                  >
+                    <Check />
+                  </Toggle>
+                </div>
               </div>
             </div>
-          </div>
-        ) : null}
-        {editor && (
-          <div className='space-y-2 pt-2'>
-            <Label>Rules Text Assistance</Label>
-            <AssistedRulesText editor={editor} />
-          </div>
-        )}
-      </CollapsibleContent>
+          ) : null}
+          {editor && (
+            <div className='space-y-2 pt-2'>
+              <Label>Rules Text Assistance</Label>
+              <AssistedRulesText editor={editor} />
+            </div>
+          )}
+        </CollapsibleContent>
+      </div>
     </FormContainer>
   );
 };

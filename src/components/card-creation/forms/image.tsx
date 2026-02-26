@@ -148,7 +148,7 @@ export const ImageForm = () => {
 
   return (
     <FormContainer title='Card Image' collapsible defaultOpen>
-      <div className='space-y-2'>
+      <div className='space-y-2 border-t px-4 py-3'>
         <div className='flex flex-col gap-2'>
           <Button
             variant='outline'

@@ -134,95 +134,103 @@ export const RulesForm = () => {
 
   return (
     <FormContainer title='Features Text' collapsible defaultOpen>
-      {editor && <RichTextEditor editor={editor} />}
-      <CollapsibleContent>
-        <div className='flex items-end gap-2 pt-2'>
-          <div className='grow space-y-2'>
-            <Label htmlFor='feature-assistance'>Feature Text Assistance</Label>
-            <Popover open={open} onOpenChange={setOpen}>
-              <PopoverTrigger asChild>
-                <Button
-                  id='feature-assistance'
-                  variant='outline'
-                  role='combobox'
-                  aria-expanded={open}
-                  className='w-full justify-between bg-white font-normal'
+      <div className='border-t px-4 py-3'>
+        {editor && <RichTextEditor editor={editor} />}
+        <CollapsibleContent>
+          <div className='flex items-end gap-2 pt-2'>
+            <div className='grow space-y-2'>
+              <Label htmlFor='feature-assistance'>
+                Feature Text Assistance
+              </Label>
+              <Popover open={open} onOpenChange={setOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    id='feature-assistance'
+                    variant='outline'
+                    role='combobox'
+                    aria-expanded={open}
+                    className='w-full justify-between bg-white font-normal'
+                  >
+                    {feature ? (
+                      <span className='capitalize'>{feature}</span>
+                    ) : (
+                      <span className='text-muted-foreground'>
+                        Select Features
+                      </span>
+                    )}
+                    <ChevronDown className='text-muted-foreground size-4' />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent
+                  className='min-w-[var(--radix-popover-trigger-width)] p-0'
+                  align='start'
                 >
-                  {feature ? (
-                    <span className='capitalize'>{feature}</span>
-                  ) : (
-                    <span className='text-muted-foreground'>
-                      Select Features
-                    </span>
-                  )}
-                  <ChevronDown className='text-muted-foreground size-4' />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent
-                className='min-w-[var(--radix-popover-trigger-width)] p-0'
-                align='start'
-              >
-                <Command>
-                  <CommandInput placeholder='Search features' />
-                  <CommandEmpty>
-                    <div className='text-center'>
-                      <p className='text-muted-foreground text-sm'>
-                        None found.
-                      </p>
-                    </div>
-                  </CommandEmpty>
-                  <CommandList>
-                    <CommandGroup>
-                      <CommandItem value='custom' onSelect={handleSelect}>
-                        <span className='font-bold capitalize'>custom</span>
-                        <Check
-                          className={cn(
-                            'ml-auto size-4',
-                            feature === 'custom' ? 'opacity-100' : 'opacity-0',
-                          )}
-                        />
-                      </CommandItem>
-                    </CommandGroup>
-                    <CommandGroup heading='SRD Examples'>
-                      {exampleFeatures.map((feat) => (
-                        <CommandItem
-                          key={feat.name}
-                          value={feat.name}
-                          onSelect={handleSelect}
-                        >
-                          <div className='flex items-center'>
-                            <div>
-                              <p className='font-bold'>{feat.name}</p>
-                              <p className='text-muted-foreground text-sm'>
-                                <span className='capitalize'>{feat.type}</span>{' '}
-                                - {feat.description}
-                              </p>
-                            </div>
-                            <Check
-                              className={cn(
-                                'ml-auto size-4',
-                                feature === feat.name
-                                  ? 'opacity-100'
-                                  : 'opacity-0',
-                              )}
-                            />
-                          </div>
+                  <Command>
+                    <CommandInput placeholder='Search features' />
+                    <CommandEmpty>
+                      <div className='text-center'>
+                        <p className='text-muted-foreground text-sm'>
+                          None found.
+                        </p>
+                      </div>
+                    </CommandEmpty>
+                    <CommandList>
+                      <CommandGroup>
+                        <CommandItem value='custom' onSelect={handleSelect}>
+                          <span className='font-bold capitalize'>custom</span>
+                          <Check
+                            className={cn(
+                              'ml-auto size-4',
+                              feature === 'custom'
+                                ? 'opacity-100'
+                                : 'opacity-0',
+                            )}
+                          />
                         </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  </CommandList>
-                </Command>
-              </PopoverContent>
-            </Popover>
+                      </CommandGroup>
+                      <CommandGroup heading='SRD Examples'>
+                        {exampleFeatures.map((feat) => (
+                          <CommandItem
+                            key={feat.name}
+                            value={feat.name}
+                            onSelect={handleSelect}
+                          >
+                            <div className='flex items-center'>
+                              <div>
+                                <p className='font-bold'>{feat.name}</p>
+                                <p className='text-muted-foreground text-sm'>
+                                  <span className='capitalize'>
+                                    {feat.type}
+                                  </span>{' '}
+                                  - {feat.description}
+                                </p>
+                              </div>
+                              <Check
+                                className={cn(
+                                  'ml-auto size-4',
+                                  feature === feat.name
+                                    ? 'opacity-100'
+                                    : 'opacity-0',
+                                )}
+                              />
+                            </div>
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+            </div>
+            <Button variant='ghost' onClick={handleClick}>
+              Add Feature
+            </Button>
           </div>
-          <Button variant='ghost' onClick={handleClick}>
-            Add Feature
-          </Button>
-        </div>
-        {feature === 'custom' && (
-          <AssistedFeatureText feature={custom} onChange={setCustom} />
-        )}
-      </CollapsibleContent>
+          {feature === 'custom' && (
+            <AssistedFeatureText feature={custom} onChange={setCustom} />
+          )}
+        </CollapsibleContent>
+      </div>
     </FormContainer>
   );
 };

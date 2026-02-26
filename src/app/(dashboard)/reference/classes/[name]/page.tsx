@@ -1,12 +1,6 @@
-import { ChevronDown } from 'lucide-react';
-
 import { CardDisplayPreview } from '@/components/card-creation/preview';
-import { Button } from '@/components/ui/button';
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/components/ui/collapsible';
+import { Collapsible, CollapsibleContent } from '@/components/ui/collapsible';
+import { CollapsibleSectionTrigger } from '@/components/common';
 import { Label } from '@/components/ui/label';
 import { initialSettings } from '@/lib/constants';
 import { classes, domainColor } from '@/lib/constants/srd';
@@ -115,16 +109,9 @@ export default async function Page({ params }: PageProps) {
             className='bg-card group/collapsible rounded-lg border'
             defaultOpen
           >
-            <CollapsibleTrigger asChild>
-              <button
-                type='button'
-                className='font-eveleth-clean hover:bg-accent/50 flex w-full cursor-pointer items-center gap-3 px-4 py-3 text-lg transition-colors'
-              >
-                <Label>{sc.name}</Label>
-                <ChevronDown className='text-muted-foreground ml-auto size-4 transition-transform group-data-[state=open]/collapsible:rotate-180' />
-                <span className='sr-only'>Toggle subclass section</span>
-              </button>
-            </CollapsibleTrigger>
+            <CollapsibleSectionTrigger>
+              <Label className='font-eveleth-clean text-lg'>{sc.name}</Label>
+            </CollapsibleSectionTrigger>
             <p className='text-muted-foreground px-4 py-3'>{sc.description}</p>
             <CollapsibleContent>
               <div className='grid grid-cols-1 gap-2 border-t px-4 py-3 lg:grid-cols-3'>
