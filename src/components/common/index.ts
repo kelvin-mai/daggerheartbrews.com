@@ -1,4 +1,5 @@
 export * from './adsense';
+export * from './collapsible-section';
 export * from './buy-me-coffee-banner';
 export * from './custom-select';
 export * from './dcgl-compatibility-banner';

@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { eq } from 'drizzle-orm';
-import { ChevronDown, Layers, Skull, Plus } from 'lucide-react';
+import { Layers, Skull, Plus } from 'lucide-react';
 
 import type {
   AdversaryDetails,
@@ -18,15 +18,12 @@ import {
   userAdversaries,
   userCards,
 } from '@/lib/database/schema';
-import {
-  Collapsible,
-  CollapsibleTrigger,
-  CollapsibleContent,
-} from '@/components/ui/collapsible';
+import { Collapsible, CollapsibleContent } from '@/components/ui/collapsible';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { PersonalAdversary, PersonalCard } from '@/components/post';
+import { CollapsibleSectionTrigger } from '@/components/common';
 
 export default async function Page() {
   const session = await auth.api.getSession({
@@ -96,22 +93,15 @@ export default async function Page() {
         defaultOpen
         className='bg-card group/collapsible rounded-lg border'
       >
-        <CollapsibleTrigger asChild>
-          <button
-            type='button'
-            className='hover:bg-accent/50 flex w-full cursor-pointer items-center gap-3 px-4 py-3 transition-colors'
-          >
-            <div className='bg-primary/10 text-primary flex size-8 shrink-0 items-center justify-center rounded-md'>
-              <Layers className='size-4' />
-            </div>
-            <Label className='font-eveleth-clean text-sm'>Cards</Label>
-            <Badge variant='secondary' className='ml-1'>
-              {cardData.length}
-            </Badge>
-            <ChevronDown className='text-muted-foreground ml-auto size-4 transition-transform group-data-[state=open]/collapsible:rotate-180' />
-            <span className='sr-only'>Toggle cards section</span>
-          </button>
-        </CollapsibleTrigger>
+        <CollapsibleSectionTrigger>
+          <div className='bg-primary/10 text-primary flex size-8 shrink-0 items-center justify-center rounded-md'>
+            <Layers className='size-4' />
+          </div>
+          <Label className='font-eveleth-clean text-sm'>Cards</Label>
+          <Badge variant='secondary' className='ml-1'>
+            {cardData.length}
+          </Badge>
+        </CollapsibleSectionTrigger>
         <CollapsibleContent>
           <div className='border-t px-4 py-3'>
             {cardData.length > 0 ? (
@@ -151,22 +141,15 @@ export default async function Page() {
         defaultOpen
         className='bg-card group/collapsible rounded-lg border'
       >
-        <CollapsibleTrigger asChild>
-          <button
-            type='button'
-            className='hover:bg-accent/50 flex w-full cursor-pointer items-center gap-3 px-4 py-3 transition-colors'
-          >
-            <div className='bg-primary/10 text-primary flex size-8 shrink-0 items-center justify-center rounded-md'>
-              <Skull className='size-4' />
-            </div>
-            <Label className='font-eveleth-clean text-sm'>Adversaries</Label>
-            <Badge variant='secondary' className='ml-1'>
-              {cardData.length}
-            </Badge>
-            <ChevronDown className='text-muted-foreground ml-auto size-4 transition-transform group-data-[state=open]/collapsible:rotate-180' />
-            <span className='sr-only'>Toggle adversaries section</span>
-          </button>
-        </CollapsibleTrigger>
+        <CollapsibleSectionTrigger>
+          <div className='bg-primary/10 text-primary flex size-8 shrink-0 items-center justify-center rounded-md'>
+            <Skull className='size-4' />
+          </div>
+          <Label className='font-eveleth-clean text-sm'>Adversaries</Label>
+          <Badge variant='secondary' className='ml-1'>
+            {cardData.length}
+          </Badge>
+        </CollapsibleSectionTrigger>
         <CollapsibleContent>
           <div className='border-t px-4 py-3'>
             {adversaryData.length > 0 ? (
