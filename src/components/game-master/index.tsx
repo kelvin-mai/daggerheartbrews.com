@@ -1,4 +1,4 @@
-import { Table, TableCell, TableRow } from '../ui/table';
+import { Table, TableBody, TableCell, TableRow } from '../ui/table';
 import { GameMasterCollapsible } from './collapsible';
 import { GameMasterTable } from './tables';
 
@@ -287,7 +287,10 @@ export const GameMasterBattle = () => {
       description: 'Intending a less difficult or shorter fight',
     },
     { number: '-2', description: 'Using 2 or more solo adversaries' },
-    { number: '-2', description: 'Add 1d4 (or a static +2) to all adversary damage rolls' },
+    {
+      number: '-2',
+      description: 'Add 1d4 (or a static +2) to all adversary damage rolls',
+    },
     { number: '+1', description: 'Using an adversary from a lower tier' },
     {
       number: '+1',
@@ -316,21 +319,25 @@ export const GameMasterBattle = () => {
         </p>
         <h3 className='font-bold'>Adjusting battle points</h3>
         <Table>
-          {adjustments.map((adjustment, i) => (
-            <TableRow key={i}>
-              <TableCell>{adjustment.number}</TableCell>
-              <TableCell>{adjustment.description}</TableCell>
-            </TableRow>
-          ))}
+          <TableBody>
+            {adjustments.map((adjustment, i) => (
+              <TableRow key={i}>
+                <TableCell>{adjustment.number}</TableCell>
+                <TableCell>{adjustment.description}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
         </Table>
         <h3 className='font-bold'>Spending battle points</h3>
         <Table>
-          {spendings.map((spending, i) => (
-            <TableRow key={i}>
-              <TableCell>{spending.number}</TableCell>
-              <TableCell>{spending.description}</TableCell>
-            </TableRow>
-          ))}
+          <TableBody>
+            {spendings.map((spending, i) => (
+              <TableRow key={i}>
+                <TableCell>{spending.number}</TableCell>
+                <TableCell>{spending.description}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
         </Table>
       </div>
     </GameMasterCollapsible>
