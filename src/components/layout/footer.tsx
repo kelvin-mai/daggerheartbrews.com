@@ -59,7 +59,11 @@ export const Footer: React.FC = () => {
           </div>
           <div>
             <h4 className='mb-4 text-lg font-bold tracking-tight'>Connect</h4>
-            <a href='mailto:me@kelvinmai.io' target='_blank'>
+            <a
+              href='mailto:me@kelvinmai.io'
+              target='_blank'
+              rel='noopener noreferrer'
+            >
               me@kelvinmai.io
             </a>
           </div>

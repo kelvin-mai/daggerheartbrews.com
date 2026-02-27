@@ -18,7 +18,7 @@ export const WeMovedBanner = () => {
         <a
           className='underline underline-offset-4'
           href='https://daggerheartbrews.com'
-          rel='noopener'
+          rel='noopener noreferrer'
           target='_blank'
         >
           daggerheartbrews.com

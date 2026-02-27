@@ -275,10 +275,12 @@ export const CustomDomainColor: React.FC<CustomDomainColorProps> = ({
             className='flex flex-wrap justify-center gap-2'
           >
             {presets.map((p) => (
-              <div
+              <button
                 key={p}
+                type='button'
                 style={{ background: p }}
                 className='size-6 rounded'
+                aria-label={`Select color ${p}`}
                 onClick={() => setColor(p)}
               />
             ))}

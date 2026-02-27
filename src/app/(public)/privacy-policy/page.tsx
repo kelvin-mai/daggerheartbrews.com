@@ -104,6 +104,7 @@ export default function PrivacyPolicyPage() {
               <a
                 href='https://www.google.com/settings/ads'
                 target='_blank'
+                rel='noopener noreferrer'
                 className='underline underline-offset-4'
               >
                 Google Ads Settings
@@ -112,6 +113,7 @@ export default function PrivacyPolicyPage() {
               <a
                 href='https://policies.google.com/privacy'
                 target='_blank'
+                rel='noopener noreferrer'
                 className='underline underline-offset-4'
               >
                 Google Privacy Policy
@@ -130,6 +132,7 @@ export default function PrivacyPolicyPage() {
               <a
                 href='https://vercel.com/docs/analytics/privacy-policy'
                 target='_blank'
+                rel='noopener noreferrer'
                 className='underline underline-offset-4'
               >
                 Vercel Privacy Policy
@@ -156,6 +159,7 @@ export default function PrivacyPolicyPage() {
               <a
                 href='https://neon.tech/privacy-policy'
                 target='_blank'
+                rel='noopener noreferrer'
                 className='underline underline-offset-4'
               >
                 Neon Privacy Policy
@@ -173,6 +177,7 @@ export default function PrivacyPolicyPage() {
               <a
                 href='https://resend.com/privacy'
                 target='_blank'
+                rel='noopener noreferrer'
                 className='underline underline-offset-4'
               >
                 Resend Privacy Policy

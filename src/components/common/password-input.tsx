@@ -17,7 +17,6 @@ export const PasswordInput: React.FC<React.ComponentProps<typeof Input>> = ({
         onClick={visible.toggle}
         aria-label={visible.value ? 'Hide password' : 'Show password'}
         aria-pressed={visible.value}
-        aria-controls='password'
       >
         {visible.value ? (
           <EyeOff className='size-4' aria-hidden='true' />

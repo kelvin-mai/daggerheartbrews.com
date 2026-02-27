@@ -36,6 +36,7 @@ export default function AboutPage() {
           <a
             href='https://daggerheart.com'
             target='_blank'
+            rel='noopener noreferrer'
             className='underline underline-offset-4'
           >
             Daggerheart TTRPG
@@ -65,6 +66,7 @@ export default function AboutPage() {
           <a
             href='https://kelvinmai.io'
             target='_blank'
+            rel='noopener noreferrer'
             className='underline underline-offset-4'
           >
             Kelvin Mai
@@ -77,6 +79,7 @@ export default function AboutPage() {
           <a
             href='https://github.com/kelvin-mai/daggerheartbrews.com'
             target='_blank'
+            rel='noopener noreferrer'
             className='underline underline-offset-4'
           >
             GitHub
@@ -103,6 +106,7 @@ export default function AboutPage() {
             <a
               href='https://darringtonpress.com/license/'
               target='_blank'
+              rel='noopener noreferrer'
               className='underline underline-offset-4'
             >
               Darrington Press Community Gaming License (DCGL)
@@ -131,6 +135,7 @@ export default function AboutPage() {
           <a
             href='https://github.com/kelvin-mai/daggerheartbrews.com/issues'
             target='_blank'
+            rel='noopener noreferrer'
             className='underline underline-offset-4'
           >
             GitHub

@@ -31,6 +31,7 @@ export const DCGLCompatibilityBanner: React.FC<React.ComponentProps<'div'>> = ({
         <a
           href='https://darringtonpress.com/license/'
           target='_blank'
+          rel='noopener noreferrer'
           className='underline underline-offset-4'
         >
           <em>Darrington Press Community Gaming License</em>

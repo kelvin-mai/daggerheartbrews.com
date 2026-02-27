@@ -36,14 +36,16 @@ export const AdUnit: React.FC<AdUnitProps> = ({
   }, []);
 
   return (
-    <ins
-      ref={adRef}
-      className={cn('adsbygoogle block', className)}
-      data-ad-client='ca-pub-7510278420022630'
-      data-ad-slot={slot}
-      data-ad-format={format}
-      data-full-width-responsive='true'
-    />
+    <div aria-label='Advertisement'>
+      <ins
+        ref={adRef}
+        className={cn('adsbygoogle block', className)}
+        data-ad-client='ca-pub-7510278420022630'
+        data-ad-slot={slot}
+        data-ad-format={format}
+        data-full-width-responsive='true'
+      />
+    </div>
   );
 };
 

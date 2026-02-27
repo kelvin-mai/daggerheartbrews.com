@@ -16,11 +16,14 @@ export const SavePreviewButton: React.FC<
   ) : (
     <Tooltip>
       <TooltipTrigger asChild>
-        <span tabIndex={0} className='grow'>
-          <Button disabled className={cn('w-full', className)} {...props}>
-            {children}
-          </Button>
-        </span>
+        <Button
+          {...props}
+          aria-disabled
+          className={cn('w-full cursor-not-allowed opacity-50', className)}
+          onClick={(e) => e.preventDefault()}
+        >
+          {children}
+        </Button>
       </TooltipTrigger>
       <TooltipContent>
         <p>Save feature is only available if you are logged in.</p>

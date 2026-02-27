@@ -408,6 +408,7 @@ export const MultipleSelector = React.forwardRef<
         }
         filter={commandFilter()}
       >
+        {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions -- keyboard navigation is handled by the parent Command component; this div routes pointer clicks to the internal input */}
         <div
           className={cn(
             'border-input ring-offset-background focus-within:ring-ring min-h-10 rounded-md border text-base focus-within:ring-2 focus-within:ring-offset-2 md:text-sm',
@@ -420,6 +421,12 @@ export const MultipleSelector = React.forwardRef<
           onClick={() => {
             if (disabled) return;
             inputRef?.current?.focus();
+          }}
+          onKeyDown={(e) => {
+            if (disabled) return;
+            if (e.key === 'Enter' || e.key === ' ') {
+              inputRef?.current?.focus();
+            }
           }}
         >
           <div className='relative flex flex-wrap gap-1'>
