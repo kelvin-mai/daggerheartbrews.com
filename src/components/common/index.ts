@@ -13,5 +13,6 @@ export * from './responsive-dialog';
 export * from './rich-text-editor';
 export * from './save-preview-button';
 export * from './theme-toggle';
+export * from './outdated-version-banner';
 export * from './version-logger';
 export * from './we-moved-banner';

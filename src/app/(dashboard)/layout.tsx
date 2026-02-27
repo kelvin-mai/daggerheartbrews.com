@@ -2,6 +2,7 @@ import {
   AdUnit,
   BuyMeCofffeeBanner,
   DCGLCompatibilityBanner,
+  OutdatedVersionBanner,
   ThemeToggle,
   WeMovedBanner,
 } from '@/components/common';
@@ -25,6 +26,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         </header>
         <main className='container'>
           <WeMovedBanner />
+          <OutdatedVersionBanner />
           {children}
         </main>
         <section className='container my-4 space-y-2'>
