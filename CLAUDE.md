@@ -1,5 +1,7 @@
 # CLAUDE.md
 
+@.claude/skills.md
+
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Project Overview
@@ -19,6 +21,7 @@ Daggerheart Brews is a Next.js web application for creating and sharing homebrew
 ## Commands
 
 ### Development
+
 ```bash
 npm run dev          # Start dev server with Turbopack
 npm run build        # Build for production
@@ -26,6 +29,7 @@ npm start            # Start production server
 ```
 
 ### Code Quality
+
 ```bash
 npm run lint         # Run ESLint
 npm run lint:fix     # Run ESLint with auto-fix
@@ -33,6 +37,7 @@ npm run format       # Format code with Prettier
 ```
 
 ### Database
+
 ```bash
 npm run db:generate           # Generate Drizzle migrations from schema
 npm run migration:generate    # Generate custom migration (runs tsx ./scripts/generate-migration.ts)
@@ -45,11 +50,13 @@ Migrations are stored in `sql/` directory with numbered prefixes (e.g., `0000_op
 ### Directory Structure
 
 - **`src/app/`** - Next.js App Router pages
+
   - `(auth)/` - Authentication routes: login, register, forgot-password, reset-password, verify
   - `(dashboard)/` - Protected routes: card/adversary creation, profile, reference pages, community
   - `api/` - API routes for previews, auth, community items
 
 - **`src/components/`** - React components organized by feature
+
   - `card-creation/` - Card builder components
   - `adversary-creation/` - Adversary builder components
   - `game-master/` - GM screen tools
@@ -57,6 +64,7 @@ Migrations are stored in `sql/` directory with numbered prefixes (e.g., `0000_op
   - `ui/` - Reusable UI components (Radix UI based)
 
 - **`src/lib/`** - Core library code
+
   - `auth/` - Better Auth configuration and client
   - `database/` - Drizzle setup and schemas
   - `constants/` - Game data (SRD content for ancestries, classes, domains, etc.)
@@ -72,6 +80,7 @@ Migrations are stored in `sql/` directory with numbered prefixes (e.g., `0000_op
 ### Path Aliases
 
 The project uses `@/` as an alias for `src/`:
+
 ```typescript
 import { db } from '@/lib/database';
 import type { CardState } from '@/store/card/types';
@@ -80,11 +89,13 @@ import type { CardState } from '@/store/card/types';
 ### Database Architecture
 
 - **Setup**: Drizzle ORM with PostgreSQL
+
   - Production uses `drizzle-orm/neon-serverless` for Neon database
   - Development uses `drizzle-orm/node-postgres`
   - Client selection is environment-based (see `src/lib/database/index.ts`)
 
 - **Schemas**: Located in `src/lib/database/schema/`
+
   - `auth.sql.ts` - Better Auth tables (users, sessions, accounts, verification)
   - `user-items.sql.ts` - User-created content (cards, adversaries)
   - `constants.sql.ts` - Reference data tables
@@ -94,6 +105,7 @@ import type { CardState } from '@/store/card/types';
 ### Authentication
 
 Better Auth configuration in `src/lib/auth/index.ts`:
+
 - Email/password authentication with verification
 - Social providers: Google, Discord
 - Email verification sends users to `/profile` after verification
@@ -104,12 +116,14 @@ Better Auth configuration in `src/lib/auth/index.ts`:
 ### State Management
 
 Zustand stores follow a consistent pattern with three modules:
+
 - **`types.ts`** - Store state and types
 - **`actions.ts`** - State mutations
 - **`effects.ts`** - Side effects (API calls, local storage)
 - **`computed.ts`** - Derived values (card store only)
 
 Example usage:
+
 ```typescript
 import { useCardStore, useCardActions, useCardEffects } from '@/store';
 
@@ -121,6 +135,7 @@ const effects = useCardEffects();
 ### Environment Variables
 
 Environment variables are validated with Zod in `src/lib/env.ts`. Required variables:
+
 - `DATABASE_URL` - PostgreSQL connection string
 - `BETTER_AUTH_SECRET` - Auth secret key
 - `BETTER_AUTH_URL` - Base URL for auth callbacks
@@ -133,20 +148,26 @@ Environment variables are validated with Zod in `src/lib/env.ts`. Required varia
 ## Key Patterns
 
 ### Route Groups
+
 The app uses Next.js route groups for organization:
+
 - `(auth)` - Public authentication pages
 - `(dashboard)` - Protected application pages
 
 ### Component Organization
+
 Components are organized by feature area, not by type. Each feature directory contains all related components, not split into "forms", "cards", etc.
 
 ### API Routes
+
 Preview endpoints (`/api/card-preview`, `/api/adversary-preview`) generate images of user-created content. Community endpoints serve homebrew content from the database.
 
 ### Image Handling
+
 The app uses `@jpinsonneau/html-to-image` for generating card/adversary images and `@origin-space/image-cropper` for user image uploads.
 
 ### Rich Text Editing
+
 TipTap editor is used for card text content with custom extensions for text alignment.
 
 ## Important Notes

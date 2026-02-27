@@ -14,18 +14,18 @@ import {
 } from '@/components/ui/command';
 import { cn } from '@/lib/utils';
 
-export interface Option {
+export type Option = {
   value: string;
   label: string;
   disable?: boolean;
   fixed?: boolean;
   [key: string]: string | boolean | undefined;
-}
-interface GroupOption {
+};
+type GroupOption = {
   [key: string]: Option[];
-}
+};
 
-interface MultipleSelectorProps {
+type MultipleSelectorProps = {
   value?: Option[];
   defaultOptions?: Option[];
   options?: Option[];
@@ -52,14 +52,14 @@ interface MultipleSelectorProps {
     'value' | 'placeholder' | 'disabled'
   >;
   hideClearAllButton?: boolean;
-}
+};
 
-export interface MultipleSelectorRef {
+export type MultipleSelectorRef = {
   selectedValue: Option[];
   input: HTMLInputElement;
   focus: () => void;
   reset: () => void;
-}
+};
 
 export function useDebounce<T>(value: T, delay?: number): T {
   const [debouncedValue, setDebouncedValue] = React.useState<T>(value);
