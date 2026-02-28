@@ -41,7 +41,6 @@ const features = [
 export default async function Home() {
   return (
     <>
-      {/* Skip to main content — WCAG 2.4.1 */}
       <a
         href='#main-content'
         className='focus:bg-background focus:ring-ring sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:rounded-md focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:ring-2'
@@ -49,7 +48,6 @@ export default async function Home() {
         Skip to main content
       </a>
 
-      {/* Sticky Nav */}
       <header className='bg-background/80 sticky top-0 z-50 border-b backdrop-blur-sm'>
         <div className='container flex h-16 items-center justify-between'>
           <Link href='/' className='flex items-center gap-3'>
@@ -74,12 +72,10 @@ export default async function Home() {
       </header>
 
       <main id='main-content'>
-        {/* Hero */}
         <section
           aria-labelledby='hero-heading'
           className='relative overflow-hidden py-24 md:py-36 lg:py-48'
         >
-          {/* Blurred key art background */}
           <div
             aria-hidden='true'
             className='pointer-events-none absolute inset-0'
@@ -92,7 +88,6 @@ export default async function Home() {
               priority
             />
           </div>
-          {/* Gradient overlay to fade into page bg */}
           <div
             aria-hidden='true'
             className='pointer-events-none absolute inset-0'
@@ -137,13 +132,11 @@ export default async function Home() {
           </div>
         </section>
 
-        {/* Product Screenshot */}
         <section
           aria-label='Product preview'
-          className='container pb-24 md:pb-36'
+          className='container py-24 md:py-36'
         >
           <div className='overflow-hidden rounded-2xl border shadow-2xl'>
-            {/* Decorative browser chrome — hidden from assistive tech */}
             <div
               aria-hidden='true'
               className='bg-muted/50 flex items-center gap-1.5 border-b px-4 py-3'
@@ -207,7 +200,6 @@ export default async function Home() {
           </div>
         </section>
 
-        {/* Bottom CTA */}
         <section aria-labelledby='cta-heading' className='border-t py-24'>
           <div className='container mx-auto max-w-2xl space-y-6 text-center'>
             <h2
@@ -231,7 +223,6 @@ export default async function Home() {
           </div>
         </section>
 
-        {/* Legal & Support */}
         <div className='container space-y-8 py-12'>
           <DCGLCompatibilityBanner className='text-black' />
           <BuyMeCofffeeBanner />
