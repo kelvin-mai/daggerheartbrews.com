@@ -16,7 +16,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils/index';
-import { DropdownMenuRadioGroup } from '@radix-ui/react-dropdown-menu';
+import { DropdownMenuRadioGroup } from '@/components/ui/dropdown-menu';
 
 type PaginationProps = React.ComponentProps<'nav'> & {
   currentPage: number;

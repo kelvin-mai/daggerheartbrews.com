@@ -39,7 +39,7 @@ import {
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
-import { Collapsible } from '@radix-ui/react-collapsible';
+import { Collapsible } from '@/components/ui/collapsible';
 import { CollapsibleContent, CollapsibleTrigger } from '../ui/collapsible';
 import { Badge } from '../ui/badge';
 

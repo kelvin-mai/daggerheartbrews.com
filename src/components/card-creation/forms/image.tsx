@@ -13,7 +13,7 @@ import {
   ImageCropperImage,
 } from '@/components/common';
 import { FormContainer } from '@/components/common/form';
-import { CollapsibleContent } from '@radix-ui/react-collapsible';
+import { CollapsibleContent } from '@/components/ui/collapsible';
 import { fileToBase64 } from '@/lib/utils';
 
 const createImage = (url: string): Promise<HTMLImageElement> =>

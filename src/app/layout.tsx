@@ -6,7 +6,7 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 import { fontVariables } from '@/lib/fonts';
 import { cn } from '@/lib/utils';
 import { QueryProvider } from '@/lib/context';
-import { Toaster } from '@/components/ui/toast';
+import { Toaster } from '@/components/ui/sonner';
 import { GoogleAdsense, VersionLogger } from '@/components/common';
 import '@/styles/globals.css';
 
