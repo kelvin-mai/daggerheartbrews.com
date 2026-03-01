@@ -19,7 +19,7 @@ export const SavePreviewButton: React.FC<
         <Button
           {...props}
           aria-disabled
-          className={cn('w-full cursor-not-allowed opacity-50', className)}
+          className={cn('cursor-not-allowed opacity-50', className)}
           onClick={(e) => e.preventDefault()}
         >
           {children}
