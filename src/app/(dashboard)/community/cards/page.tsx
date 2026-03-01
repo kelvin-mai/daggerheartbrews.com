@@ -12,6 +12,7 @@ export default function Page() {
       <PageHeader
         title='Community Cards'
         subtitle='Discover cards crafted by the Daggerheart community.'
+        className='mb-4'
       />
       <CommunityCards />
     </>

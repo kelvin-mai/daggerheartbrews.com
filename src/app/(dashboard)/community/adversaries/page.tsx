@@ -12,6 +12,7 @@ export default function Page() {
       <PageHeader
         title='Community Adversaries'
         subtitle='Discover adversaries crafted by the Daggerheart community.'
+        className='mb-4'
       />
       <CommunityAdversaries />
     </>

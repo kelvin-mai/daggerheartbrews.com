@@ -14,7 +14,7 @@ export default function Page() {
       <PageHeader
         title='Communities'
         subtitle='Browse SRD communities for use in custom community card creation.'
-        className='mb-6'
+        className='mb-4'
       >
         <span className='text-muted-foreground text-sm'>
           {communities.length} available

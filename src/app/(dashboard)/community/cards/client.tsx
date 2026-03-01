@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
+import { Layers } from 'lucide-react';
 
 import type {
   ApiResponse,
@@ -10,21 +11,23 @@ import type {
   User,
   UserCard,
 } from '@/lib/types';
-import { Pagination, PaginationPageSizeDropdown } from '@/components/common';
+import {
+  MultipleSelector,
+  Option,
+  Pagination,
+  PaginationPageSizeDropdown,
+} from '@/components/common';
 import { Skeleton } from '@/components/ui/skeleton';
 import { CommunityCard } from '@/components/post';
 import { cardTypes } from '@/lib/types/card-creation';
-import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { ChevronDown, Layers } from 'lucide-react';
+import { capitalize } from '@/lib/utils';
 
 type Data = { userCard: UserCard; user: User; cardPreview: CardDetails };
+
+const typeOptions: Option[] = cardTypes.map((t) => ({
+  value: t,
+  label: capitalize(t),
+}));
 
 async function fetchCards({
   page,
@@ -45,12 +48,14 @@ async function fetchCards({
 export const CommunityCards = () => {
   const [currentPage, setCurrentPage] = React.useState(1);
   const [pageSize, setPageSize] = React.useState(10);
-  const [selectedTypes, setSelectedTypes] = React.useState<string[]>([]);
+  const [selectedTypes, setSelectedTypes] = React.useState<Option[]>([]);
+
+  const selectedTypeValues = selectedTypes.map((o) => o.value);
 
   const { data, isLoading } = useQuery({
-    queryKey: ['community-cards', currentPage, pageSize, selectedTypes],
+    queryKey: ['community-cards', currentPage, pageSize, selectedTypeValues],
     queryFn: () =>
-      fetchCards({ page: currentPage, pageSize, types: selectedTypes }),
+      fetchCards({ page: currentPage, pageSize, types: selectedTypeValues }),
     placeholderData: keepPreviousData,
   });
 
@@ -71,50 +76,22 @@ export const CommunityCards = () => {
 
   return (
     <div className='mb-2 space-y-2'>
-      <div className='flex items-center justify-between gap-2'>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant='outline' className='capitalize'>
-              {selectedTypes.length > 0 &&
-              selectedTypes.length < cardTypes.length
-                ? `Type: ${selectedTypes.join(', ')}`
-                : 'Type: All'}
-              <ChevronDown className='text-muted-foreground ml-2 size-4' />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align='start' className='min-w-64'>
-            <DropdownMenuLabel>Filter by type</DropdownMenuLabel>
-            <DropdownMenuCheckboxItem
-              checked={selectedTypes.length === cardTypes.length}
-              onCheckedChange={(c) => {
-                setSelectedTypes(c ? [...cardTypes] : []);
-                setCurrentPage(1);
-              }}
-              className='capitalize'
-            >
-              All
-            </DropdownMenuCheckboxItem>
-            {cardTypes.map((t) => {
-              const checked = selectedTypes.includes(t);
-              return (
-                <DropdownMenuCheckboxItem
-                  key={t}
-                  checked={checked}
-                  onCheckedChange={(c) => {
-                    setSelectedTypes((prev) => {
-                      if (c) return Array.from(new Set([...prev, t]));
-                      return prev.filter((x) => x !== t);
-                    });
-                    setCurrentPage(1);
-                  }}
-                  className='capitalize'
-                >
-                  {t}
-                </DropdownMenuCheckboxItem>
-              );
-            })}
-          </DropdownMenuContent>
-        </DropdownMenu>
+      <div className='mb-6'>
+        <MultipleSelector
+          commandProps={{ label: 'Select Types' }}
+          defaultOptions={typeOptions}
+          value={selectedTypes}
+          onChange={(opts) => {
+            setSelectedTypes(opts);
+            setCurrentPage(1);
+          }}
+          placeholder='Filter by type'
+          emptyIndicator={
+            <p className='text-muted-foreground text-center text-sm'>
+              No results
+            </p>
+          }
+        />
       </div>
       {cards.map((card) => (
         <CommunityCard

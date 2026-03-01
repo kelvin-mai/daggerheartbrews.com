@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
+import { Skull } from 'lucide-react';
 
 import type {
   AdversaryDetails,
@@ -10,18 +11,15 @@ import type {
   User,
   UserAdversary,
 } from '@/lib/types';
-import { Pagination, PaginationPageSizeDropdown } from '@/components/common';
+import {
+  MultipleSelector,
+  Option,
+  Pagination,
+  PaginationPageSizeDropdown,
+} from '@/components/common';
 import { Skeleton } from '@/components/ui/skeleton';
 import { CommunityAdversary } from '@/components/post';
-import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { ChevronDown, Skull } from 'lucide-react';
+import { capitalize } from '@/lib/utils';
 
 type Data = {
   userAdversary: UserAdversary;
@@ -40,7 +38,18 @@ const predefinedRoles = [
   'solo',
   'standard',
   'support',
+  'custom',
 ];
+
+const tierOptions: Option[] = [1, 2, 3, 4, 5].map((n) => ({
+  value: String(n),
+  label: `Tier ${n}`,
+}));
+
+const roleOptions: Option[] = predefinedRoles.map((r) => ({
+  value: r,
+  label: capitalize(r),
+}));
 
 async function fetchAdversaries({
   page,
@@ -64,23 +73,26 @@ async function fetchAdversaries({
 export const CommunityAdversaries = () => {
   const [currentPage, setCurrentPage] = React.useState(1);
   const [pageSize, setPageSize] = React.useState(10);
-  const [selectedTiers, setSelectedTiers] = React.useState<number[]>([]);
-  const [selectedRoles, setSelectedRoles] = React.useState<string[]>([]);
+  const [selectedTiers, setSelectedTiers] = React.useState<Option[]>([]);
+  const [selectedRoles, setSelectedRoles] = React.useState<Option[]>([]);
+
+  const selectedTierValues = selectedTiers.map((o) => Number(o.value));
+  const selectedRoleValues = selectedRoles.map((o) => o.value);
 
   const { data, isLoading } = useQuery({
     queryKey: [
       'community-adversaries',
       currentPage,
       pageSize,
-      selectedTiers,
-      selectedRoles,
+      selectedTierValues,
+      selectedRoleValues,
     ],
     queryFn: () =>
       fetchAdversaries({
         page: currentPage,
         pageSize,
-        tiers: selectedTiers,
-        roles: selectedRoles,
+        tiers: selectedTierValues,
+        roles: selectedRoleValues,
       }),
     placeholderData: keepPreviousData,
   });
@@ -102,103 +114,37 @@ export const CommunityAdversaries = () => {
 
   return (
     <div className='mb-2 space-y-2'>
-      <div className='flex flex-row items-start gap-2'>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant='outline' className='capitalize'>
-              {selectedTiers.length > 0 && selectedTiers.length < 5
-                ? `Tier: ${selectedTiers.join(', ')}`
-                : 'Tier: All'}
-              <ChevronDown className='text-muted-foreground ml-2 size-4' />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align='start' className='min-w-64'>
-            <DropdownMenuLabel>Filter by tier</DropdownMenuLabel>
-            <DropdownMenuCheckboxItem
-              checked={selectedTiers.length === 5}
-              onCheckedChange={(c) => {
-                setSelectedTiers(c ? [1, 2, 3, 4, 5] : []);
-                setCurrentPage(1);
-              }}
-            >
-              All
-            </DropdownMenuCheckboxItem>
-            {[1, 2, 3, 4, 5].map((tier) => {
-              const checked = selectedTiers.includes(tier);
-              return (
-                <DropdownMenuCheckboxItem
-                  key={tier}
-                  checked={checked}
-                  onCheckedChange={(c) => {
-                    setSelectedTiers((prev) => {
-                      if (c) return Array.from(new Set([...prev, tier]));
-                      return prev.filter((x) => x !== tier);
-                    });
-                    setCurrentPage(1);
-                  }}
-                >
-                  {tier}
-                </DropdownMenuCheckboxItem>
-              );
-            })}
-          </DropdownMenuContent>
-        </DropdownMenu>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant='outline' className='capitalize'>
-              {selectedRoles.length > 0 &&
-              selectedRoles.length < predefinedRoles.length
-                ? `Role: ${selectedRoles.join(', ')}`
-                : 'Role: All'}
-              <ChevronDown className='text-muted-foreground ml-2 size-4' />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align='start' className='min-w-64'>
-            <DropdownMenuLabel>Filter by role</DropdownMenuLabel>
-            <DropdownMenuCheckboxItem
-              checked={selectedRoles.length === predefinedRoles.length}
-              onCheckedChange={(c) => {
-                setSelectedRoles(c ? [...predefinedRoles] : []);
-                setCurrentPage(1);
-              }}
-              className='capitalize'
-            >
-              All
-            </DropdownMenuCheckboxItem>
-            <DropdownMenuCheckboxItem
-              checked={selectedRoles.includes('custom')}
-              onCheckedChange={(c) => {
-                setSelectedRoles((prev) => {
-                  if (c) return Array.from(new Set([...prev, 'custom']));
-                  return prev.filter((x) => x !== 'custom');
-                });
-                setCurrentPage(1);
-              }}
-              className='capitalize'
-            >
-              custom
-            </DropdownMenuCheckboxItem>
-            {predefinedRoles.map((r) => {
-              const checked = selectedRoles.includes(r);
-              return (
-                <DropdownMenuCheckboxItem
-                  key={r}
-                  checked={checked}
-                  onCheckedChange={(c) => {
-                    setSelectedRoles((prev) => {
-                      if (c) return Array.from(new Set([...prev, r]));
-                      return prev.filter((x) => x !== r);
-                    });
-                    setCurrentPage(1);
-                  }}
-                  className='capitalize'
-                >
-                  {r}
-                </DropdownMenuCheckboxItem>
-              );
-            })}
-          </DropdownMenuContent>
-        </DropdownMenu>
+      <div className='mb-6 grid grid-cols-2 gap-2'>
+        <MultipleSelector
+          commandProps={{ label: 'Select Tiers' }}
+          defaultOptions={tierOptions}
+          value={selectedTiers}
+          onChange={(opts) => {
+            setSelectedTiers(opts);
+            setCurrentPage(1);
+          }}
+          placeholder='Filter by tier'
+          emptyIndicator={
+            <p className='text-muted-foreground text-center text-sm'>
+              No results
+            </p>
+          }
+        />
+        <MultipleSelector
+          commandProps={{ label: 'Select Roles' }}
+          defaultOptions={roleOptions}
+          value={selectedRoles}
+          onChange={(opts) => {
+            setSelectedRoles(opts);
+            setCurrentPage(1);
+          }}
+          placeholder='Filter by role'
+          emptyIndicator={
+            <p className='text-muted-foreground text-center text-sm'>
+              No results
+            </p>
+          }
+        />
       </div>
       {adversaries.map((adversary) => (
         <CommunityAdversary

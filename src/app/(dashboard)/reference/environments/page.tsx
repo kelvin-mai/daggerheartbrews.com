@@ -14,7 +14,7 @@ export default function Page() {
       <PageHeader
         title='Environments'
         subtitle='Browse SRD environments to inspire your next session.'
-        className='mb-6'
+        className='mb-4'
       />
       <FilteredEnvironments environments={environments} />
     </>

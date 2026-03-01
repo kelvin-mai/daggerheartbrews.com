@@ -14,7 +14,7 @@ export default function Page() {
       <PageHeader
         title='Ancestries'
         subtitle='Browse SRD ancestries for use in custom ancestry card creation.'
-        className='mb-6'
+        className='mb-4'
       >
         <span className='text-muted-foreground text-sm'>
           {ancestries.length} available
