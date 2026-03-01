@@ -5,7 +5,7 @@ export const Footer: React.FC = () => {
   return (
     <footer className='container'>
       <div className='mb-4 rounded-lg bg-neutral-900 p-4 text-neutral-200'>
-        <div className='grid grid-cols-3 gap-2'>
+        <div className='grid grid-cols-2 gap-2'>
           <div>
             <div className='mb-4 flex items-center gap-2'>
               <DaggerheartBrewsIcon
@@ -25,7 +25,7 @@ export const Footer: React.FC = () => {
               >
                 kelvin-mai
               </a>
-              . The soure code is availble on{' '}
+              . The source code is available on{' '}
               <a
                 className='underline underline-offset-4'
                 href='https://github.com/kelvin-mai/daggerheartbrews.com'
@@ -36,9 +36,7 @@ export const Footer: React.FC = () => {
             </p>
           </div>
           <div>
-            <h4 className='mb-4 text-lg font-bold tracking-tight'>
-              Quick Links
-            </h4>
+            <h4 className='mb-4 text-lg font-bold tracking-tight'>Pages</h4>
             <ul className='space-y-2'>
               <li>
                 <Link href='/'>Home</Link>
@@ -53,19 +51,12 @@ export const Footer: React.FC = () => {
                 <Link href='/about'>About</Link>
               </li>
               <li>
+                <Link href='/contact'>Contact</Link>
+              </li>
+              <li>
                 <Link href='/privacy-policy'>Privacy Policy</Link>
               </li>
             </ul>
-          </div>
-          <div>
-            <h4 className='mb-4 text-lg font-bold tracking-tight'>Connect</h4>
-            <a
-              href='mailto:me@kelvinmai.io'
-              target='_blank'
-              rel='noopener noreferrer'
-            >
-              me@kelvinmai.io
-            </a>
           </div>
         </div>
         <div className='pt-4 text-left text-sm text-neutral-400'>

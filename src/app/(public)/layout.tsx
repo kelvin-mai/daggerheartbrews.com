@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 
 import { Footer } from '@/components/layout';
+import { ThemeToggle } from '@/components/common';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -20,6 +21,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           />
           Daggerheart Brews
         </Link>
+        <div className='ml-auto'>
+          <ThemeToggle />
+        </div>
       </header>
       <main className='container flex-1 py-8'>{children}</main>
       <Footer />

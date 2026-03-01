@@ -1,7 +1,11 @@
 import { Resend } from 'resend';
 
-import { env } from '@/lib/env';
-import { ResetPasswordEmail, VerificationEmail } from '@/components/email';
+import { env } from '../env';
+import {
+  ContactEmail,
+  ResetPasswordEmail,
+  VerificationEmail,
+} from '@/components/email';
 
 export const resend = new Resend(env.RESEND_API_KEY);
 
@@ -28,5 +32,22 @@ export const sendResetPasswordEmail = async ({
     to: [user.email],
     subject: '[Action Required] Reset your password',
     react: <ResetPasswordEmail user={user} url={url} />,
+  });
+};
+
+type ContactEmailParams = {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+};
+
+export const sendContactEmail = async (params: ContactEmailParams) => {
+  return await resend.emails.send({
+    from: 'contact@daggerheartbrews.com',
+    to: ['me@kelvinmai.io'],
+    replyTo: params.email,
+    subject: `[Contact] ${params.subject}`,
+    react: <ContactEmail {...params} />,
   });
 };

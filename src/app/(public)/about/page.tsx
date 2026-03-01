@@ -123,15 +123,11 @@ export default function AboutPage() {
       <section className='space-y-4'>
         <h2 className='text-2xl font-bold'>Contact</h2>
         <p>
-          Have a question, found a bug, or want to get in touch? Reach out by
-          email at{' '}
-          <a
-            href='mailto:me@kelvinmai.io'
-            className='underline underline-offset-4'
-          >
-            me@kelvinmai.io
-          </a>{' '}
-          or open an issue on{' '}
+          Have a question, found a bug, or want to get in touch? Visit the{' '}
+          <Link href='/contact' className='underline underline-offset-4'>
+            contact page
+          </Link>{' '}
+          to send a message, or open an issue on{' '}
           <a
             href='https://github.com/kelvin-mai/daggerheartbrews.com/issues'
             target='_blank'
@@ -150,6 +146,9 @@ export default function AboutPage() {
         </Link>
         <Link href='/community/cards' className='underline underline-offset-4'>
           Browse Community
+        </Link>
+        <Link href='/contact' className='underline underline-offset-4'>
+          Contact
         </Link>
         <Link href='/privacy-policy' className='underline underline-offset-4'>
           Privacy Policy

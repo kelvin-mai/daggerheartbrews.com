@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'Privacy Policy',
@@ -94,8 +95,8 @@ export default function PrivacyPolicyPage() {
           data on our behalf:
         </p>
 
-        <div className='divide-y rounded-lg border'>
-          <div className='space-y-1 p-4'>
+        <div className='divide-y overflow-hidden rounded-lg border'>
+          <div className='hover:bg-accent space-y-1 p-4 transition-colors'>
             <h3 className='font-semibold'>Google AdSense</h3>
             <p className='text-muted-foreground text-sm'>
               We display advertisements served by Google AdSense. Google may use
@@ -122,7 +123,7 @@ export default function PrivacyPolicyPage() {
             </p>
           </div>
 
-          <div className='space-y-1 p-4'>
+          <div className='hover:bg-accent space-y-1 p-4 transition-colors'>
             <h3 className='font-semibold'>
               Vercel Analytics &amp; Speed Insights
             </h3>
@@ -141,7 +142,7 @@ export default function PrivacyPolicyPage() {
             </p>
           </div>
 
-          <div className='space-y-1 p-4'>
+          <div className='hover:bg-accent space-y-1 p-4 transition-colors'>
             <h3 className='font-semibold'>Better Auth</h3>
             <p className='text-muted-foreground text-sm'>
               Authentication is powered by Better Auth. Session tokens and
@@ -151,7 +152,7 @@ export default function PrivacyPolicyPage() {
             </p>
           </div>
 
-          <div className='space-y-1 p-4'>
+          <div className='hover:bg-accent space-y-1 p-4 transition-colors'>
             <h3 className='font-semibold'>Neon (Database)</h3>
             <p className='text-muted-foreground text-sm'>
               Our PostgreSQL database is hosted by Neon. Your account data and
@@ -168,7 +169,7 @@ export default function PrivacyPolicyPage() {
             </p>
           </div>
 
-          <div className='space-y-1 p-4'>
+          <div className='hover:bg-accent space-y-1 p-4 transition-colors'>
             <h3 className='font-semibold'>Resend</h3>
             <p className='text-muted-foreground text-sm'>
               Transactional emails (email verification, password reset) are sent
@@ -232,13 +233,10 @@ export default function PrivacyPolicyPage() {
           </li>
         </ul>
         <p>
-          To exercise any of these rights, please contact us at{' '}
-          <a
-            href='mailto:me@kelvinmai.io'
-            className='underline underline-offset-4'
-          >
-            me@kelvinmai.io
-          </a>
+          To exercise any of these rights, please{' '}
+          <Link href='/contact' className='underline underline-offset-4'>
+            contact us
+          </Link>
           .
         </p>
       </section>
@@ -267,18 +265,12 @@ export default function PrivacyPolicyPage() {
         <h2 className='text-2xl font-bold'>Contact</h2>
         <p>
           Questions about this privacy policy or requests regarding your data
-          can be sent to:
+          can be submitted via the{' '}
+          <Link href='/contact' className='underline underline-offset-4'>
+            contact page
+          </Link>
+          .
         </p>
-        <address className='not-italic'>
-          <strong>Kelvin Mai</strong>
-          <br />
-          <a
-            href='mailto:me@kelvinmai.io'
-            className='underline underline-offset-4'
-          >
-            me@kelvinmai.io
-          </a>
-        </address>
       </section>
     </div>
   );
