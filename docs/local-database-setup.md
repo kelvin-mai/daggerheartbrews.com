@@ -213,15 +213,50 @@ The `sql/` directory contains both schema migrations and seed data files. Docker
 
 ### SQL Files
 
-| File                       | Purpose                               |
-| -------------------------- | ------------------------------------- |
-| `0000_options.sql`         | Schema: game options/reference tables |
-| `0001_auth.sql`            | Schema: Better Auth tables            |
-| `0002_seed-options.sql`    | Seed: game options data               |
-| `0003_previews.sql`        | Schema: card/adversary preview tables |
-| `0005_user_items.sql`      | Schema: user-created content tables   |
-| `0006_seed-test-users.sql` | Seed: test user accounts              |
-| `0007_seed-content.sql`    | Seed: sample homebrew content         |
+| File                          | Purpose                                                                |
+| ----------------------------- | ---------------------------------------------------------------------- |
+| `0000_options.sql`            | Schema: game options/reference tables                                  |
+| `0001_auth.sql`               | Schema: Better Auth tables                                             |
+| `0002_seed-options.sql`       | Seed: game options data                                                |
+| `0003_previews.sql`           | Schema: card/adversary preview tables                                  |
+| `0005_user_items.sql`         | Schema: user-created content tables                                    |
+| `0006_seed-test-users.sql`    | Seed: test user accounts                                               |
+| `0007_seed-content.sql`       | Seed: sample homebrew content                                          |
+| `0008_user-settings.sql`      | Schema: user_settings table                                            |
+| `template_neon-migration.sql` | Template: for drafting Neon migrations (always rolls back — see below) |
+
+## Testing Migrations Before Production
+
+`sql/template_neon-migration.sql` is a reusable template for drafting and validating migration SQL locally before running it in Neon's SQL editor.
+
+### How it works
+
+The template wraps all statements in `BEGIN; ... ROLLBACK;`. This means:
+
+- **On local Docker**: the SQL executes fully (so errors surface), then rolls back — no data is changed
+- **In Neon's SQL editor**: you paste only the statements between `BEGIN` and `ROLLBACK`, then end with `COMMIT` yourself
+
+### Workflow
+
+1. Copy the template and name it with a `scratch_` prefix so it sorts after numbered migrations:
+
+   ```bash
+   cp sql/template_neon-migration.sql sql/scratch_my-migration.sql
+   ```
+
+2. Write your migration in the numbered steps inside the file.
+
+3. Test against local Postgres:
+
+   ```bash
+   docker exec -i dhbrews_db psql -U postgres -d brews < sql/scratch_my-migration.sql
+   ```
+
+   Review the output for errors. Repeat until it runs cleanly.
+
+4. Copy the migration statements (without `BEGIN` / `ROLLBACK`) into Neon's SQL editor. Run each step in order, verifying row counts between steps.
+
+5. Delete your scratch file once the migration is applied to production.
 
 ### Test Users
 
