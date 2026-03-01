@@ -7,13 +7,13 @@ import { updatePublicByDefault } from '@/actions/profile';
 import { Switch } from '@/components/ui/switch';
 
 type PublicDefaultFormProps = {
-  publicByDefault: boolean;
+  defaultVisibility: boolean;
 };
 
 export const PublicDefaultForm: React.FC<PublicDefaultFormProps> = ({
-  publicByDefault,
+  defaultVisibility,
 }) => {
-  const [checked, setChecked] = React.useState(publicByDefault);
+  const [checked, setChecked] = React.useState(defaultVisibility);
   const [pending, startTransition] = React.useTransition();
 
   const handleChange = (value: boolean) => {

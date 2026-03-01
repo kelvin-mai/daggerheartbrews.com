@@ -35,7 +35,7 @@ export default async function Page() {
     redirect('/login');
   }
   const [prefs] = await db
-    .select({ publicByDefault: users.publicByDefault })
+    .select({ defaultVisibility: users.defaultVisibility })
     .from(users)
     .where(eq(users.id, session.user.id));
 
@@ -95,7 +95,9 @@ export default async function Page() {
         </div>
       </div>
       <div className='bg-card rounded-lg border p-4'>
-        <PublicDefaultForm publicByDefault={prefs?.publicByDefault ?? false} />
+        <PublicDefaultForm
+          defaultVisibility={prefs?.defaultVisibility ?? false}
+        />
       </div>
 
       <Collapsible

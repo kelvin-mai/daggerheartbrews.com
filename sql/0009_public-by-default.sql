@@ -1,1 +1,1 @@
-ALTER TABLE "users" ADD COLUMN "public_by_default" boolean NOT NULL DEFAULT false;
+ALTER TABLE "users" ADD COLUMN "default_visibility" boolean NOT NULL DEFAULT false;

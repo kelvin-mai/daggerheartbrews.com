@@ -53,14 +53,14 @@ export const updateProfile = async (
 };
 
 export const updatePublicByDefault = async (
-  publicByDefault: boolean,
+  defaultVisibility: boolean,
 ): Promise<{ success: boolean; error?: string }> => {
   try {
     const session = await auth.api.getSession({ headers: await headers() });
     if (!session) throw new Error('Unauthorized');
     await db
       .update(users)
-      .set({ publicByDefault, updatedAt: sql`now()` })
+      .set({ defaultVisibility, updatedAt: sql`now()` })
       .where(eq(users.id, session.user.id));
     return { success: true };
   } catch (e) {

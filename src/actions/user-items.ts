@@ -37,7 +37,7 @@ export const insertCard = async ({
   session: { user: User };
 }) => {
   const [prefs] = await db
-    .select({ publicByDefault: users.publicByDefault })
+    .select({ defaultVisibility: users.defaultVisibility })
     .from(users)
     .where(eq(users.id, session.user.id));
   return await db.transaction(async (tx) => {
@@ -51,7 +51,7 @@ export const insertCard = async ({
       .values({
         userId: session.user.id,
         cardPreviewId: card.id,
-        public: prefs?.publicByDefault ?? false,
+        public: prefs?.defaultVisibility ?? false,
       })
       .returning();
     return { card, userCard };
@@ -111,7 +111,7 @@ export const insertAdversary = async ({
   session: { user: User };
 }) => {
   const [prefs] = await db
-    .select({ publicByDefault: users.publicByDefault })
+    .select({ defaultVisibility: users.defaultVisibility })
     .from(users)
     .where(eq(users.id, session.user.id));
   return await db.transaction(async (tx) => {
@@ -128,7 +128,7 @@ export const insertAdversary = async ({
       .values({
         userId: session.user.id,
         adversaryPreviewId: adversary.id,
-        public: prefs?.publicByDefault ?? false,
+        public: prefs?.defaultVisibility ?? false,
       })
       .returning();
     return { adversary, userAdversary };

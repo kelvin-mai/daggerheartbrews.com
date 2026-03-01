@@ -11,7 +11,7 @@ export const users = pgTable('users', {
     .notNull(),
   image: text('image'),
   emailUpdates: boolean('email_updates').notNull().default(true),
-  publicByDefault: boolean('public_by_default').notNull().default(false),
+  defaultVisibility: boolean('default_visibility').notNull().default(false),
   ...timestamps,
 });
 
