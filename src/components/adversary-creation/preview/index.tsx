@@ -45,7 +45,7 @@ export const AdversaryCreationPreview = () => {
   };
 
   return (
-    <div className='flex grow flex-col items-center space-y-2'>
+    <div className='flex flex-col items-center space-y-2'>
       <AdversaryPreviewStatblock
         ref={ref}
         adversary={adversary}

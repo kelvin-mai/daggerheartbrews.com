@@ -20,7 +20,7 @@ export default async function Page({ searchParams }: Props) {
       <p className='text-muted-foreground'>
         Create your very own Daggerheart Adversary or Environment!
       </p>
-      <div className='flex flex-col-reverse gap-2 py-4 md:flex-row'>
+      <div className='grid grid-cols-1 gap-2 py-4 md:grid-cols-2'>
         <AdversaryCreationForms />
         <AdversaryCreationPreview />
       </div>
