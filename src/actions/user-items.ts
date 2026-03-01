@@ -9,7 +9,7 @@ import {
   cardPreviews,
   userAdversaries,
   userCards,
-  users,
+  userSettings,
 } from '@/lib/database/schema';
 import type { AdversaryDetails, CardDetails, User } from '@/lib/types';
 
@@ -37,9 +37,9 @@ export const insertCard = async ({
   session: { user: User };
 }) => {
   const [prefs] = await db
-    .select({ defaultVisibility: users.defaultVisibility })
-    .from(users)
-    .where(eq(users.id, session.user.id));
+    .select({ defaultVisibility: userSettings.defaultVisibility })
+    .from(userSettings)
+    .where(eq(userSettings.userId, session.user.id));
   return await db.transaction(async (tx) => {
     const { id: _id, ...insertCard } = body.card;
     const [card] = await tx
@@ -111,9 +111,9 @@ export const insertAdversary = async ({
   session: { user: User };
 }) => {
   const [prefs] = await db
-    .select({ defaultVisibility: users.defaultVisibility })
-    .from(users)
-    .where(eq(users.id, session.user.id));
+    .select({ defaultVisibility: userSettings.defaultVisibility })
+    .from(userSettings)
+    .where(eq(userSettings.userId, session.user.id));
   return await db.transaction(async (tx) => {
     const { id: _id, ...insertAdversary } = body.adversary;
     const [adversary] = await tx

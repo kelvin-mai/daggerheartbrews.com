@@ -7,7 +7,7 @@ import { eq, sql } from 'drizzle-orm';
 
 import type { ActionState } from '@/lib/types';
 import { db } from '@/lib/database';
-import { users } from '@/lib/database/schema';
+import { users, userSettings } from '@/lib/database/schema';
 import { auth } from '@/lib/auth';
 import { syncAudienceContact } from '@/lib/email';
 
@@ -59,9 +59,9 @@ export const updatePublicByDefault = async (
     const session = await auth.api.getSession({ headers: await headers() });
     if (!session) throw new Error('Unauthorized');
     await db
-      .update(users)
+      .update(userSettings)
       .set({ defaultVisibility, updatedAt: sql`now()` })
-      .where(eq(users.id, session.user.id));
+      .where(eq(userSettings.userId, session.user.id));
     return { success: true };
   } catch (e) {
     return { success: false, error: (e as Error).message };
@@ -75,9 +75,9 @@ export const updateEmailPreference = async (
     const session = await auth.api.getSession({ headers: await headers() });
     if (!session) throw new Error('Unauthorized');
     await db
-      .update(users)
+      .update(userSettings)
       .set({ emailUpdates, updatedAt: sql`now()` })
-      .where(eq(users.id, session.user.id));
+      .where(eq(userSettings.userId, session.user.id));
     await syncAudienceContact({
       email: session.user.email,
       unsubscribed: !emailUpdates,

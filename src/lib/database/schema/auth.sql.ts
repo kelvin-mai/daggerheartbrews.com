@@ -10,6 +10,14 @@ export const users = pgTable('users', {
     .$defaultFn(() => false)
     .notNull(),
   image: text('image'),
+  ...timestamps,
+});
+
+export const userSettings = pgTable('user_settings', {
+  ...uuidPrimaryKey,
+  userId: uuid('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
   emailUpdates: boolean('email_updates').notNull().default(true),
   defaultVisibility: boolean('default_visibility').notNull().default(false),
   ...timestamps,

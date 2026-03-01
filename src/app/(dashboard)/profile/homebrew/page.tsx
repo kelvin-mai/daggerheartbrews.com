@@ -17,7 +17,7 @@ import {
   cardPreviews,
   userAdversaries,
   userCards,
-  users,
+  userSettings,
 } from '@/lib/database/schema';
 import { Collapsible, CollapsibleContent } from '@/components/ui/collapsible';
 import { Label } from '@/components/ui/label';
@@ -35,9 +35,9 @@ export default async function Page() {
     redirect('/login');
   }
   const [prefs] = await db
-    .select({ defaultVisibility: users.defaultVisibility })
-    .from(users)
-    .where(eq(users.id, session.user.id));
+    .select({ defaultVisibility: userSettings.defaultVisibility })
+    .from(userSettings)
+    .where(eq(userSettings.userId, session.user.id));
 
   const cardData = await db
     .select()

@@ -3,7 +3,7 @@ import { eq } from 'drizzle-orm';
 
 import { auth } from '@/lib/auth';
 import { db } from '@/lib/database';
-import { users } from '@/lib/database/schema';
+import { userSettings } from '@/lib/database/schema';
 import {
   EmailPreferenceForm,
   LogoutButton,
@@ -17,9 +17,9 @@ export default async function Page() {
   const session = await auth.api.getSession({ headers: await headers() });
   const prefs = session
     ? await db
-        .select({ emailUpdates: users.emailUpdates })
-        .from(users)
-        .where(eq(users.id, session.user.id))
+        .select({ emailUpdates: userSettings.emailUpdates })
+        .from(userSettings)
+        .where(eq(userSettings.userId, session.user.id))
         .then((rows) => rows[0])
     : null;
   return (
