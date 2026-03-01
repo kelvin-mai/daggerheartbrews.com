@@ -111,7 +111,7 @@ insert into adversary_previews (
 -- 1. Gravewarden (Solo Standard)
 (
   'd0000000-0000-0000-0000-000000000001',
-  'Gravewarden', 'Standard', 'Undead',
+  'Gravewarden', 'adversary', 'standard',
   2,
   'A hulking knight who died mid-oath and refused to stop. The Gravewarden patrols cursed crypts in silence, its armour sealed shut over centuries of decay. It cannot be reasoned with — only outlasted.',
   'When the Gravewarden drops below half HP, it enters Judgment Stance: all its attacks deal +1d6 damage and it gains resistance to physical damage.',
@@ -124,7 +124,7 @@ insert into adversary_previews (
 -- 2. Thornmaw Hydra (Solo)
 (
   'd0000000-0000-0000-0000-000000000002',
-  'Thornmaw Hydra', 'Solo', 'Beast',
+  'Thornmaw Hydra', 'adversary', 'solo',
   3,
   'A six-headed serpent whose necks are wrapped in living thorns. Each head operates independently, snapping and lunging from different angles. Severing a head only accelerates its hunger — two grow back, each angrier than the last.',
   'Each time the Hydra takes Severe damage, add one Head Token. At the start of each round, the Hydra makes one additional attack for each Head Token (max 3 bonus attacks).',
@@ -137,7 +137,7 @@ insert into adversary_previews (
 -- 3. Cult Zealot (Standard)
 (
   'd0000000-0000-0000-0000-000000000003',
-  'Cult Zealot', 'Standard', 'Humanoid',
+  'Cult Zealot', 'adversary', 'standard',
   1,
   'Hollow-eyed and feverish, the Zealot fights not with skill but with utter conviction. They feel no fear because they''ve traded it away for certainty. Their patron''s symbol is burned into their palm.',
   null,
@@ -150,7 +150,7 @@ insert into adversary_previews (
 -- 4. Deepmire Lurker (Skulk)
 (
   'd0000000-0000-0000-0000-000000000004',
-  'Deepmire Lurker', 'Skulk', 'Aberration',
+  'Deepmire Lurker', 'adversary', 'skulk',
   2,
   'Something that used to be an eel before the dark water changed it. The Lurker moves through flooded ruins with silent efficiency, striking from below and retreating into murk. It hunts by heat and breath.',
   null,
@@ -158,6 +158,44 @@ insert into adversary_previews (
   '<p><strong>Murk Veil (Passive):</strong> While in water or dim light, the Lurker is Concealed. Attacks against it have disadvantage until it attacks or takes damage.</p><p><strong>Drag Under (Reaction):</strong> When the Lurker hits with its standard attack, it may spend a Fear to grapple the target and pull them into the nearest body of water within Very Close range.</p>',
   'Tricky', 14, 2, '(7,14)',
   'Lunge Bite', 'Serrated Maw', 'Very Close', 'physical', '1d10+3', '+2'
+);
+--> statement-breakpoint
+
+-- ─────────────────────────────────────────────
+-- adversary_previews (environments)
+-- ─────────────────────────────────────────────
+insert into adversary_previews (
+  id, name, type, subtype,
+  tier, description, sub_description, experience,
+  text,
+  difficulty, hp, stress, thresholds,
+  attack, weapon, distance, damage_type, damage_amount, potential
+) values
+
+-- 5. The Whispering Bog (traversal)
+(
+  'd0000000-0000-0000-0000-000000000005',
+  'The Whispering Bog', 'environment', 'traversal',
+  null,
+  'A vast expanse of black water and sunken earth draped in perpetual mist. Ghostly voices murmur just below hearing, and every path that seemed solid a moment ago has since swallowed itself in mud.',
+  'Disorient, separate, and exhaust the party before dragging them under.',
+  null,
+  '<p><strong>Sinking Ground (Passive):</strong> At the start of each round, one PC of the GM''s choice must succeed on an Agility reaction roll or become Restrained in the mud until the start of their next turn.</p><p><strong>Ghost Voices (Action — 1 Fear):</strong> The bog speaks to one PC in the voice of someone they trust. That character must succeed on an Instinct reaction roll or spend their next action moving toward the voice.</p><p><strong>Mist Veil (Passive):</strong> Visibility is limited to Close range. Ranged attacks beyond Close range have disadvantage.</p>',
+  'Dangerous', null, null, null,
+  null, null, null, null, null, 'Deepmire Lurker, Will-o-Wisp'
+),
+
+-- 6. The Sunken Bazaar (social)
+(
+  'd0000000-0000-0000-0000-000000000006',
+  'The Sunken Bazaar', 'environment', 'social',
+  null,
+  'A drowned trading post that somehow still operates beneath thirty feet of seawater. Merchants in glass helmets haggle over secrets and stolen names. Coin is worthless here — only information has value.',
+  'Extract secrets, create obligations, and ensure no one leaves without owing something.',
+  null,
+  '<p><strong>Currency of Secrets (Passive):</strong> Any PC who asks for goods or information must first offer a secret in return. The GM decides whether the secret is valuable enough.</p><p><strong>Binding Debt (Reaction):</strong> When a PC accepts aid or goods without offering a secret, the GM may spend 2 Fear to mark them as Indebted. An Indebted character has disadvantage on Presence rolls until the debt is repaid.</p><p><strong>Leverage (Action — 1 Fear):</strong> A merchant reveals they already know something the party wanted kept hidden. One PC of the GM''s choice must make an Instinct reaction roll or become Shaken.</p>',
+  'Moderate', null, null, null,
+  null, null, null, null, null, 'Corrupt Merchant, Sea Witch, Debt Collector'
 );
 --> statement-breakpoint
 
@@ -180,4 +218,6 @@ insert into user_adversaries (id, user_id, public, adversary_preview_id, created
 ('f0000000-0000-0000-0000-000000000001', 'a0000000-0000-0000-0000-000000000001', true,  'd0000000-0000-0000-0000-000000000001', now()),
 ('f0000000-0000-0000-0000-000000000002', 'a0000000-0000-0000-0000-000000000002', true,  'd0000000-0000-0000-0000-000000000002', now()),
 ('f0000000-0000-0000-0000-000000000003', 'a0000000-0000-0000-0000-000000000003', true,  'd0000000-0000-0000-0000-000000000003', now()),
-('f0000000-0000-0000-0000-000000000004', 'a0000000-0000-0000-0000-000000000001', false, 'd0000000-0000-0000-0000-000000000004', now());
+('f0000000-0000-0000-0000-000000000004', 'a0000000-0000-0000-0000-000000000001', false, 'd0000000-0000-0000-0000-000000000004', now()),
+('f0000000-0000-0000-0000-000000000005', 'a0000000-0000-0000-0000-000000000002', true,  'd0000000-0000-0000-0000-000000000005', now()),
+('f0000000-0000-0000-0000-000000000006', 'a0000000-0000-0000-0000-000000000003', true,  'd0000000-0000-0000-0000-000000000006', now());

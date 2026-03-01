@@ -11,14 +11,13 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { FormField, PasswordInput } from '../common';
 import { cn } from '@/lib/utils';
-import { REDIRECT_LINK } from '@/lib/constants';
 
 export const LoginForm = () => {
   const [state, action, pending] = React.useActionState(login, {
     success: false,
   });
   if (state.success) {
-    redirect(REDIRECT_LINK);
+    redirect('/profile/homebrew');
   }
 
   return (

@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { AuthFormContainer, RegisterForm } from '@/components/auth';
 import { auth } from '@/lib/auth';
 import { headers } from 'next/headers';
-import { REDIRECT_LINK } from '@/lib/constants';
 
 export const metadata = {
   title: 'Register',
@@ -15,7 +14,7 @@ export const metadata = {
 export default async function Page() {
   const session = await auth.api.getSession({ headers: await headers() });
   if (session?.session) {
-    redirect(REDIRECT_LINK);
+    redirect('/profile/homebrew');
   }
   return (
     <div className='flex items-center justify-center'>

@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
+import { headers } from 'next/headers';
 import { LogIn, Palette, Download, Users, Sliders } from 'lucide-react';
 import {
   AdUnit,
@@ -10,6 +11,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Footer } from '@/components/layout';
+import { auth } from '@/lib/auth';
 
 const features = [
   {
@@ -39,6 +41,8 @@ const features = [
 ];
 
 export default async function Home() {
+  const session = await auth.api.getSession({ headers: await headers() });
+  const ctaHref = session ? '/profile/homebrew' : '/card/create';
   return (
     <>
       <a
@@ -65,7 +69,7 @@ export default async function Home() {
           <nav aria-label='Main navigation' className='flex items-center gap-2'>
             <ThemeToggle />
             <Button size='sm' asChild>
-              <Link href='/card/create'>Start Building</Link>
+              <Link href={ctaHref}>Start Building</Link>
             </Button>
           </nav>
         </div>
@@ -120,7 +124,7 @@ export default async function Home() {
             </p>
             <div className='flex flex-col items-center justify-center gap-4 sm:flex-row'>
               <Button size='lg' className='px-8' asChild>
-                <Link href='/card/create'>Start Building for Free</Link>
+                <Link href={ctaHref}>Start Building for Free</Link>
               </Button>
               <Button size='lg' variant='outline' asChild>
                 <Link href='/login'>
@@ -214,7 +218,7 @@ export default async function Home() {
             </p>
             <div className='flex flex-col items-center justify-center gap-4 sm:flex-row'>
               <Button size='lg' asChild>
-                <Link href='/card/create'>Create Your First Card</Link>
+                <Link href={ctaHref}>Create Your First Card</Link>
               </Button>
               <Button size='lg' variant='ghost' asChild>
                 <Link href='/community'>Browse Community</Link>

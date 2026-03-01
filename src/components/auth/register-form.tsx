@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { FormField, PasswordInput, PasswordStrengthMeter } from '../common';
 import { cn } from '@/lib/utils';
-import { passwordRequirements, REDIRECT_LINK } from '@/lib/constants';
+import { passwordRequirements } from '@/lib/constants';
 
 export const RegisterForm = () => {
   const [password, setPassword] = React.useState('');
@@ -17,7 +17,7 @@ export const RegisterForm = () => {
     success: false,
   });
   if (state.success) {
-    redirect(REDIRECT_LINK);
+    redirect('/profile/homebrew');
   }
   return (
     <form action={action} className='flex flex-col space-y-4'>
