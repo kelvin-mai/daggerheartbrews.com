@@ -57,7 +57,7 @@ export default async function Page() {
     <div className='mb-4 space-y-4'>
       <PageHeader
         title='My Homebrew'
-        subtitle='Manage your custom cards and adversaries'
+        subtitle='All your custom content in one place.'
       />
       <div className='grid grid-cols-2 gap-3 sm:grid-cols-4'>
         <div className='bg-card rounded-lg border p-3 text-center'>

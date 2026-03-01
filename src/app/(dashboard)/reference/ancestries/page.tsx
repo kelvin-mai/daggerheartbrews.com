@@ -13,7 +13,7 @@ export default function Page() {
     <>
       <PageHeader
         title='Ancestries'
-        subtitle='Browse SRD ancestries available for ancestry card creation.'
+        subtitle='Browse SRD ancestries for use in custom ancestry card creation.'
         className='mb-6'
       >
         <span className='text-muted-foreground text-sm'>

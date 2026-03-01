@@ -38,7 +38,10 @@ export default async function Page({ params }: Props) {
         card={result.card_previews as CardDetails}
         userCard={result.user_cards as UserCard}
       />
-      <PageHeader title='Edit Card' subtitle='Edit your Daggerheart card.' />
+      <PageHeader
+        title='Edit Card'
+        subtitle='Refine and update your custom card.'
+      />
       <div className='flex flex-col-reverse gap-2 py-4 md:flex-row'>
         <CardCreationForms />
         <CardCreationPreview />

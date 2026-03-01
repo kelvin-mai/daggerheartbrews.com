@@ -12,7 +12,10 @@ export default async function Page() {
   });
   return (
     <div>
-      <PageHeader title='Account' subtitle='These are your profile settings' />
+      <PageHeader
+        title='Account'
+        subtitle='Manage your account details and preferences.'
+      />
       <div className='my-4 space-y-4'>
         <div className='bg-card space-y-2 rounded-lg border p-4'>
           <div className='flex items-center gap-2'>

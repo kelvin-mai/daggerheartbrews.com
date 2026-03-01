@@ -17,7 +17,7 @@ export default async function Page({ searchParams }: Props) {
       <CardCreateInitializer isTemplate={template === 'true'} />
       <PageHeader
         title='Create a card'
-        subtitle='Create your very own Daggerheart card!'
+        subtitle='Design custom cards to expand your Daggerheart experience.'
       />
       <div className='flex flex-col-reverse gap-2 py-4 md:flex-row'>
         <CardCreationForms />

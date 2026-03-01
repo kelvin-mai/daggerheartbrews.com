@@ -17,7 +17,7 @@ export default function Page() {
     <>
       <PageHeader
         title='Game Master Screen'
-        subtitle='GM Screen with quick reference to common rules'
+        subtitle='Quick reference for rules, rolls, and tables at the table.'
       />
       <div className='my-4 columns-1 gap-4 space-y-4 md:columns-2 lg:columns-3'>
         <GameMasterTables />

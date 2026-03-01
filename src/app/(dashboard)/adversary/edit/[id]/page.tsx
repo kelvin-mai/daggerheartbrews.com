@@ -48,7 +48,7 @@ export default async function Page({ params }: Props) {
       />
       <PageHeader
         title='Edit Adversary'
-        subtitle='Edit your Daggerheart adversary.'
+        subtitle='Refine and update your custom adversary.'
       />
       <div className='flex flex-col-reverse gap-2 py-4 md:flex-row'>
         <AdversaryCreationForms />

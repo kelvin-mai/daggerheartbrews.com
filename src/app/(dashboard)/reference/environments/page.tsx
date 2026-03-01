@@ -13,7 +13,7 @@ export default function Page() {
     <>
       <PageHeader
         title='Environments'
-        subtitle='Reference to environments available in the System Reference Document'
+        subtitle='Browse SRD environments to inspire your next session.'
         className='mb-6'
       />
       <FilteredEnvironments environments={environments} />

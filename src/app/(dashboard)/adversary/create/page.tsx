@@ -17,7 +17,7 @@ export default async function Page({ searchParams }: Props) {
       <AdversaryCreateInitializer isTemplate={template === 'true'} />
       <PageHeader
         title='Create an Adversary'
-        subtitle='Create your very own Daggerheart Adversary or Environment!'
+        subtitle='Build custom adversaries and environments for your campaign.'
       />
       <div className='grid grid-cols-1 gap-2 py-4 md:grid-cols-2'>
         <AdversaryCreationForms />
