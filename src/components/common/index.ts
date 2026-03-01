@@ -1,4 +1,5 @@
 export * from './adsense';
+export * from './page-header';
 export * from './collapsible-section';
 export * from './buy-me-coffee-banner';
 export * from './custom-select';

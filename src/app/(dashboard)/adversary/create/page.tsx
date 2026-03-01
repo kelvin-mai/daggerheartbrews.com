@@ -1,5 +1,6 @@
 import { AdversaryCreationForms } from '@/components/adversary-creation/forms';
 import { AdversaryCreationPreview } from '@/components/adversary-creation/preview';
+import { PageHeader } from '@/components/common';
 import { AdversaryCreateInitializer } from './initializer';
 
 export const metadata = {
@@ -14,12 +15,10 @@ export default async function Page({ searchParams }: Props) {
   return (
     <>
       <AdversaryCreateInitializer isTemplate={template === 'true'} />
-      <h1 className='font-eveleth-clean dark:text-primary-foreground text-2xl font-bold'>
-        Create an Adversary
-      </h1>
-      <p className='text-muted-foreground'>
-        Create your very own Daggerheart Adversary or Environment!
-      </p>
+      <PageHeader
+        title='Create an Adversary'
+        subtitle='Create your very own Daggerheart Adversary or Environment!'
+      />
       <div className='grid grid-cols-1 gap-2 py-4 md:grid-cols-2'>
         <AdversaryCreationForms />
         <AdversaryCreationPreview />

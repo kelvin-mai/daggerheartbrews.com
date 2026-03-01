@@ -1,4 +1,5 @@
 import { ancestries } from '@/lib/constants';
+import { PageHeader } from '@/components/common';
 import { FilteredAncestries } from './client';
 
 export const metadata = {
@@ -10,19 +11,15 @@ export const metadata = {
 export default function Page() {
   return (
     <>
-      <div className='mb-6'>
-        <div className='flex items-baseline gap-2'>
-          <h1 className='font-eveleth-clean dark:text-primary-foreground text-2xl font-bold'>
-            Ancestries
-          </h1>
-          <span className='text-muted-foreground text-sm'>
-            {ancestries.length} available
-          </span>
-        </div>
-        <p className='text-muted-foreground mt-0.5 text-sm'>
-          Browse SRD ancestries available for ancestry card creation.
-        </p>
-      </div>
+      <PageHeader
+        title='Ancestries'
+        subtitle='Browse SRD ancestries available for ancestry card creation.'
+        className='mb-6'
+      >
+        <span className='text-muted-foreground text-sm'>
+          {ancestries.length} available
+        </span>
+      </PageHeader>
       <FilteredAncestries ancestries={ancestries} />
     </>
   );

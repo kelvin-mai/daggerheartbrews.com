@@ -8,6 +8,7 @@ import { cardPreviews, userCards } from '@/lib/database/schema';
 import type { CardDetails, UserCard } from '@/lib/types';
 import { CardCreationForms } from '@/components/card-creation/forms';
 import { CardCreationPreview } from '@/components/card-creation/preview';
+import { PageHeader } from '@/components/common';
 import { CardEditInitializer } from './initializer';
 
 export const metadata = {
@@ -37,10 +38,7 @@ export default async function Page({ params }: Props) {
         card={result.card_previews as CardDetails}
         userCard={result.user_cards as UserCard}
       />
-      <h1 className='font-eveleth-clean dark:text-primary-foreground text-2xl font-bold'>
-        Edit Card
-      </h1>
-      <p className='text-muted-foreground'>Edit your Daggerheart card.</p>
+      <PageHeader title='Edit Card' subtitle='Edit your Daggerheart card.' />
       <div className='flex flex-col-reverse gap-2 py-4 md:flex-row'>
         <CardCreationForms />
         <CardCreationPreview />

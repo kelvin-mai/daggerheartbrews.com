@@ -8,6 +8,7 @@ import { adversaryPreviews, userAdversaries } from '@/lib/database/schema';
 import type { AdversaryDetails, UserAdversary } from '@/lib/types';
 import { AdversaryCreationForms } from '@/components/adversary-creation/forms';
 import { AdversaryCreationPreview } from '@/components/adversary-creation/preview';
+import { PageHeader } from '@/components/common';
 import { AdversaryEditInitializer } from './initializer';
 
 export const metadata = {
@@ -45,10 +46,10 @@ export default async function Page({ params }: Props) {
         adversary={result.adversary_previews as AdversaryDetails}
         userAdversary={result.user_adversaries as UserAdversary}
       />
-      <h1 className='font-eveleth-clean dark:text-primary-foreground text-2xl font-bold'>
-        Edit Adversary
-      </h1>
-      <p className='text-muted-foreground'>Edit your Daggerheart adversary.</p>
+      <PageHeader
+        title='Edit Adversary'
+        subtitle='Edit your Daggerheart adversary.'
+      />
       <div className='flex flex-col-reverse gap-2 py-4 md:flex-row'>
         <AdversaryCreationForms />
         <AdversaryCreationPreview />

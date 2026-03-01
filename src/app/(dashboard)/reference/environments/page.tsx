@@ -1,4 +1,5 @@
 import { environments } from '@/lib/constants/srd';
+import { PageHeader } from '@/components/common';
 import { FilteredEnvironments } from './client';
 
 export const metadata = {
@@ -10,12 +11,10 @@ export const metadata = {
 export default function Page() {
   return (
     <>
-      <h1 className='font-eveleth-clean dark:text-primary-foreground text-2xl font-bold'>
-        Environments
-      </h1>
-      <p className='text-muted-foreground'>
-        Reference to environments available in the System Reference Document
-      </p>
+      <PageHeader
+        title='Environments'
+        subtitle='Reference to environments available in the System Reference Document'
+      />
       <FilteredEnvironments environments={environments} />
     </>
   );

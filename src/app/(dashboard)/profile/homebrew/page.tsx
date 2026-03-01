@@ -23,7 +23,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { PersonalAdversary, PersonalCard } from '@/components/post';
-import { CollapsibleSectionTrigger } from '@/components/common';
+import { CollapsibleSectionTrigger, PageHeader } from '@/components/common';
 
 export default async function Page() {
   const session = await auth.api.getSession({
@@ -55,12 +55,10 @@ export default async function Page() {
 
   return (
     <div className='mb-4 space-y-4'>
-      <div>
-        <h1 className='font-eveleth-clean text-2xl font-bold'>My Homebrew</h1>
-        <p className='text-muted-foreground'>
-          Manage your custom cards and adversaries
-        </p>
-      </div>
+      <PageHeader
+        title='My Homebrew'
+        subtitle='Manage your custom cards and adversaries'
+      />
       <div className='grid grid-cols-2 gap-3 sm:grid-cols-4'>
         <div className='bg-card rounded-lg border p-3 text-center'>
           <p className='text-muted-foreground text-xs font-medium tracking-wider uppercase'>

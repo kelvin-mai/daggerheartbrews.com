@@ -1,4 +1,5 @@
 import { classes, domainColor } from '@/lib/constants/srd';
+import { PageHeader } from '@/components/common';
 import { CardClassPreview } from './client';
 
 export const metadata = {
@@ -10,17 +11,14 @@ export const metadata = {
 export default function Page() {
   return (
     <>
-      <div className='flex items-baseline gap-2'>
-        <h1 className='font-eveleth-clean dark:text-primary-foreground text-2xl font-bold'>
-          Classes
-        </h1>
+      <PageHeader
+        title='Classes'
+        subtitle='Browse SRD classes available for class card creation'
+      >
         <span className='text-muted-foreground text-sm'>
           {classes.length} available
         </span>
-      </div>
-      <p className='text-muted-foreground'>
-        Browse SRD classes available for class card creation
-      </p>
+      </PageHeader>
       <div className='my-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
         {classes.map((cl) => (
           <CardClassPreview

@@ -3,6 +3,7 @@ import { headers } from 'next/headers';
 import { auth } from '@/lib/auth';
 import { LogoutButton, ProfileSettingsForm } from '@/components/auth';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { PageHeader } from '@/components/common';
 import { ResendVerificationForm } from './client';
 
 export default async function Page() {
@@ -11,8 +12,7 @@ export default async function Page() {
   });
   return (
     <div>
-      <h1 className='font-eveleth-clean text-2xl font-bold'>Account</h1>
-      <p className='text-muted-foreground'>These are your profile settings</p>
+      <PageHeader title='Account' subtitle='These are your profile settings' />
       <div className='my-4 space-y-4'>
         <div className='bg-card space-y-2 rounded-lg border p-4'>
           <div className='flex items-center gap-2'>

@@ -1,6 +1,6 @@
 import { CardDisplayPreview } from '@/components/card-creation/preview';
 import { Collapsible, CollapsibleContent } from '@/components/ui/collapsible';
-import { CollapsibleSectionTrigger } from '@/components/common';
+import { CollapsibleSectionTrigger, PageHeader } from '@/components/common';
 import { Label } from '@/components/ui/label';
 import { initialSettings } from '@/lib/constants';
 import { classes, domainColor } from '@/lib/constants/srd';
@@ -30,9 +30,7 @@ export default async function Page({ params }: PageProps) {
   }
   return (
     <>
-      <h1 className='font-eveleth-clean dark:text-primary-foreground text-2xl font-bold'>
-        {name}
-      </h1>
+      <PageHeader title={name} />
       <div className='my-4 flex flex-col gap-4 sm:grid sm:grid-cols-2 lg:grid-cols-[1fr_2fr]'>
         <CardDisplayPreview
           card={{

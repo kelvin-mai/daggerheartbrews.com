@@ -5,6 +5,7 @@ import {
   GameMasterTables,
   GameMasterTraits,
 } from '@/components/game-master';
+import { PageHeader } from '@/components/common';
 
 export const metadata = {
   title: 'Game Master Screen',
@@ -14,12 +15,10 @@ export const metadata = {
 export default function Page() {
   return (
     <>
-      <h1 className='font-eveleth-clean dark:text-primary-foreground text-2xl font-bold'>
-        Game Master Screen
-      </h1>
-      <p className='text-muted-foreground'>
-        GM Screen with quick reference to common rules
-      </p>
+      <PageHeader
+        title='Game Master Screen'
+        subtitle='GM Screen with quick reference to common rules'
+      />
       <div className='my-4 columns-1 gap-4 space-y-4 md:columns-2 lg:columns-3'>
         <GameMasterTables />
         <GameMasterRolls />
