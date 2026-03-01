@@ -227,11 +227,11 @@ The `sql/` directory contains both schema migrations and seed data files. Docker
 
 `0006_seed-test-users.sql` creates three test accounts for local development. All use the password `Password1`.
 
-| Email               | Role         |
-| ------------------- | ------------ |
-| `admin@example.com` | Admin        |
-| `user@example.com`  | Regular user |
-| `user2@example.com` | Regular user |
+| Email            | Role         |
+| ---------------- | ------------ |
+| `admin@test.com` | Admin        |
+| `user@test.com`  | Regular user |
+| `user2@test.com` | Regular user |
 
 ### Applying Seed Files Manually
 

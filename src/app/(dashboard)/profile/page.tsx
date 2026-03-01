@@ -1,15 +1,27 @@
 import { headers } from 'next/headers';
+import { eq } from 'drizzle-orm';
 
 import { auth } from '@/lib/auth';
-import { LogoutButton, ProfileSettingsForm } from '@/components/auth';
+import { db } from '@/lib/database';
+import { users } from '@/lib/database/schema';
+import {
+  EmailPreferenceForm,
+  LogoutButton,
+  ProfileSettingsForm,
+} from '@/components/auth';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { PageHeader } from '@/components/common';
 import { ResendVerificationForm } from './client';
 
 export default async function Page() {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+  const session = await auth.api.getSession({ headers: await headers() });
+  const prefs = session
+    ? await db
+        .select({ emailUpdates: users.emailUpdates })
+        .from(users)
+        .where(eq(users.id, session.user.id))
+        .then((rows) => rows[0])
+    : null;
   return (
     <div>
       <PageHeader
@@ -47,6 +59,12 @@ export default async function Page() {
         </div>
         {session?.user && !session.user.emailVerified && (
           <ResendVerificationForm email={session.user.email} />
+        )}
+        {session?.user && prefs && (
+          <div className='bg-card space-y-2 rounded-lg border p-4'>
+            <h2 className='text-lg font-bold'>Email Preferences</h2>
+            <EmailPreferenceForm emailUpdates={prefs.emailUpdates} />
+          </div>
         )}
       </div>
     </div>

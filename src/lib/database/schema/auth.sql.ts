@@ -10,6 +10,7 @@ export const users = pgTable('users', {
     .$defaultFn(() => false)
     .notNull(),
   image: text('image'),
+  emailUpdates: boolean('email_updates').notNull().default(true),
   ...timestamps,
 });
 

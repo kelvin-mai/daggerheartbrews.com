@@ -1,3 +1,4 @@
+export * from './email-preference-form';
 export * from './forgot-password-form';
 export * from './layout';
 export * from './login-form';

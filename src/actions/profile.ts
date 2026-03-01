@@ -9,6 +9,7 @@ import type { ActionState } from '@/lib/types';
 import { db } from '@/lib/database';
 import { users } from '@/lib/database/schema';
 import { auth } from '@/lib/auth';
+import { syncAudienceContact } from '@/lib/email';
 
 const profileSchema = z.object({
   email: z.string().email(),
@@ -41,14 +42,33 @@ export const updateProfile = async (
         .set({ name: validation.data.name, updatedAt: sql`now()` })
         .where(eq(users.email, validation.data.email));
       revalidatePath('/profile');
-      return {
-        success: true,
-      };
+      return { success: true };
     } catch (e) {
       return {
         errors: { action: (e as Error).message },
         success: false,
       };
     }
+  }
+};
+
+export const updateEmailPreference = async (
+  emailUpdates: boolean,
+): Promise<{ success: boolean; error?: string }> => {
+  try {
+    const session = await auth.api.getSession({ headers: await headers() });
+    if (!session) throw new Error('Unauthorized');
+    await db
+      .update(users)
+      .set({ emailUpdates, updatedAt: sql`now()` })
+      .where(eq(users.id, session.user.id));
+    await syncAudienceContact({
+      email: session.user.email,
+      unsubscribed: !emailUpdates,
+    });
+    revalidatePath('/profile');
+    return { success: true };
+  } catch (e) {
+    return { success: false, error: (e as Error).message };
   }
 };

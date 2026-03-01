@@ -4,6 +4,7 @@ import { z } from 'zod';
 
 import type { ActionState } from '@/lib/types';
 import { auth } from '@/lib/auth';
+import { addAudienceContact } from '@/lib/email';
 
 const authSchema = z.object({
   email: z.string().email(),
@@ -82,6 +83,10 @@ export const register = async (
           email: validation.data.email,
           password: validation.data.password,
         },
+      });
+      await addAudienceContact({
+        email: validation.data.email,
+        firstName: validation.data.name,
       });
       return {
         success: true,

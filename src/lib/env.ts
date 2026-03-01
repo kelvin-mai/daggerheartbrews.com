@@ -17,6 +17,8 @@ const schema = z.object({
   GOOGLE_CLIENT_ID: z.string(),
   GOOGLE_CLIENT_SECRET: z.string(),
   RESEND_API_KEY: z.string(),
+  RESEND_AUDIENCE_ID: z.string().optional(),
+  BROADCAST_SECRET: z.string().optional(),
 });
 
 export const env = schema.parse(process.env);
