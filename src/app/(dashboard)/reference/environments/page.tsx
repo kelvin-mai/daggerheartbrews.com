@@ -14,6 +14,7 @@ export default function Page() {
       <PageHeader
         title='Environments'
         subtitle='Reference to environments available in the System Reference Document'
+        className='mb-6'
       />
       <FilteredEnvironments environments={environments} />
     </>

@@ -2,12 +2,12 @@
 
 import * as React from 'react';
 import { AnimatePresence, motion } from 'motion/react';
+import { Search } from 'lucide-react';
 
 import type { AdversaryDetails } from '@/lib/types';
 import { AdversaryPreviewStatblock } from '@/components/adversary-creation/preview/statblock';
-import { FormInput } from '@/components/common/form';
 import { MultipleSelector, Option } from '@/components/common';
-import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 import { capitalize } from '@/lib/utils';
 
 export const FilteredEnvironments = ({
@@ -29,45 +29,41 @@ export const FilteredEnvironments = ({
   const [selectedTypes, setSelectedTypes] = React.useState<Option[]>([]);
   const [selectedTiers, setSelectedTiers] = React.useState<Option[]>([]);
   return (
-    <div className='pt-2'>
-      <Label className='py-2'>Filter Environments</Label>
-      <div className='grid grid-cols-3 items-center gap-2'>
-        <FormInput
-          id='name'
-          placeholder='Environment Name'
-          value={searchName}
-          onChange={(e) => setSearchName(e.target.value)}
+    <div>
+      <div className='mb-6 grid grid-cols-3 gap-2'>
+        <div className='relative'>
+          <Search className='text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2' />
+          <Input
+            className='pl-9'
+            placeholder='Search environments…'
+            value={searchName}
+            onChange={(e) => setSearchName(e.target.value)}
+          />
+        </div>
+        <MultipleSelector
+          commandProps={{ label: 'Select Types' }}
+          defaultOptions={types}
+          value={selectedTypes}
+          onChange={setSelectedTypes}
+          placeholder='Filter by type'
+          emptyIndicator={
+            <p className='text-muted-foreground text-center text-sm'>
+              No results
+            </p>
+          }
         />
-        <div className='space-y-2'>
-          <Label>Type</Label>
-          <MultipleSelector
-            commandProps={{ label: 'Select Types' }}
-            defaultOptions={types}
-            value={selectedTypes}
-            onChange={setSelectedTypes}
-            placeholder='Select Types'
-            emptyIndicator={
-              <p className='text-muted-foreground text-center text-sm'>
-                No results
-              </p>
-            }
-          />
-        </div>
-        <div className='space-y-2'>
-          <Label>Tier</Label>
-          <MultipleSelector
-            commandProps={{ label: 'Select Tiers' }}
-            defaultOptions={tiers}
-            value={selectedTiers}
-            onChange={setSelectedTiers}
-            placeholder='Select Tiers'
-            emptyIndicator={
-              <p className='text-muted-foreground text-center text-sm'>
-                No results
-              </p>
-            }
-          />
-        </div>
+        <MultipleSelector
+          commandProps={{ label: 'Select Tiers' }}
+          defaultOptions={tiers}
+          value={selectedTiers}
+          onChange={setSelectedTiers}
+          placeholder='Filter by tier'
+          emptyIndicator={
+            <p className='text-muted-foreground text-center text-sm'>
+              No results
+            </p>
+          }
+        />
       </div>
       <div className='my-4 columns-1 gap-4 space-y-4 lg:columns-2 xl:columns-3'>
         <AnimatePresence>
