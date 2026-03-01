@@ -36,8 +36,8 @@ export const FilteredBeastforms = ({
 
   return (
     <div>
-      <div className='mb-6 flex gap-2'>
-        <div className='relative flex-1'>
+      <div className='mb-6 grid grid-cols-2 gap-2'>
+        <div className='relative'>
           <Search className='text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2' />
           <Input
             className='pl-9'
@@ -46,20 +46,18 @@ export const FilteredBeastforms = ({
             onChange={(e) => setSearchName(e.target.value)}
           />
         </div>
-        <div className='w-48 shrink-0'>
-          <MultipleSelector
-            commandProps={{ label: 'Select Tiers' }}
-            defaultOptions={tiers}
-            value={selectedTiers}
-            onChange={setSelectedTiers}
-            placeholder='Filter by tier'
-            emptyIndicator={
-              <p className='text-muted-foreground text-center text-sm'>
-                No results
-              </p>
-            }
-          />
-        </div>
+        <MultipleSelector
+          commandProps={{ label: 'Select Tiers' }}
+          defaultOptions={tiers}
+          value={selectedTiers}
+          onChange={setSelectedTiers}
+          placeholder='Filter by tier'
+          emptyIndicator={
+            <p className='text-muted-foreground text-center text-sm'>
+              No results
+            </p>
+          }
+        />
       </div>
 
       {filtered.length === 0 && (
