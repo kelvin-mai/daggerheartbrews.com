@@ -5,7 +5,7 @@ export const Footer: React.FC = () => {
   return (
     <footer className='container'>
       <div className='mb-4 rounded-lg bg-neutral-900 p-4 text-neutral-200'>
-        <div className='grid grid-cols-2 gap-2'>
+        <div className='flex flex-col gap-4 md:flex-row md:justify-between'>
           <div>
             <div className='mb-4 flex items-center gap-2'>
               <DaggerheartBrewsIcon
@@ -25,7 +25,8 @@ export const Footer: React.FC = () => {
               >
                 kelvin-mai
               </a>
-              . The source code is available on{' '}
+              . This project is open source and welcomes contributions from the
+              community. The source code is available on{' '}
               <a
                 className='underline underline-offset-4'
                 href='https://github.com/kelvin-mai/daggerheartbrews.com'
@@ -35,7 +36,7 @@ export const Footer: React.FC = () => {
               .
             </p>
           </div>
-          <div>
+          <div className='min-w-[250px] shrink-0'>
             <h4 className='mb-4 text-lg font-bold tracking-tight'>Pages</h4>
             <ul className='space-y-2'>
               <li>
