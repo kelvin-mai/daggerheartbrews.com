@@ -1,0 +1,9 @@
+insert into users (id, name, email, email_verified, created_at) values
+('a0000000-0000-0000-0000-000000000001', 'Test Admin', 'admin@test.com', true, now()),
+('a0000000-0000-0000-0000-000000000002', 'Test User', 'user@test.com', true, now()),
+('a0000000-0000-0000-0000-000000000003', 'Test User 2', 'user2@test.com', true, now());
+--> statement-breakpoint
+insert into accounts (id, account_id, provider_id, user_id, password, created_at) values
+('b0000000-0000-0000-0000-000000000001', 'admin@test.com', 'credential', 'a0000000-0000-0000-0000-000000000001', '16000f46606e2e2931b2583833df720f:e90b138fdd504667d1fde9b8b72108730deb6cc7f9bd111f977d929fb728393825287ec1f50f8ecc2d23a1301deb588abb00ce48d5be752c58b5553a9db7f254', now()),
+('b0000000-0000-0000-0000-000000000002', 'user@test.com', 'credential', 'a0000000-0000-0000-0000-000000000002', '1fcaf6db91c8ed2dd30d873349801cbb:78e981666188cb3b136873fc48c0a207c0a74192c7b1005049b7888b1c9c731d938de67d114426c4d928e2da1a33adc664bee12540cfb4c693dcdcef71a3a353', now()),
+('b0000000-0000-0000-0000-000000000003', 'user2@test.com', 'credential', 'a0000000-0000-0000-0000-000000000003', '47311670a7501f63ed31d0b1569a0dfb:46b4d59c52ce83071d83f57e04ec3d62a2b39687c204de4eeb3b03a38929c2b57c8265c7aa75fbb4058ba20d0fcfb9750927498d6afaa09cd467b65c1820f07a', now());
