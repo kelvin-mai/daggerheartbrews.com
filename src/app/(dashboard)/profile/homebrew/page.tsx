@@ -17,6 +17,7 @@ import {
   cardPreviews,
   userAdversaries,
   userCards,
+  users,
 } from '@/lib/database/schema';
 import { Collapsible, CollapsibleContent } from '@/components/ui/collapsible';
 import { Label } from '@/components/ui/label';
@@ -24,6 +25,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { PersonalAdversary, PersonalCard } from '@/components/post';
 import { CollapsibleSectionTrigger, PageHeader } from '@/components/common';
+import { PublicDefaultForm } from '@/components/auth/public-default-form';
 
 export default async function Page() {
   const session = await auth.api.getSession({
@@ -32,6 +34,11 @@ export default async function Page() {
   if (!session?.user) {
     redirect('/login');
   }
+  const [prefs] = await db
+    .select({ publicByDefault: users.publicByDefault })
+    .from(users)
+    .where(eq(users.id, session.user.id));
+
   const cardData = await db
     .select()
     .from(userCards)
@@ -87,6 +94,10 @@ export default async function Page() {
           </p>
         </div>
       </div>
+      <div className='bg-card rounded-lg border p-4'>
+        <PublicDefaultForm publicByDefault={prefs?.publicByDefault ?? false} />
+      </div>
+
       <Collapsible
         defaultOpen
         className='bg-card group/collapsible rounded-lg border'

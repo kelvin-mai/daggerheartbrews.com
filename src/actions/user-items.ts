@@ -9,6 +9,7 @@ import {
   cardPreviews,
   userAdversaries,
   userCards,
+  users,
 } from '@/lib/database/schema';
 import type { AdversaryDetails, CardDetails, User } from '@/lib/types';
 
@@ -35,6 +36,10 @@ export const insertCard = async ({
   body: { card: CardDetails };
   session: { user: User };
 }) => {
+  const [prefs] = await db
+    .select({ publicByDefault: users.publicByDefault })
+    .from(users)
+    .where(eq(users.id, session.user.id));
   return await db.transaction(async (tx) => {
     const { id: _id, ...insertCard } = body.card;
     const [card] = await tx
@@ -43,7 +48,11 @@ export const insertCard = async ({
       .returning();
     const [userCard] = await tx
       .insert(userCards)
-      .values({ userId: session.user.id, cardPreviewId: card.id })
+      .values({
+        userId: session.user.id,
+        cardPreviewId: card.id,
+        public: prefs?.publicByDefault ?? false,
+      })
       .returning();
     return { card, userCard };
   });
@@ -101,6 +110,10 @@ export const insertAdversary = async ({
   body: { adversary: AdversaryDetails };
   session: { user: User };
 }) => {
+  const [prefs] = await db
+    .select({ publicByDefault: users.publicByDefault })
+    .from(users)
+    .where(eq(users.id, session.user.id));
   return await db.transaction(async (tx) => {
     const { id: _id, ...insertAdversary } = body.adversary;
     const [adversary] = await tx
@@ -112,7 +125,11 @@ export const insertAdversary = async ({
       .returning();
     const [userAdversary] = await tx
       .insert(userAdversaries)
-      .values({ userId: session.user.id, adversaryPreviewId: adversary.id })
+      .values({
+        userId: session.user.id,
+        adversaryPreviewId: adversary.id,
+        public: prefs?.publicByDefault ?? false,
+      })
       .returning();
     return { adversary, userAdversary };
   });
