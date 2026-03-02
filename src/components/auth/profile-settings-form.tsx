@@ -1,7 +1,8 @@
 'use client';
 
 import * as React from 'react';
-import { CheckCircle, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 import type { User } from '@/lib/types';
 import { useSession } from '@/lib/auth/client';
@@ -25,16 +26,14 @@ export const ProfileSettingsForm: React.FC<ProfileSettingsFormProps> = ({
   React.useEffect(() => {
     if (state.success) {
       refetch();
+      toast.success('Profile settings updated.');
+    } else if (state.errors?.action) {
+      toast.error(state.errors.action);
     }
-  }, [state.success]);
+  }, [state]);
 
   return (
     <form action={action} className='flex flex-col space-y-4'>
-      {state.errors?.action ? (
-        <div className='border-destructive text-destructive bg-destructive/10 rounded-lg border px-4 py-2'>
-          <p>{state.errors.action}</p>
-        </div>
-      ) : null}
       <FormField id='email'>
         <Input
           id='email'
@@ -50,26 +49,12 @@ export const ProfileSettingsForm: React.FC<ProfileSettingsFormProps> = ({
         label='Username'
         errors={state.errors?.validation?.name}
       >
-        <Input
-          id='name'
-          name='name'
-          defaultValue={user.name}
-          disabled={state.success}
-        />
+        <Input id='name' name='name' defaultValue={user.name} />
       </FormField>
-      {state.success ? (
-        <div className='flex items-center justify-center gap-2'>
-          <CheckCircle className='size-4 text-emerald-500' />
-          <p className='text-muted-foreground text-sm'>
-            Your profile settings have been updated
-          </p>
-        </div>
-      ) : (
-        <Button type='submit' disabled={pending}>
-          {pending ? <Loader2 className='animate-spin' /> : null}
-          Edit Settings
-        </Button>
-      )}
+      <Button type='submit' disabled={pending}>
+        {pending ? <Loader2 className='animate-spin' /> : null}
+        Edit Settings
+      </Button>
     </form>
   );
 };

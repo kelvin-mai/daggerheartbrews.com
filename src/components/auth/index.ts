@@ -1,5 +1,6 @@
 export * from './email-preference-form';
 export * from './forgot-password-form';
+export * from './public-default-form';
 export * from './layout';
 export * from './login-form';
 export * from './logout-button';

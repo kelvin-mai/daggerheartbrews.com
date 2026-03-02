@@ -8,6 +8,7 @@ import {
   EmailPreferenceForm,
   LogoutButton,
   ProfileSettingsForm,
+  PublicDefaultForm,
 } from '@/components/auth';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { PageHeader } from '@/components/common';
@@ -17,10 +18,15 @@ export default async function Page() {
   const session = await auth.api.getSession({ headers: await headers() });
   const prefs = session
     ? await db
-        .select({ emailUpdates: userSettings.emailUpdates })
+        .select({
+          emailUpdates: userSettings.emailUpdates,
+          defaultVisibility: userSettings.defaultVisibility,
+        })
         .from(userSettings)
         .where(eq(userSettings.userId, session.user.id))
-        .then((rows) => rows[0])
+        .then(
+          (rows) => rows[0] ?? { emailUpdates: true, defaultVisibility: false },
+        )
     : null;
   return (
     <div>
@@ -62,8 +68,9 @@ export default async function Page() {
         )}
         {session?.user && prefs && (
           <div className='bg-card space-y-2 rounded-lg border p-4'>
-            <h2 className='text-lg font-bold'>Email Preferences</h2>
+            <h2 className='text-lg font-bold'>Preferences</h2>
             <EmailPreferenceForm emailUpdates={prefs.emailUpdates} />
+            <PublicDefaultForm defaultVisibility={prefs.defaultVisibility} />
           </div>
         )}
       </div>

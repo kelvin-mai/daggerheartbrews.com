@@ -7,6 +7,7 @@ import { env } from '@/lib/env';
 import { getBaseUrl } from '../utils';
 import { db } from '@/lib/database';
 import * as schemas from '@/lib/database/schema';
+import { userSettings } from '@/lib/database/schema';
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -51,4 +52,13 @@ export const auth = betterAuth({
     },
   },
   plugins: [nextCookies()],
+  databaseHooks: {
+    user: {
+      create: {
+        after: async (user) => {
+          await db.insert(userSettings).values({ userId: user.id });
+        },
+      },
+    },
+  },
 });
