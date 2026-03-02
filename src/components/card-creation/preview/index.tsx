@@ -4,7 +4,7 @@ import * as React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Loader2 } from 'lucide-react';
+import { LayoutTemplate, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 import type { CardDetails, CardSettings, UserCard } from '@/lib/types';
@@ -12,7 +12,8 @@ import { cn } from '@/lib/utils';
 import { useCardActions, useCardEffects, useCardStore } from '@/store/card';
 import { DaggerheartBrewsIcon } from '@/components/icons';
 import { Button } from '@/components/ui/button';
-import { SavePreviewButton } from '@/components/common';
+import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
+import { DisplayContainer, SavePreviewButton } from '@/components/common';
 import {
   Banner,
   Divider,
@@ -178,9 +179,28 @@ export const CardCreationPreview = () => {
 export const CardDisplayPreview: React.FC<
   CardPreviewProps & { userCard?: UserCard }
 > = ({ card, userCard, settings }) => {
+  const router = useRouter();
+  const { setCardDetails } = useCardActions();
+
+  const handleUseAsTemplate = () => {
+    const { id: _, ...template } = card;
+    setCardDetails(template);
+    router.push('/card/create?template=true');
+  };
+
   return (
     <div className='flex flex-col items-center space-y-2'>
-      <CardPreview card={card} settings={settings} />
+      <DisplayContainer
+        blur
+        menu={
+          <DropdownMenuItem onClick={handleUseAsTemplate}>
+            <LayoutTemplate className='size-4' />
+            Use as Template
+          </DropdownMenuItem>
+        }
+      >
+        <CardPreview card={card} settings={settings} />
+      </DisplayContainer>
       {userCard && (
         <Button className='w-full' asChild>
           <Link href={`/card/edit/${userCard.id}`}>Edit</Link>

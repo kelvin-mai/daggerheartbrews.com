@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { Search } from 'lucide-react';
 
 import type { AdversaryDetails } from '@/lib/types';
-import { AdversaryPreviewStatblock } from '@/components/adversary-creation/preview/statblock';
+import { AdversaryDisplayPreview } from '@/components/adversary-creation/preview';
 import { MultipleSelector, Option } from '@/components/common';
 import { Input } from '@/components/ui/input';
 import { capitalize } from '@/lib/utils';
@@ -99,7 +99,7 @@ export const FilteredEnvironments = ({
                 transition={{ duration: 0.15 }}
                 layout
               >
-                <AdversaryPreviewStatblock adversary={environment} />
+                <AdversaryDisplayPreview adversary={environment} />
               </motion.div>
             ))}
         </AnimatePresence>

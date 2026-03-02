@@ -12,6 +12,7 @@ export * from './password-input';
 export * from './password-strength-meter';
 export * from './responsive-dialog';
 export * from './rich-text-editor';
+export * from './display-container';
 export * from './save-preview-button';
 export * from './theme-toggle';
 export * from './outdated-version-banner';
