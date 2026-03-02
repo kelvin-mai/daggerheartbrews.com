@@ -23,8 +23,8 @@ export const EmailPreferenceForm: React.FC<EmailPreferenceFormProps> = ({
       if (result.success) {
         toast.success(
           value
-            ? 'Subscribed to version updates.'
-            : 'Unsubscribed from version updates.',
+            ? 'Subscribed to email updates.'
+            : 'Unsubscribed from email updates.',
         );
       } else {
         setChecked(!value);
@@ -36,9 +36,9 @@ export const EmailPreferenceForm: React.FC<EmailPreferenceFormProps> = ({
   return (
     <div className='flex items-center justify-between gap-4'>
       <div>
-        <p className='text-sm font-medium'>Version update emails</p>
+        <p className='text-sm font-medium'>Update emails</p>
         <p className='text-muted-foreground text-sm'>
-          Receive an email when a new major or minor version ships.
+          Receive an email when new updates ships.
         </p>
       </div>
       <Switch
