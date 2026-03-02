@@ -1,6 +1,7 @@
 import {
   ArcanaDomainIcon,
   BladeDomainIcon,
+  BloodDomainIcon,
   BoneDomainIcon,
   CodexDomainIcon,
   DaggerheartBrewsIcon,
@@ -21,6 +22,8 @@ const getDomainIcon = (domain?: string) => {
       return ArcanaDomainIcon;
     case 'blade':
       return BladeDomainIcon;
+    case 'blood':
+      return BloodDomainIcon;
     case 'bone':
       return BoneDomainIcon;
     case 'codex':

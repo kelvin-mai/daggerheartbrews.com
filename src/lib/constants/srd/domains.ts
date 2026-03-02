@@ -1,6 +1,7 @@
 const domainColors = {
   arcana: '#4e3456',
   blade: '#af231c',
+  blood: '#7a0e0e',
   bone: '#a4a9a8',
   codex: '#24395d',
   grace: '#8d3965',

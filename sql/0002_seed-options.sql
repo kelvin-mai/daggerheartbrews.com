@@ -8,7 +8,8 @@ insert into domain_options (name, color, source) values
 ('sage', '#0e854d', 'SRD'),
 ('splendor', '#d1b447', 'SRD'),
 ('valor', '#dc7a27', 'SRD'),
-('dread', '#362b6c', 'The Void');
+('dread', '#362b6c', 'The Void'),
+('blood', '#7a0e0e', 'The Void');
 --> statement-breakpoint
 insert into class_options (name, domain_primary, domain_secondary, source) values
 ('bard', 'grace', 'codex', 'SRD'),
@@ -21,4 +22,7 @@ insert into class_options (name, domain_primary, domain_secondary, source) value
 ('warrior', 'blade', 'bone', 'SRD'),
 ('wizard', 'codex', 'splendor', 'SRD'),
 ('warlock', 'dread', 'grace', 'The Void'),
-('fighter', 'bone', 'valor', 'The Void');
+('brawler', 'bone', 'valor', 'The Void'),
+('assassin', 'midnight', 'blade', 'The Void'),
+('witch', 'dread', 'sage', 'The Void'),
+('blood hunter', 'blade', 'blood', 'The Void');
