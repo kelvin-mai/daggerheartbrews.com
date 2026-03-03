@@ -271,12 +271,456 @@ const syncCommunities = () => {
 };
 
 // ---------------------------------------------------------------------------
+// Classes & Subclasses
+// ---------------------------------------------------------------------------
+
+type ParsedClassFeature = { name: string; description: string; extra?: string };
+
+const NAMED_BULLET_RE = /^_(.+?):_\s*(.*)/;
+
+const renderBulletItem = (text: string): string => {
+  const m = text.match(NAMED_BULLET_RE);
+  if (m)
+    return `<li><strong><em>${stripMd(m[1])}: </em></strong>${stripMd(m[2])}</li>`;
+  return `<li>${stripMd(text)}</li>`;
+};
+
+const buildClassFeature = (
+  name: string,
+  rawLines: string[],
+): ParsedClassFeature => {
+  const lines = rawLines.filter((l) => !l.trimStart().startsWith('> '));
+  const raw = lines.join('\n').trim();
+  const segments = raw
+    .split(/\n\n+/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+
+  const descParts: string[] = [];
+  const extraParts: string[] = [];
+  let inExtra = false;
+
+  for (const seg of segments) {
+    const segLines = seg.split('\n');
+    const bulletLines = segLines.filter((l) => l.trim().startsWith('- '));
+    const isBulletBlock =
+      bulletLines.length > 0 &&
+      bulletLines.length === segLines.filter((l) => l.trim()).length;
+
+    if (isBulletBlock) {
+      inExtra = true;
+      const items = bulletLines
+        .map((l) => `        ${renderBulletItem(l.trim().slice(2))}`)
+        .join('\n');
+      extraParts.push(
+        `<ul class="list-disc list-outside pl-4">\n${items}\n        </ul>`,
+      );
+    } else if (inExtra) {
+      extraParts.push(`<p>${stripMd(seg)}</p>`);
+    } else {
+      descParts.push(seg);
+    }
+  }
+
+  const description = stripMd(descParts.join(' '));
+  const extra =
+    extraParts.length > 0
+      ? '\n        ' + extraParts.join('\n        ') + '\n        '
+      : undefined;
+
+  return { name, description, ...(extra !== undefined ? { extra } : {}) };
+};
+
+const CLASS_FEATURE_SECTIONS = new Set([
+  'HOPE FEATURE',
+  'CLASS FEATURE',
+  'CLASS FEATURES',
+]);
+
+const parseClassFeatures = (lines: string[]): ParsedClassFeature[] => {
+  const features: ParsedClassFeature[] = [];
+  let inSection = false;
+  let currentName = '';
+  let currentLines: string[] = [];
+
+  const flush = () => {
+    if (!currentName) return;
+    features.push(buildClassFeature(currentName, currentLines));
+    currentName = '';
+    currentLines = [];
+  };
+
+  for (const line of lines) {
+    if (line.startsWith('### ')) {
+      const heading = line.slice(4).trim();
+      if (CLASS_FEATURE_SECTIONS.has(heading)) {
+        inSection = true;
+      } else {
+        flush();
+        inSection = false;
+      }
+      continue;
+    }
+    if (!inSection) continue;
+    const m = line.match(CARD_FEATURE_RE);
+    if (m) {
+      flush();
+      currentName = m[1].trim();
+      if (m[2].trim()) currentLines = [m[2].trim()];
+    } else if (currentName) {
+      currentLines.push(line);
+    }
+  }
+  flush();
+  return features;
+};
+
+const parseBulletSection = (lines: string[], heading: string): string[] => {
+  const idx = lines.findIndex((l) => l.trim() === `### ${heading}`);
+  if (idx < 0) return [];
+  const end = lines.findIndex((l, i) => i > idx && l.startsWith('### '));
+  const slice = end >= 0 ? lines.slice(idx + 1, end) : lines.slice(idx + 1);
+  return slice
+    .filter((l) => l.trim().startsWith('- '))
+    .map((l) => stripMd(l.trim().slice(2)));
+};
+
+const parseSubclassNames = (lines: string[]): string[] => {
+  const idx = lines.findIndex((l) => l.trim() === '### SUBCLASSES');
+  if (idx < 0) return [];
+  const end = lines.findIndex((l, i) => i > idx && l.startsWith('### '));
+  const slice = end >= 0 ? lines.slice(idx + 1, end) : lines.slice(idx + 1);
+  const names: string[] = [];
+  for (const line of slice) {
+    for (const m of line.matchAll(/\[([^\]]+)\]\([^)]+\)/g)) names.push(m[1]);
+  }
+  return names;
+};
+
+const SUBCLASS_TIER_SECTIONS: Record<
+  string,
+  'foundation' | 'specialization' | 'mastery'
+> = {
+  'FOUNDATION FEATURE': 'foundation',
+  'FOUNDATION FEATURES': 'foundation',
+  'SPECIALIZATION FEATURE': 'specialization',
+  'SPECIALIZATION FEATURES': 'specialization',
+  'MASTERY FEATURE': 'mastery',
+  'MASTERY FEATURES': 'mastery',
+};
+
+type ParsedSubclass = {
+  name: string;
+  description: string;
+  trait?: string;
+  foundation: ParsedClassFeature[];
+  specialization: ParsedClassFeature[];
+  mastery: ParsedClassFeature[];
+};
+
+const parseSubclassFile = (filepath: string): ParsedSubclass => {
+  const lines = fs.readFileSync(filepath, 'utf-8').split('\n');
+  const name =
+    lines
+      .find((l) => l.startsWith('# '))
+      ?.slice(2)
+      .trim() ?? '';
+
+  const firstSection = lines.findIndex((l) => l.startsWith('### '));
+  const descLines = (
+    firstSection >= 0 ? lines.slice(0, firstSection) : lines
+  ).filter((l) => l.trim() && !l.startsWith('#'));
+  const description = stripMd(descLines[0]?.trim() ?? '');
+
+  const traitIdx = lines.findIndex((l) => l.trim() === '### SPELLCAST TRAIT');
+  let trait: string | undefined;
+  if (traitIdx >= 0) {
+    const traitLine = lines.slice(traitIdx + 1).find((l) => l.trim());
+    if (traitLine) trait = traitLine.trim().toLowerCase();
+  }
+
+  const foundation: ParsedClassFeature[] = [];
+  const specialization: ParsedClassFeature[] = [];
+  const mastery: ParsedClassFeature[] = [];
+
+  let currentTier: 'foundation' | 'specialization' | 'mastery' | null = null;
+  let currentName = '';
+  let currentLines: string[] = [];
+
+  const flushFeature = () => {
+    if (!currentName || !currentTier) return;
+    const target =
+      currentTier === 'foundation'
+        ? foundation
+        : currentTier === 'specialization'
+          ? specialization
+          : mastery;
+    target.push(buildClassFeature(currentName, currentLines));
+    currentName = '';
+    currentLines = [];
+  };
+
+  for (const line of lines) {
+    if (line.startsWith('### ')) {
+      flushFeature();
+      currentTier = SUBCLASS_TIER_SECTIONS[line.slice(4).trim()] ?? null;
+      continue;
+    }
+    if (!currentTier) continue;
+    const m = line.match(CARD_FEATURE_RE);
+    if (m) {
+      flushFeature();
+      currentName = m[1].trim();
+      if (m[2].trim()) currentLines = [m[2].trim()];
+    } else if (currentName) {
+      currentLines.push(line);
+    }
+  }
+  flushFeature();
+
+  return {
+    name,
+    description,
+    ...(trait !== undefined ? { trait } : {}),
+    foundation,
+    specialization,
+    mastery,
+  };
+};
+
+type ParsedClass = {
+  name: string;
+  flavor: string;
+  domains: [string, string];
+  startEvasion: number;
+  startHp: number;
+  items: string;
+  features: ParsedClassFeature[];
+  questions: string[];
+  connections: string[];
+  subclasses: ParsedSubclass[];
+};
+
+const parseClassFile = (filepath: string, subclassDir: string): ParsedClass => {
+  const lines = fs.readFileSync(filepath, 'utf-8').split('\n');
+  const name = (
+    lines
+      .find((l) => l.startsWith('# '))
+      ?.slice(2)
+      .trim() ?? ''
+  ).toLowerCase();
+
+  const firstSection = lines.findIndex((l) => l.startsWith('---'));
+  const flavorLines = (
+    firstSection >= 0 ? lines.slice(0, firstSection) : lines
+  ).filter((l) => l.trim() && !l.startsWith('#'));
+  const flavor = stripMd(flavorLines[0]?.trim() ?? '');
+
+  const domainLine = lines.find((l) => l.includes('**DOMAINS -**')) ?? '';
+  const domainMatches = [...domainLine.matchAll(/\[([^\]]+)\]/g)];
+  const domains: [string, string] = [
+    domainMatches[0]?.[1]?.toLowerCase() ?? '',
+    domainMatches[1]?.[1]?.toLowerCase() ?? '',
+  ];
+
+  const evasionLine =
+    lines.find((l) => l.includes('**STARTING EVASION -**')) ?? '';
+  const startEvasion = parseInt(
+    evasionLine.match(/\*\*STARTING EVASION -\*\* (\d+)/)?.[1] ?? '0',
+  );
+
+  const hpLine =
+    lines.find((l) => l.includes('**STARTING HIT POINTS -**')) ?? '';
+  const startHp = parseInt(
+    hpLine.match(/\*\*STARTING HIT POINTS -\*\* (\d+)/)?.[1] ?? '0',
+  );
+
+  const itemLine = lines.find((l) => l.includes('**CLASS ITEMS -**')) ?? '';
+  const items = stripMd(
+    itemLine.replace(/.*\*\*CLASS ITEMS -\*\*\s*/, '').trim(),
+  );
+
+  const features = parseClassFeatures(lines);
+  const questions = parseBulletSection(lines, 'BACKGROUND QUESTIONS');
+  const connections = parseBulletSection(lines, 'CONNECTIONS');
+  const subclassNames = parseSubclassNames(lines);
+  const subclasses = subclassNames.map((subName) =>
+    parseSubclassFile(path.join(subclassDir, `${subName}.md`)),
+  );
+
+  return {
+    name,
+    flavor,
+    domains,
+    startEvasion,
+    startHp,
+    items,
+    features,
+    questions,
+    connections,
+    subclasses,
+  };
+};
+
+// ---------------------------------------------------------------------------
+// Class rendering
+// ---------------------------------------------------------------------------
+
+const SUBCLASS_ARTISTS: Record<string, string> = {
+  troubadour: 'Bear Frymire',
+  wordsmith: 'Nikki Dawes',
+  'warden-of-the-elements': 'Zoe Badini',
+  'warden-of-renewal': 'Ilya Royz',
+  stalwart: 'Reiko Murakami',
+  vengeance: 'Linda Lithén',
+  beastbound: 'Jenny Tan',
+  wayfinder: 'Simon Pape',
+  nightwalker: 'Juan Salvador Almencion',
+  syndicate: 'Jenny Tan',
+  'divine-wielder': 'Jenny Tan',
+  'winged-sentinel': 'Stephanie Cost',
+  'elemental-origin': 'Bear Frymire',
+  'primal-origin': 'Laura Galli',
+  'call-of-the-brave': 'Mat Wilma',
+  'call-of-the-slayer': 'Reiko Murakami',
+  'school-of-knowledge': 'Bear Frymire',
+  'school-of-war': 'Nikki Dawes',
+};
+
+const renderClassFeature = (
+  f: ParsedClassFeature,
+  indent = '      ',
+): string => {
+  const lines = [
+    `${indent}{`,
+    `${indent}  name: '${esc(f.name)}',`,
+    `${indent}  description: '${esc(f.description)}',`,
+  ];
+  if (f.extra !== undefined) {
+    const escaped = f.extra.replace(/`/g, '\\`').replace(/\$\{/g, '\\${');
+    lines.push(`${indent}  extra: \`${escaped}\`,`);
+  }
+  lines.push(`${indent}},`);
+  return lines.join('\n');
+};
+
+const renderSubclass = (sc: ParsedSubclass, className: string): string => {
+  const slug = sc.name.toLowerCase().replace(/\s+/g, '-');
+  const image = `${className}-${slug}.jpg`;
+  const artist = SUBCLASS_ARTISTS[slug] ?? '';
+
+  const lines = [
+    `    {`,
+    `      name: '${esc(sc.name)}',`,
+    `      description: '${esc(sc.description)}',`,
+    `      image: '${image}',`,
+    `      artist: '${esc(artist)}',`,
+  ];
+  if (sc.trait !== undefined) lines.push(`      trait: '${esc(sc.trait)}',`);
+
+  lines.push(`      foundation: [`);
+  for (const f of sc.foundation) lines.push(renderClassFeature(f, '        '));
+  lines.push(`      ],`);
+
+  lines.push(`      specialization: [`);
+  for (const f of sc.specialization)
+    lines.push(renderClassFeature(f, '        '));
+  lines.push(`      ],`);
+
+  lines.push(`      mastery: [`);
+  for (const f of sc.mastery) lines.push(renderClassFeature(f, '        '));
+  lines.push(`      ],`);
+
+  lines.push(`    },`);
+  return lines.join('\n');
+};
+
+const renderClass = (cl: ParsedClass): string => {
+  const lines = [
+    `  {`,
+    `    name: '${esc(cl.name)}',`,
+    `    flavor: '${esc(cl.flavor)}',`,
+    `    domains: ['${esc(cl.domains[0])}', '${esc(cl.domains[1])}'],`,
+    `    startEvasion: ${cl.startEvasion},`,
+    `    startHp: ${cl.startHp},`,
+    `    items: '${esc(cl.items)}',`,
+    `    features: [`,
+  ];
+  for (const f of cl.features) lines.push(renderClassFeature(f));
+  lines.push(`    ],`);
+
+  lines.push(`    questions: [`);
+  for (const q of cl.questions) lines.push(`      '${esc(q)}',`);
+  lines.push(`    ],`);
+
+  lines.push(`    connections: [`);
+  for (const c of cl.connections) lines.push(`      '${esc(c)}',`);
+  lines.push(`    ],`);
+
+  lines.push(`    subclasses: [`);
+  for (const sc of cl.subclasses) lines.push(renderSubclass(sc, cl.name));
+  lines.push(`    ],`);
+
+  lines.push(`  },`);
+  return lines.join('\n');
+};
+
+const CLASSES_HEADER = `type Feature = {
+  name: string;
+  description: string;
+  extra?: string;
+};
+
+type ClassReference = {
+  name: string;
+  flavor: string;
+  domains: [string, string];
+  startEvasion: number;
+  startHp: number;
+  items: string;
+  features: Feature[];
+  questions: string[];
+  connections: string[];
+  subclasses: {
+    name: string;
+    image: string;
+    artist: string;
+    description: string;
+    trait?: string;
+    foundation: Feature[];
+    specialization: Feature[];
+    mastery: Feature[];
+  }[];
+};
+
+export const classes: ClassReference[] = [`;
+
+const syncClasses = () => {
+  const classDir = path.join(ROOT, 'srd-source', 'classes');
+  const subclassDir = path.join(ROOT, 'srd-source', 'subclasses');
+  const out = path.join(ROOT, 'src', 'lib', 'constants', 'srd', 'classes.tsx');
+
+  const items = fs
+    .readdirSync(classDir)
+    .filter((f) => f.endsWith('.md'))
+    .map((f) => parseClassFile(path.join(classDir, f), subclassDir))
+    .sort((a, b) => a.name.localeCompare(b.name));
+
+  const body = items.map(renderClass).join('\n');
+  const output = [CLASSES_HEADER, body, `];`, ``].join('\n');
+
+  fs.writeFileSync(out, output);
+  console.log(`Synced ${items.length} classes → ${path.relative(ROOT, out)}`);
+};
+
+// ---------------------------------------------------------------------------
 // Main
 // ---------------------------------------------------------------------------
 
 const TARGETS: Record<string, () => void> = {
   ancestries: syncAncestries,
   communities: syncCommunities,
+  classes: syncClasses,
 };
 
 const target = process.argv[2];

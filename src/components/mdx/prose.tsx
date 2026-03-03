@@ -21,6 +21,12 @@ export const defaultComponents: MDXComponents = {
   h3: ({ children }: { children?: React.ReactNode }) => (
     <h3 className='text-lg font-semibold'>{children}</h3>
   ),
+  h4: ({ children }: { children?: React.ReactNode }) => (
+    <h4 className='font-eveleth-clean'>{children}</h4>
+  ),
+  h5: ({ children }: { children?: React.ReactNode }) => (
+    <h5 className='text-sm font-bold uppercase'>{children}</h5>
+  ),
   a: ({ href, children }: { href?: string; children?: React.ReactNode }) => {
     const isExternal = href?.startsWith('http');
     return (

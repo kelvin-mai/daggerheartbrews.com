@@ -1,9 +1,11 @@
 import { CardDisplayPreview } from '@/components/card-creation/preview';
+import { Prose, getMdxComponents } from '@/components/mdx';
 import { Collapsible, CollapsibleContent } from '@/components/ui/collapsible';
 import { CollapsibleSectionTrigger, PageHeader } from '@/components/common';
 import { Label } from '@/components/ui/label';
 import { initialSettings } from '@/lib/constants';
 import { classes, domainColor } from '@/lib/constants/srd';
+import { getClassAdditional, getSubclassAdditional } from '@/lib/mdx';
 import { capitalize } from '@/lib/utils';
 
 type PageProps = {
@@ -28,6 +30,18 @@ export default async function Page({ params }: PageProps) {
   if (!current) {
     return null;
   }
+
+  const components = getMdxComponents();
+  const classAdditional = await getClassAdditional(current.name, components);
+  const subclassAdditionals = await Promise.all(
+    current.subclasses.map((sc) =>
+      getSubclassAdditional(
+        sc.name.toLowerCase().replace(/\s+/g, '-'),
+        components,
+      ),
+    ),
+  );
+
   return (
     <>
       <PageHeader title={name} />
@@ -98,10 +112,12 @@ export default async function Page({ params }: PageProps) {
           </ul>
         </div>
       </div>
-      {current.AdditionalSection ? <current.AdditionalSection /> : null}
+      {classAdditional && (
+        <Prose className='mb-4 space-y-4'>{classAdditional}</Prose>
+      )}
       <h2 className='font-eveleth-clean text-xl'>Subclasses</h2>
       <div className='my-2 space-y-2'>
-        {current.subclasses.map((sc) => (
+        {current.subclasses.map((sc, i) => (
           <Collapsible
             key={sc.name}
             className='bg-card group/collapsible rounded-lg border'
@@ -190,7 +206,11 @@ export default async function Page({ params }: PageProps) {
                   settings={initialSettings}
                 />
               </div>
-              {sc.AdditoanlSection ? <sc.AdditoanlSection /> : null}
+              {subclassAdditionals[i] && (
+                <Prose className='space-y-4 px-4 pb-3'>
+                  {subclassAdditionals[i]}
+                </Prose>
+              )}
             </CollapsibleContent>
           </Collapsible>
         ))}

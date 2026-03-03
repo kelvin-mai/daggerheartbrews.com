@@ -103,6 +103,34 @@ export const getSrdSlugs = (): string[] => {
     .map((f) => f.replace(/\.mdx$/, ''));
 };
 
+export const getClassAdditional = async (
+  name: string,
+  components: MDXComponents,
+): Promise<React.ReactElement | null> => {
+  const filePath = path.join(contentDir, 'srd', 'classes', `${name}.mdx`);
+  if (!fs.existsSync(filePath)) return null;
+  const { content } = await compileMDX({
+    source: readMdxFile(filePath),
+    components,
+    options: { mdxOptions: { remarkPlugins: [remarkGfm] } },
+  });
+  return content;
+};
+
+export const getSubclassAdditional = async (
+  slug: string,
+  components: MDXComponents,
+): Promise<React.ReactElement | null> => {
+  const filePath = path.join(contentDir, 'srd', 'subclasses', `${slug}.mdx`);
+  if (!fs.existsSync(filePath)) return null;
+  const { content } = await compileMDX({
+    source: readMdxFile(filePath),
+    components,
+    options: { mdxOptions: { remarkPlugins: [remarkGfm] } },
+  });
+  return content;
+};
+
 export const getSrdPage = async (
   slug: string,
   components: MDXComponents,
