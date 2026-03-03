@@ -40,6 +40,13 @@ export const nav: NavCategory[] = [
     name: 'Reference',
     children: [
       {
+        name: 'Classes',
+        url: '/reference/classes',
+      },
+      {
+        type: 'divider',
+      },
+      {
         name: 'Ancestries',
         url: '/reference/ancestries',
       },
@@ -48,14 +55,14 @@ export const nav: NavCategory[] = [
         url: '/reference/communities',
       },
       {
-        name: 'Classes',
-        url: '/reference/classes',
-      },
-      {
         name: 'Beastforms',
         url: '/reference/beastforms',
       },
       { type: 'divider' as const },
+      {
+        name: 'Adversaries',
+        url: '/reference/adversaries',
+      },
       {
         name: 'Environments',
         url: '/reference/environments',
