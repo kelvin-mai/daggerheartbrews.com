@@ -1,36 +1,45 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { BookOpen, LayoutTemplate } from 'lucide-react';
 
 import type { CardDetails } from '@/lib/types';
-import { CardPreview } from '@/components/card-creation/preview';
-import { Button } from '@/components/ui/button';
-import { useCardActions } from '@/store';
 import { initialSettings } from '@/lib/constants';
+import { CardPreview } from '@/components/card-creation/preview';
+import { DisplayContainer } from '@/components/common';
+import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
+import { useCardActions } from '@/store';
 
 export const CardClassPreview: React.FC<{ card: CardDetails }> = ({ card }) => {
   const { setCardDetails } = useCardActions();
   const router = useRouter();
-  const handleClick = () => {
-    setCardDetails(card);
-    router.push('/card/create');
+
+  const handleUseAsTemplate = () => {
+    const { id: _, ...template } = card;
+    setCardDetails(template);
+    router.push('/card/create?template=true');
   };
+
   return (
-    <div className='flex flex-col items-center space-y-2'>
+    <DisplayContainer
+      blur
+      menu={
+        <>
+          <DropdownMenuItem asChild>
+            <Link href={`/reference/classes/${card.name}`}>
+              <BookOpen className='size-4' />
+              View Class
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={handleUseAsTemplate}>
+            <LayoutTemplate className='size-4' />
+            Use as Template
+          </DropdownMenuItem>
+        </>
+      }
+    >
       <CardPreview card={card} settings={initialSettings} />
-      <div className='flex w-full gap-2'>
-        <Button className='grow hover:cursor-pointer' asChild>
-          <Link href={`/reference/classes/${card.name}`}>View Class</Link>
-        </Button>
-        <Button
-          variant='secondary'
-          className='grow hover:cursor-pointer'
-          onClick={handleClick}
-        >
-          Edit
-        </Button>
-      </div>
-    </div>
+    </DisplayContainer>
   );
 };

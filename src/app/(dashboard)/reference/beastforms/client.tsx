@@ -66,12 +66,12 @@ export const FilteredBeastforms = ({
         </div>
       )}
 
-      <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
+      <div className='flex flex-wrap justify-center gap-4'>
         <AnimatePresence>
           {filtered.map((beastform) => (
             <motion.div
               key={beastform.name}
-              className='break-inside-avoid'
+              className='w-full max-w-[340px]'
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}

@@ -155,7 +155,7 @@ export const CardCreationPreview = () => {
   };
 
   return (
-    <div className='flex w-[340px] flex-col items-center space-y-2'>
+    <div className='flex w-[340px] shrink-0 flex-col items-center space-y-2'>
       <CardPreview ref={ref} card={card} settings={settings} />
       <div className='flex w-full gap-2'>
         <Button className='grow' onClick={downloadImage}>
