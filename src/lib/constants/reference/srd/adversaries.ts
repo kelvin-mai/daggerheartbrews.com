@@ -1,12 +1,5 @@
-import type {
-  AdversaryDetails,
-  AdversaryFeature,
-} from '@/lib/types/adversary-creation';
 import { capitalize } from '@/lib/utils';
-
-type PreAdversaryDetails = Omit<AdversaryDetails, 'text' | 'type'> & {
-  features: (AdversaryFeature & { extra?: string })[];
-};
+import type { PreAdversaryDetails } from '../types';
 
 const preAdversaries: PreAdversaryDetails[] = [
   {

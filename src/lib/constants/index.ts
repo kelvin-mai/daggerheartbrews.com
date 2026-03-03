@@ -1,4 +1,4 @@
 export * from './card-settings';
-export * from './srd';
+export * from './reference';
 export * from './nav';
 export * from './password-requirements';

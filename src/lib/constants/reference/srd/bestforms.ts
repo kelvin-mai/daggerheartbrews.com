@@ -1,24 +1,6 @@
 import { CardDetails } from '@/lib/types';
 import { capitalize } from '@/lib/utils';
-
-type Feature = {
-  name: string;
-  description: string;
-  extra?: string;
-};
-
-type PreBeastform = {
-  name: string;
-  tier: number;
-  traitBonuses?: [string, string];
-  weaponTrait?: string;
-  distance?: string;
-  damage?: string;
-  damageType?: string;
-  advantage?: string;
-  examples: string;
-  features: Feature[];
-};
+import type { PreBeastform } from '../types';
 
 const preBeastforms: PreBeastform[] = [
   {

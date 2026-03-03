@@ -173,7 +173,7 @@ TipTap editor is used for card text content with custom extensions for text alig
 ## Important Notes
 
 - The project is MIT licensed and creates Daggerheart™ compatible content
-- SRD (System Reference Document) data is stored in `src/lib/constants/srd/`
+- SRD (System Reference Document) data is stored in `src/lib/constants/reference/srd/`
 - Card and adversary creation tools support customizable domains, colors, images, and stats
 - Community features allow users to share and browse homebrew content
 - The middleware only protects profile routes; other dashboard routes may need authentication checks in components/actions

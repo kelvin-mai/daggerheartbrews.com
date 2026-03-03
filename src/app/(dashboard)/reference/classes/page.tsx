@@ -1,4 +1,8 @@
-import { classes, domainColor } from '@/lib/constants/srd';
+import {
+  classes,
+  subclasses,
+  domainColor,
+} from '@/lib/constants/reference/srd';
 import { PageHeader } from '@/components/common';
 import { CardClassPreview } from './client';
 
@@ -20,26 +24,31 @@ export default function Page() {
         </span>
       </PageHeader>
       <div className='my-4 flex flex-wrap justify-center gap-4'>
-        {classes.map((cl) => (
-          <div key={cl.name} className='w-full max-w-[340px]'>
-            <CardClassPreview
-              card={{
-                name: cl.name,
-                type: 'class',
-                subtitle: 'Flavor',
-                evasion: cl.startEvasion,
-                image: `/assets/images/srd/class/${cl.subclasses[0].image}`,
-                artist: cl.subclasses[0].artist,
-                domainPrimary: cl.domains[0],
-                domainPrimaryColor: domainColor(cl.domains[0]),
-                domainSecondary: cl.domains[1],
-                domainSecondaryColor: domainColor(cl.domains[1]),
-                text: `<p><em>${cl.flavor}</em></p>`,
-                credits: 'Daggerheart © Darrington Press 2025',
-              }}
-            />
-          </div>
-        ))}
+        {classes.map((cl) => {
+          const firstSubclass = subclasses.find(
+            (sc) => sc.className === cl.name,
+          );
+          return (
+            <div key={cl.name} className='w-full max-w-[340px]'>
+              <CardClassPreview
+                card={{
+                  name: cl.name,
+                  type: 'class',
+                  subtitle: 'Flavor',
+                  evasion: cl.startEvasion,
+                  image: `/assets/images/srd/class/${firstSubclass?.image ?? ''}`,
+                  artist: firstSubclass?.artist ?? '',
+                  domainPrimary: cl.domains[0],
+                  domainPrimaryColor: domainColor(cl.domains[0]),
+                  domainSecondary: cl.domains[1],
+                  domainSecondaryColor: domainColor(cl.domains[1]),
+                  text: `<p><em>${cl.flavor}</em></p>`,
+                  credits: 'Daggerheart © Darrington Press 2025',
+                }}
+              />
+            </div>
+          );
+        })}
       </div>
     </>
   );

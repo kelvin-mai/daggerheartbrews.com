@@ -28,7 +28,7 @@ import {
   CommandList,
 } from '@/components/ui/command';
 import type { AdversaryFeature } from '@/lib/types';
-import { exampleFeatures } from '@/lib/constants/srd';
+import { exampleFeatures } from '@/lib/constants/reference/srd';
 import { capitalize, cn } from '@/lib/utils';
 
 export const AssistedFeatureText = ({

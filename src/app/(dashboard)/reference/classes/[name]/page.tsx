@@ -4,7 +4,11 @@ import { Collapsible, CollapsibleContent } from '@/components/ui/collapsible';
 import { CollapsibleSectionTrigger, PageHeader } from '@/components/common';
 import { Label } from '@/components/ui/label';
 import { initialSettings } from '@/lib/constants';
-import { classes, domainColor } from '@/lib/constants/srd';
+import {
+  classes,
+  subclasses,
+  domainColor,
+} from '@/lib/constants/reference/srd';
 import { getClassAdditional, getSubclassAdditional } from '@/lib/mdx';
 import { capitalize } from '@/lib/utils';
 
@@ -31,10 +35,13 @@ export default async function Page({ params }: PageProps) {
     return null;
   }
 
+  const classSubclasses = subclasses.filter(
+    (sc) => sc.className === current.name,
+  );
   const components = getMdxComponents();
   const classAdditional = await getClassAdditional(current.name, components);
   const subclassAdditionals = await Promise.all(
-    current.subclasses.map((sc) =>
+    classSubclasses.map((sc) =>
       getSubclassAdditional(
         sc.name.toLowerCase().replace(/\s+/g, '-'),
         components,
@@ -51,8 +58,8 @@ export default async function Page({ params }: PageProps) {
             name,
             type: 'class',
             subtitle: 'Class Features',
-            image: `/assets/images/srd/class/${current.subclasses[0].image}`,
-            artist: current.subclasses[0].artist,
+            image: `/assets/images/srd/class/${classSubclasses[0].image}`,
+            artist: classSubclasses[0].artist,
             evasion: current.startEvasion,
             domainPrimary: current.domains[0],
             domainPrimaryColor: domainColor(current.domains[0]),
@@ -117,7 +124,7 @@ export default async function Page({ params }: PageProps) {
       )}
       <h2 className='font-eveleth-clean text-xl'>Subclasses</h2>
       <div className='my-2 space-y-2'>
-        {current.subclasses.map((sc, i) => (
+        {classSubclasses.map((sc, i) => (
           <Collapsible
             key={sc.name}
             className='bg-card group/collapsible rounded-lg border'

@@ -1,4 +1,4 @@
-import { environments } from '@/lib/constants/srd';
+import { environments } from '@/lib/constants/reference/srd';
 import { PageHeader } from '@/components/common';
 import { FilteredEnvironments } from './client';
 

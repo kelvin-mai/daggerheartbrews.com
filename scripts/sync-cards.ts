@@ -150,6 +150,7 @@ const syncAncestries = () => {
     'src',
     'lib',
     'constants',
+    'reference',
     'srd',
     'ancestries.ts',
   );
@@ -244,6 +245,7 @@ const syncCommunities = () => {
     'src',
     'lib',
     'constants',
+    'reference',
     'srd',
     'communities.ts',
   );
@@ -604,34 +606,35 @@ const renderClassFeature = (
   return lines.join('\n');
 };
 
-const renderSubclass = (sc: ParsedSubclass, className: string): string => {
+const renderSubclassEntry = (sc: ParsedSubclass, className: string): string => {
   const slug = sc.name.toLowerCase().replace(/\s+/g, '-');
   const image = `${className}-${slug}.jpg`;
   const artist = SUBCLASS_ARTISTS[slug] ?? '';
 
   const lines = [
-    `    {`,
-    `      name: '${esc(sc.name)}',`,
-    `      description: '${esc(sc.description)}',`,
-    `      image: '${image}',`,
-    `      artist: '${esc(artist)}',`,
+    `  {`,
+    `    className: '${esc(className)}',`,
+    `    name: '${esc(sc.name)}',`,
+    `    description: '${esc(sc.description)}',`,
+    `    image: '${image}',`,
+    `    artist: '${esc(artist)}',`,
   ];
-  if (sc.trait !== undefined) lines.push(`      trait: '${esc(sc.trait)}',`);
+  if (sc.trait !== undefined) lines.push(`    trait: '${esc(sc.trait)}',`);
 
-  lines.push(`      foundation: [`);
-  for (const f of sc.foundation) lines.push(renderClassFeature(f, '        '));
-  lines.push(`      ],`);
+  lines.push(`    foundation: [`);
+  for (const f of sc.foundation) lines.push(renderClassFeature(f, '      '));
+  lines.push(`    ],`);
 
-  lines.push(`      specialization: [`);
+  lines.push(`    specialization: [`);
   for (const f of sc.specialization)
-    lines.push(renderClassFeature(f, '        '));
-  lines.push(`      ],`);
+    lines.push(renderClassFeature(f, '      '));
+  lines.push(`    ],`);
 
-  lines.push(`      mastery: [`);
-  for (const f of sc.mastery) lines.push(renderClassFeature(f, '        '));
-  lines.push(`      ],`);
+  lines.push(`    mastery: [`);
+  for (const f of sc.mastery) lines.push(renderClassFeature(f, '      '));
+  lines.push(`    ],`);
 
-  lines.push(`    },`);
+  lines.push(`  },`);
   return lines.join('\n');
 };
 
@@ -657,48 +660,43 @@ const renderClass = (cl: ParsedClass): string => {
   for (const c of cl.connections) lines.push(`      '${esc(c)}',`);
   lines.push(`    ],`);
 
-  lines.push(`    subclasses: [`);
-  for (const sc of cl.subclasses) lines.push(renderSubclass(sc, cl.name));
-  lines.push(`    ],`);
+  lines.push(
+    `    subclasses: [${cl.subclasses.map((sc) => `'${esc(sc.name)}'`).join(', ')}],`,
+  );
 
   lines.push(`  },`);
   return lines.join('\n');
 };
 
-const CLASSES_HEADER = `type Feature = {
-  name: string;
-  description: string;
-  extra?: string;
-};
-
-type ClassReference = {
-  name: string;
-  flavor: string;
-  domains: [string, string];
-  startEvasion: number;
-  startHp: number;
-  items: string;
-  features: Feature[];
-  questions: string[];
-  connections: string[];
-  subclasses: {
-    name: string;
-    image: string;
-    artist: string;
-    description: string;
-    trait?: string;
-    foundation: Feature[];
-    specialization: Feature[];
-    mastery: Feature[];
-  }[];
-};
+const CLASSES_HEADER = `import type { ClassReference } from '../types';
 
 export const classes: ClassReference[] = [`;
+
+const SUBCLASSES_HEADER = `import type { SubclassReference } from '../types';
+
+export const subclasses: SubclassReference[] = [`;
 
 const syncClasses = () => {
   const classDir = path.join(ROOT, 'srd-source', 'classes');
   const subclassDir = path.join(ROOT, 'srd-source', 'subclasses');
-  const out = path.join(ROOT, 'src', 'lib', 'constants', 'srd', 'classes.tsx');
+  const classOut = path.join(
+    ROOT,
+    'src',
+    'lib',
+    'constants',
+    'reference',
+    'srd',
+    'classes.tsx',
+  );
+  const subclassOut = path.join(
+    ROOT,
+    'src',
+    'lib',
+    'constants',
+    'reference',
+    'srd',
+    'subclasses.ts',
+  );
 
   const items = fs
     .readdirSync(classDir)
@@ -706,11 +704,332 @@ const syncClasses = () => {
     .map((f) => parseClassFile(path.join(classDir, f), subclassDir))
     .sort((a, b) => a.name.localeCompare(b.name));
 
-  const body = items.map(renderClass).join('\n');
-  const output = [CLASSES_HEADER, body, `];`, ``].join('\n');
+  const classBody = items.map(renderClass).join('\n');
+  fs.writeFileSync(classOut, [CLASSES_HEADER, classBody, `];`, ``].join('\n'));
+  console.log(
+    `Synced ${items.length} classes → ${path.relative(ROOT, classOut)}`,
+  );
 
+  const subclassBody = items
+    .flatMap((cl) =>
+      cl.subclasses.map((sc) => renderSubclassEntry(sc, cl.name)),
+    )
+    .join('\n');
+  fs.writeFileSync(
+    subclassOut,
+    [SUBCLASSES_HEADER, subclassBody, `];`, ``].join('\n'),
+  );
+  const subclassCount = items.reduce((n, cl) => n + cl.subclasses.length, 0);
+  console.log(
+    `Synced ${subclassCount} subclasses → ${path.relative(ROOT, subclassOut)}`,
+  );
+};
+
+// ---------------------------------------------------------------------------
+// Equipment - shared helpers
+// ---------------------------------------------------------------------------
+
+const DAMAGE_TYPE_LABELS: Record<string, string> = {
+  phy: 'physical',
+  mag: 'magical',
+};
+
+const parseEquipmentFeature = (lines: string[]): string | undefined => {
+  const featIdx = lines.findIndex((l) => l.trim() === '### FEATURE');
+  if (featIdx < 0) return undefined;
+  let fname = '';
+  let fdesc: string[] = [];
+  for (const line of lines.slice(featIdx + 1)) {
+    const m = line.match(CARD_FEATURE_RE);
+    if (m) {
+      fname = m[1].trim();
+      if (m[2].trim()) fdesc = [m[2].trim()];
+    } else if (fname && line.trim()) {
+      fdesc.push(line.trim());
+    }
+  }
+  if (!fname) return undefined;
+  return `<p><strong><em>${escBt(fname)}:</em></strong> ${escBt(stripMd(fdesc.join(' ')))}</p>`;
+};
+
+// ---------------------------------------------------------------------------
+// Equipment - Armor
+// ---------------------------------------------------------------------------
+
+type ParsedArmor = {
+  name: string;
+  tier: number;
+  thresholds: [number, number];
+  score: number;
+  feature?: string;
+};
+
+const parseArmorFile = (filepath: string): ParsedArmor => {
+  const lines = fs.readFileSync(filepath, 'utf-8').split('\n');
+  const name =
+    lines
+      .find((l) => l.startsWith('# '))
+      ?.slice(2)
+      .trim() ?? '';
+  const tier = parseInt(
+    lines.find((l) => /^\*\*_Tier \d/.test(l))?.match(/Tier (\d+)/)?.[1] ?? '1',
+  );
+  const threshLine = lines.find((l) => l.includes('Base Thresholds:')) ?? '';
+  const threshMatch = threshLine.match(/(\d+)\s*\/\s*(\d+)/);
+  const thresholds: [number, number] = threshMatch
+    ? [parseInt(threshMatch[1]), parseInt(threshMatch[2])]
+    : [0, 0];
+  const scoreLine = lines.find((l) => l.includes('Base Score:')) ?? '';
+  const score = parseInt(
+    scoreLine.match(/Base Score:\*\*\s*(\d+)/)?.[1] ?? '0',
+  );
+  const feature = parseEquipmentFeature(lines);
+  return {
+    name,
+    tier,
+    thresholds,
+    score,
+    ...(feature !== undefined ? { feature } : {}),
+  };
+};
+
+const renderArmor = (a: ParsedArmor): string => {
+  const lines = [
+    `  {`,
+    `    type: 'equipment',`,
+    `    name: '${esc(a.name)}',`,
+    `    subtype: 'Armor',`,
+    `    tier: ${a.tier},`,
+    `    tierEnabled: true,`,
+    `    thresholds: [${a.thresholds[0]}, ${a.thresholds[1]}],`,
+    `    thresholdsEnabled: true,`,
+    `    armor: ${a.score},`,
+    `    armorEnabled: true,`,
+  ];
+  if (a.feature !== undefined) lines.push(`    text: \`${a.feature}\`,`);
+  lines.push(`    credits: '${CREDITS}',`, `  },`);
+  return lines.join('\n');
+};
+
+const syncArmor = () => {
+  const dir = path.join(ROOT, 'srd-source', 'armor');
+  const out = path.join(
+    ROOT,
+    'src',
+    'lib',
+    'constants',
+    'reference',
+    'srd',
+    'armor.ts',
+  );
+  const items = fs
+    .readdirSync(dir)
+    .filter((f) => f.endsWith('.md'))
+    .map((f) => parseArmorFile(path.join(dir, f)))
+    .sort((a, b) => a.tier - b.tier || a.name.localeCompare(b.name));
+  const body = items.map(renderArmor).join('\n');
+  const output = [
+    `import type { CardDetails } from '@/lib/types';`,
+    ``,
+    `export const armor: CardDetails[] = [`,
+    body,
+    `];`,
+    ``,
+  ].join('\n');
   fs.writeFileSync(out, output);
-  console.log(`Synced ${items.length} classes → ${path.relative(ROOT, out)}`);
+  console.log(`Synced ${items.length} armor → ${path.relative(ROOT, out)}`);
+};
+
+// ---------------------------------------------------------------------------
+// Equipment - Weapons
+// ---------------------------------------------------------------------------
+
+type ParsedWeapon = {
+  name: string;
+  tier: number;
+  role: string;
+  damageKind: string;
+  trait: string;
+  range: string;
+  damage: string;
+  hands: 1 | 2;
+  feature?: string;
+};
+
+const parseWeaponFile = (filepath: string): ParsedWeapon => {
+  const lines = fs.readFileSync(filepath, 'utf-8').split('\n');
+  const name =
+    lines
+      .find((l) => l.startsWith('# '))
+      ?.slice(2)
+      .trim() ?? '';
+  const headerLine = lines.find((l) => /^\*\*_Tier \d/.test(l)) ?? '';
+  const tier = parseInt(headerLine.match(/Tier (\d+)/)?.[1] ?? '1');
+  const role = /Primary/.test(headerLine) ? 'Primary' : 'Secondary';
+  const damageKind = /Magical/.test(headerLine) ? 'Magical' : 'Physical';
+
+  const getBullet = (label: string) =>
+    (lines.find((l) => l.includes(`**${label}:**`)) ?? '')
+      .replace(`- **${label}:**`, '')
+      .trim();
+
+  const trait = getBullet('Trait');
+  const range = getBullet('Range');
+  const burdenRaw = getBullet('Burden');
+  const hands = burdenRaw === 'Two-Handed' ? 2 : 1;
+
+  const damageRaw = getBullet('Damage');
+  const damageParts = damageRaw.split(/\s+/);
+  const typeKey = damageParts[damageParts.length - 1];
+  const amount = damageParts.slice(0, -1).join(' ');
+  const damage = `${amount} ${DAMAGE_TYPE_LABELS[typeKey] ?? typeKey}`;
+
+  const feature = parseEquipmentFeature(lines);
+  return {
+    name,
+    tier,
+    role,
+    damageKind,
+    trait,
+    range,
+    damage,
+    hands,
+    ...(feature !== undefined ? { feature } : {}),
+  };
+};
+
+const renderWeapon = (w: ParsedWeapon): string => {
+  const subtype = `${w.role} ${w.damageKind} Weapon`;
+  const statsLine = `<p><strong>Trait:</strong> ${escBt(w.trait)} | <strong>Range:</strong> ${escBt(w.range)} | <strong>Damage:</strong> ${escBt(w.damage)}</p>`;
+  const text =
+    w.feature !== undefined ? `${statsLine}\n${w.feature}` : statsLine;
+  return [
+    `  {`,
+    `    type: 'equipment',`,
+    `    name: '${esc(w.name)}',`,
+    `    subtype: '${esc(subtype)}',`,
+    `    tier: ${w.tier},`,
+    `    tierEnabled: true,`,
+    `    hands: ${w.hands},`,
+    `    handsEnabled: true,`,
+    `    text: \`${escBt(text)}\`,`,
+    `    credits: '${CREDITS}',`,
+    `  },`,
+  ].join('\n');
+};
+
+const syncWeapons = () => {
+  const dir = path.join(ROOT, 'srd-source', 'weapons');
+  const out = path.join(
+    ROOT,
+    'src',
+    'lib',
+    'constants',
+    'reference',
+    'srd',
+    'weapons.ts',
+  );
+  const items = fs
+    .readdirSync(dir)
+    .filter((f) => f.endsWith('.md'))
+    .map((f) => parseWeaponFile(path.join(dir, f)))
+    .sort((a, b) => a.tier - b.tier || a.name.localeCompare(b.name));
+  const body = items.map(renderWeapon).join('\n');
+  const output = [
+    `import type { CardDetails } from '@/lib/types';`,
+    ``,
+    `export const weapons: CardDetails[] = [`,
+    body,
+    `];`,
+    ``,
+  ].join('\n');
+  fs.writeFileSync(out, output);
+  console.log(`Synced ${items.length} weapons → ${path.relative(ROOT, out)}`);
+};
+
+// ---------------------------------------------------------------------------
+// Equipment - Consumables & Items
+// ---------------------------------------------------------------------------
+
+type ParsedSimpleEquipment = {
+  name: string;
+  description: string;
+};
+
+const parseSimpleEquipmentFile = (filepath: string): ParsedSimpleEquipment => {
+  const lines = fs
+    .readFileSync(filepath, 'utf-8')
+    .replace(/^\uFEFF/, '')
+    .split('\n');
+  const name =
+    lines
+      .find((l) => l.startsWith('# '))
+      ?.slice(2)
+      .trim() ?? '';
+  const description = stripMd(
+    lines
+      .filter(
+        (l) =>
+          l.trim() &&
+          !l.startsWith('#') &&
+          !/^\*+_?[A-Za-z\s]+_?\*+$/.test(l.trim()),
+      )
+      .join(' ')
+      .trim(),
+  );
+  return { name, description };
+};
+
+const renderSimpleEquipment = (
+  item: ParsedSimpleEquipment,
+  subtype: string,
+): string =>
+  [
+    `  {`,
+    `    type: 'equipment',`,
+    `    name: '${esc(item.name)}',`,
+    `    subtype: '${subtype}',`,
+    `    text: \`<p>${escBt(item.description)}</p>\`,`,
+    `    credits: '${CREDITS}',`,
+    `  },`,
+  ].join('\n');
+
+const syncSimpleEquipment = (
+  sourceDir: string,
+  outFile: string,
+  exportName: string,
+  subtype: string,
+) => {
+  const dir = path.join(ROOT, 'srd-source', sourceDir);
+  const out = path.join(
+    ROOT,
+    'src',
+    'lib',
+    'constants',
+    'reference',
+    'srd',
+    outFile,
+  );
+  const items = fs
+    .readdirSync(dir)
+    .filter((f) => f.endsWith('.md'))
+    .map((f) => parseSimpleEquipmentFile(path.join(dir, f)))
+    .sort((a, b) => a.name.localeCompare(b.name));
+  const body = items
+    .map((item) => renderSimpleEquipment(item, subtype))
+    .join('\n');
+  const output = [
+    `import type { CardDetails } from '@/lib/types';`,
+    ``,
+    `export const ${exportName}: CardDetails[] = [`,
+    body,
+    `];`,
+    ``,
+  ].join('\n');
+  fs.writeFileSync(out, output);
+  console.log(
+    `Synced ${items.length} ${exportName} → ${path.relative(ROOT, out)}`,
+  );
 };
 
 // ---------------------------------------------------------------------------
@@ -721,14 +1040,37 @@ const TARGETS: Record<string, () => void> = {
   ancestries: syncAncestries,
   communities: syncCommunities,
   classes: syncClasses,
+  armor: syncArmor,
+  weapons: syncWeapons,
+  consumables: () =>
+    syncSimpleEquipment(
+      'consumables',
+      'consumables.ts',
+      'consumables',
+      'Consumable',
+    ),
+  items: () => syncSimpleEquipment('items', 'items.ts', 'items', 'Item'),
 };
 
 const target = process.argv[2];
 
-if (!target || !(target in TARGETS)) {
-  console.error(
-    `Usage: tsx scripts/sync-cards.ts <${Object.keys(TARGETS).join(' | ')}>`,
-  );
+if (!target) {
+  console.log(`Usage: tsx scripts/sync-cards.ts <type>
+
+Types:
+  ancestries    Sync ancestry card data
+  communities   Sync community card data
+  classes       Sync class and subclass data
+  armor         Sync armor card data
+  weapons       Sync weapon card data
+  consumables   Sync consumable card data
+  items         Sync item card data`);
+  process.exit(0);
+}
+
+if (!(target in TARGETS)) {
+  console.error(`Unknown type: ${target}`);
+  console.error(`Valid types: ${Object.keys(TARGETS).join(', ')}`);
   process.exit(1);
 }
 

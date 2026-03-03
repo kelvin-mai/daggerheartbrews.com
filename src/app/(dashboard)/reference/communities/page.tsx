@@ -1,4 +1,4 @@
-import { communities } from '@/lib/constants/srd/communities';
+import { communities } from '@/lib/constants/reference/srd';
 import { PageHeader } from '@/components/common';
 import { FilteredCommunities } from './client';
 

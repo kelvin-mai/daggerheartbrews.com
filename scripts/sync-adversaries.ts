@@ -276,6 +276,7 @@ const syncEnvironments = () => {
     'src',
     'lib',
     'constants',
+    'reference',
     'srd',
     'environments.ts',
   );
@@ -467,6 +468,7 @@ const syncAdversaries = () => {
     'src',
     'lib',
     'constants',
+    'reference',
     'srd',
     'adversaries.ts',
   );
@@ -505,10 +507,18 @@ const TARGETS: Record<string, () => void> = {
 
 const target = process.argv[2];
 
-if (!target || !(target in TARGETS)) {
-  console.error(
-    `Usage: tsx scripts/sync-adversaries.ts <${Object.keys(TARGETS).join(' | ')}>`,
-  );
+if (!target) {
+  console.log(`Usage: tsx scripts/sync-adversaries.ts <type>
+
+Types:
+  environments  Sync environment data
+  adversaries   Sync adversary data`);
+  process.exit(0);
+}
+
+if (!(target in TARGETS)) {
+  console.error(`Unknown type: ${target}`);
+  console.error(`Valid types: ${Object.keys(TARGETS).join(', ')}`);
   process.exit(1);
 }
 

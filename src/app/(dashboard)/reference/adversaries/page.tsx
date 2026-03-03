@@ -1,4 +1,4 @@
-import { adversaries } from '@/lib/constants/srd';
+import { adversaries } from '@/lib/constants/reference/srd';
 import { PageHeader } from '@/components/common';
 import { FilteredAdversaries } from './client';
 

@@ -33,7 +33,7 @@ type CommunityPostProps = React.ComponentProps<'div'> & {
   onUseAsTemplate: () => void;
 };
 
-const CommunityPost: React.FC<CommunityPostProps> = ({
+export const CommunityPost: React.FC<CommunityPostProps> = ({
   name,
   type,
   image,
