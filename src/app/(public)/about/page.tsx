@@ -121,6 +121,34 @@ export default function AboutPage() {
       </section>
 
       <section className='space-y-4'>
+        <h2 className='text-2xl font-bold'>SRD Reference Data</h2>
+        <p>
+          The reference pages (ancestries, classes, communities, adversaries,
+          and more) are generated from the{' '}
+          <a
+            href='https://github.com/seansbox/daggerheart-srd'
+            target='_blank'
+            rel='noopener noreferrer'
+            className='underline underline-offset-4'
+          >
+            daggerheart-srd
+          </a>{' '}
+          repository, a structured markdown conversion of the Daggerheart SRD
+          maintained by{' '}
+          <a
+            href='https://github.com/seansbox'
+            target='_blank'
+            rel='noopener noreferrer'
+            className='underline underline-offset-4'
+          >
+            seansbox
+          </a>
+          . Many thanks for the careful work of organizing the SRD into a
+          machine-readable format.
+        </p>
+      </section>
+
+      <section className='space-y-4'>
         <h2 className='text-2xl font-bold'>Contact</h2>
         <p>
           Have a question, found a bug, or want to get in touch? Visit the{' '}
