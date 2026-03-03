@@ -47,3 +47,7 @@ next-env.d.ts
 
 # drizzle
 migrations/
+
+# submodules
+srd-source
+.gitmodules
