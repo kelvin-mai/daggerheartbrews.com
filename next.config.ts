@@ -17,6 +17,11 @@ const nextConfig: NextConfig = {
         destination: '/card/create',
         permanent: true,
       },
+      {
+        source: '/community',
+        destination: '/community/cards',
+        permanent: true,
+      },
     ];
   },
 };
