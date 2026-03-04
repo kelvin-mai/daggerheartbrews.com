@@ -4,6 +4,7 @@ const domainColors = {
   blood: '#7a0e0e',
   bone: '#a4a9a8',
   codex: '#24395d',
+  dread: '#362b62',
   grace: '#8d3965',
   midnight: '#1e201f',
   sage: '#244e30',

@@ -8,6 +8,7 @@ Reference in CLAUDE.md with: `@.claude/skills.md`
 ## TypeScript
 
 - Prefer `type` over `interface` unless declaration merging is needed
+- Prefer `.ts` extension for TypeScript files that don't include JSX
 - No `any` — use `unknown` and narrow, or define proper types
 - Export types from `src/lib/types/` for shared use; colocate types in the same file if only used locally
 - Use `satisfies` operator to validate literal objects against a type without widening
@@ -90,9 +91,16 @@ return { data: null, error: 'Not authorized' };
 
 ---
 
+## Package Manager
+
+- Always use `pnpm` instead of `npm` for running scripts and node tasks
+- `pnpm run <script>`, `pnpm dlx <package>`, never `npm run` or `npx`
+
+---
+
 ## Database (Drizzle ORM)
 
-- Schema changes go in `src/lib/database/schema/`; run `npm run db:generate` after changes
+- Schema changes go in `src/lib/database/schema/`; run `pnpm run db:generate` after changes
 - Never write raw SQL strings in application code — use the Drizzle query builder
 - Keep queries in server actions or server-only utility files; never in Client Components
 - Use transactions for multi-step writes

@@ -10,6 +10,11 @@ import { MultipleSelector, Option } from '@/components/common';
 import { Input } from '@/components/ui/input';
 import { capitalize } from '@/lib/utils';
 
+const SOURCE_OPTIONS: Option[] = [
+  { value: 'SRD', label: 'SRD' },
+  { value: 'The Void', label: 'The Void' },
+];
+
 export const FilteredEnvironments = ({
   environments,
 }: {
@@ -28,9 +33,11 @@ export const FilteredEnvironments = ({
   const [searchName, setSearchName] = React.useState<string>('');
   const [selectedTypes, setSelectedTypes] = React.useState<Option[]>([]);
   const [selectedTiers, setSelectedTiers] = React.useState<Option[]>([]);
+  const [selectedSources, setSelectedSources] = React.useState<Option[]>([]);
+
   return (
     <div>
-      <div className='mb-4 grid grid-cols-3 gap-2'>
+      <div className='mb-4 grid grid-cols-2 gap-2'>
         <div className='relative'>
           <Search className='text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2' />
           <Input
@@ -40,6 +47,18 @@ export const FilteredEnvironments = ({
             onChange={(e) => setSearchName(e.target.value)}
           />
         </div>
+        <MultipleSelector
+          commandProps={{ label: 'Select Sources' }}
+          defaultOptions={SOURCE_OPTIONS}
+          value={selectedSources}
+          onChange={setSelectedSources}
+          placeholder='Filter by source'
+          emptyIndicator={
+            <p className='text-muted-foreground text-center text-sm'>
+              No results
+            </p>
+          }
+        />
         <MultipleSelector
           commandProps={{ label: 'Select Types' }}
           defaultOptions={types}
@@ -73,6 +92,13 @@ export const FilteredEnvironments = ({
                 ? environment.name
                     .toLowerCase()
                     .includes(searchName.toLowerCase())
+                : true,
+            )
+            .filter((environment) =>
+              selectedSources.length > 0
+                ? selectedSources
+                    .map((o) => o.value)
+                    .includes(environment.source ?? 'SRD')
                 : true,
             )
             .filter((environment) =>

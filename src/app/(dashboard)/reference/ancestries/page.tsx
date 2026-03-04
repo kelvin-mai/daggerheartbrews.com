@@ -1,4 +1,4 @@
-import { ancestries } from '@/lib/constants';
+import { ancestries } from '@/lib/constants/reference';
 import { PageHeader } from '@/components/common';
 import { FilteredAncestries } from './client';
 

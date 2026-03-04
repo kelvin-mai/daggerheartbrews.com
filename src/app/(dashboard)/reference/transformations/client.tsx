@@ -4,10 +4,10 @@ import * as React from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { Search } from 'lucide-react';
 
-import type { CardDetails } from '@/lib/types';
+import { MultipleSelector, Option } from '@/components/common';
+import { CardDetails } from '@/lib/types';
 import { CardDisplayPreview } from '@/components/card-creation/preview';
 import { initialSettings } from '@/lib/constants';
-import { MultipleSelector, Option } from '@/components/common';
 import { Input } from '@/components/ui/input';
 
 const SOURCE_OPTIONS: Option[] = [
@@ -15,21 +15,23 @@ const SOURCE_OPTIONS: Option[] = [
   { value: 'The Void', label: 'The Void' },
 ];
 
-export const FilteredAncestries = ({
-  ancestries,
+export const FilteredTransformations = ({
+  transformations,
 }: {
-  ancestries: CardDetails[];
+  transformations: CardDetails[];
 }) => {
-  const [search, setSearch] = React.useState('');
+  const [searchName, setSearchName] = React.useState<string>('');
   const [selectedSources, setSelectedSources] = React.useState<Option[]>([]);
 
-  const filtered = ancestries
-    .filter((a) =>
-      search ? a.name.toLowerCase().includes(search.toLowerCase()) : true,
+  const filtered = transformations
+    .filter((t) =>
+      searchName
+        ? t.name.toLowerCase().includes(searchName.toLowerCase())
+        : true,
     )
-    .filter((a) =>
+    .filter((t) =>
       selectedSources.length > 0
-        ? selectedSources.map((o) => o.value).includes(a.source ?? 'SRD')
+        ? selectedSources.map((o) => o.value).includes(t.source ?? 'SRD')
         : true,
     );
 
@@ -40,9 +42,9 @@ export const FilteredAncestries = ({
           <Search className='text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2' />
           <Input
             className='pl-9'
-            placeholder='Search ancestries…'
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            placeholder='Search transformations…'
+            value={searchName}
+            onChange={(e) => setSearchName(e.target.value)}
           />
         </div>
         <MultipleSelector
@@ -61,15 +63,15 @@ export const FilteredAncestries = ({
 
       {filtered.length === 0 && (
         <div className='text-muted-foreground py-16 text-center text-sm'>
-          No ancestries match your filters
+          No transformations match your filters
         </div>
       )}
 
       <div className='flex flex-wrap justify-center gap-4'>
         <AnimatePresence>
-          {filtered.map((ancestry) => (
+          {filtered.map((transformation) => (
             <motion.div
-              key={ancestry.name}
+              key={transformation.name}
               className='w-full max-w-[340px]'
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -77,7 +79,10 @@ export const FilteredAncestries = ({
               transition={{ duration: 0.15 }}
               layout
             >
-              <CardDisplayPreview card={ancestry} settings={initialSettings} />
+              <CardDisplayPreview
+                card={transformation}
+                settings={initialSettings}
+              />
             </motion.div>
           ))}
         </AnimatePresence>

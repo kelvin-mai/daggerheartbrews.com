@@ -22,6 +22,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useCardActions } from '@/store';
 
+const SOURCE_OPTIONS: Option[] = [
+  { value: 'SRD', label: 'SRD' },
+  { value: 'The Void', label: 'The Void' },
+];
+
 const CATEGORIES: Option[] = [
   { value: 'Armor', label: 'Armor' },
   { value: 'Weapon', label: 'Weapon' },
@@ -70,6 +75,7 @@ export const FilteredEquipment = ({
   const [selectedDamageTypes, setSelectedDamageTypes] = React.useState<
     Option[]
   >([]);
+  const [selectedSources, setSelectedSources] = React.useState<Option[]>([]);
   const [currentPage, setCurrentPage] = React.useState(1);
   const [pageSize, setPageSize] = React.useState(24);
 
@@ -81,6 +87,7 @@ export const FilteredEquipment = ({
     selectedTiers,
     selectedHands,
     selectedDamageTypes,
+    selectedSources,
   ]);
 
   const filtered = equipment
@@ -111,6 +118,11 @@ export const FilteredEquipment = ({
     .filter((item) =>
       selectedDamageTypes.length > 0
         ? selectedDamageTypes.some((dt) => item.subtype?.includes(dt.value))
+        : true,
+    )
+    .filter((item) =>
+      selectedSources.length > 0
+        ? selectedSources.map((o) => o.value).includes(item.source ?? 'SRD')
         : true,
     );
 
@@ -171,6 +183,14 @@ export const FilteredEquipment = ({
             placeholder='Filter by damage type'
             emptyIndicator={emptyIndicator}
           />
+          <MultipleSelector
+            commandProps={{ label: 'Select Sources' }}
+            defaultOptions={SOURCE_OPTIONS}
+            value={selectedSources}
+            onChange={setSelectedSources}
+            placeholder='Filter by source'
+            emptyIndicator={emptyIndicator}
+          />
         </div>
         <div className='flex shrink-0 gap-1'>
           <Button
@@ -206,7 +226,7 @@ export const FilteredEquipment = ({
               name={item.name}
               type={item.subtype ?? item.type}
               image={item.image}
-              creator='SRD'
+              creator={item.source ?? 'SRD'}
               onUseAsTemplate={() => handleTemplate(item)}
               preview={<CardPreview card={item} settings={initialSettings} />}
             />

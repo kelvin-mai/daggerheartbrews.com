@@ -1,4 +1,4 @@
-import { environments } from '@/lib/constants/reference/srd';
+import { environments } from '@/lib/constants/reference';
 import { PageHeader } from '@/components/common';
 import { FilteredEnvironments } from './client';
 
@@ -15,7 +15,11 @@ export default function Page() {
         title='Environments'
         subtitle='Browse SRD environments to inspire your next session.'
         className='mb-4'
-      />
+      >
+        <span className='text-muted-foreground text-sm'>
+          {environments.length} available
+        </span>
+      </PageHeader>
       <FilteredEnvironments environments={environments} />
     </>
   );

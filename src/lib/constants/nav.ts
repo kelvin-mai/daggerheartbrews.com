@@ -62,6 +62,10 @@ export const nav: NavCategory[] = [
         name: 'Beastforms',
         url: '/reference/beastforms',
       },
+      {
+        name: 'Transformations',
+        url: '/reference/transformations',
+      },
       { type: 'divider' as const },
       {
         name: 'Adversaries',

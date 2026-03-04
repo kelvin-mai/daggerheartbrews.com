@@ -7,7 +7,13 @@ import { Search } from 'lucide-react';
 import type { CardDetails } from '@/lib/types';
 import { CardDisplayPreview } from '@/components/card-creation/preview';
 import { initialSettings } from '@/lib/constants';
+import { MultipleSelector, Option } from '@/components/common';
 import { Input } from '@/components/ui/input';
+
+const SOURCE_OPTIONS: Option[] = [
+  { value: 'SRD', label: 'SRD' },
+  { value: 'The Void', label: 'The Void' },
+];
 
 export const FilteredCommunities = ({
   communities,
@@ -15,26 +21,47 @@ export const FilteredCommunities = ({
   communities: CardDetails[];
 }) => {
   const [search, setSearch] = React.useState('');
+  const [selectedSources, setSelectedSources] = React.useState<Option[]>([]);
 
-  const filtered = communities.filter((c) =>
-    search ? c.name.toLowerCase().includes(search.toLowerCase()) : true,
-  );
+  const filtered = communities
+    .filter((c) =>
+      search ? c.name.toLowerCase().includes(search.toLowerCase()) : true,
+    )
+    .filter((c) =>
+      selectedSources.length > 0
+        ? selectedSources.map((o) => o.value).includes(c.source ?? 'SRD')
+        : true,
+    );
 
   return (
     <div>
-      <div className='relative mb-6'>
-        <Search className='text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2' />
-        <Input
-          className='pl-9'
-          placeholder='Search communities…'
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
+      <div className='mb-6 grid grid-cols-2 gap-2'>
+        <div className='relative'>
+          <Search className='text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2' />
+          <Input
+            className='pl-9'
+            placeholder='Search communities…'
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
+        <MultipleSelector
+          commandProps={{ label: 'Select Sources' }}
+          defaultOptions={SOURCE_OPTIONS}
+          value={selectedSources}
+          onChange={setSelectedSources}
+          placeholder='Filter by source'
+          emptyIndicator={
+            <p className='text-muted-foreground text-center text-sm'>
+              No results
+            </p>
+          }
         />
       </div>
 
       {filtered.length === 0 && (
         <div className='text-muted-foreground py-16 text-center text-sm'>
-          No communities match &ldquo;{search}&rdquo;
+          No communities match your filters
         </div>
       )}
 

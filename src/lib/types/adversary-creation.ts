@@ -9,6 +9,7 @@ export type AdversaryDetails = {
   id?: string;
   name: string;
   type: string;
+  source?: string;
   subtype?: string;
   image?: string;
   artist?: string;

@@ -1,4 +1,4 @@
-import { adversaries } from '@/lib/constants/reference/srd';
+import { adversaries } from '@/lib/constants/reference';
 import { PageHeader } from '@/components/common';
 import { FilteredAdversaries } from './client';
 
@@ -15,7 +15,11 @@ export default function Page() {
         title='Adversaries'
         subtitle='Browse SRD adversaries to populate your next encounter.'
         className='mb-4'
-      />
+      >
+        <span className='text-muted-foreground text-sm'>
+          {adversaries.length} available
+        </span>
+      </PageHeader>
       <FilteredAdversaries adversaries={adversaries} />
     </>
   );

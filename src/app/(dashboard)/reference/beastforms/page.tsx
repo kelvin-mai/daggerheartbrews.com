@@ -1,4 +1,4 @@
-import { beastforms } from '@/lib/constants';
+import { beastforms } from '@/lib/constants/reference';
 import { PageHeader } from '@/components/common';
 import { FilteredBeastforms } from './client';
 

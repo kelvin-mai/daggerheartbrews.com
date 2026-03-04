@@ -1,4 +1,5 @@
 import { capitalize } from '@/lib/utils';
+import type { AdversaryDetails } from '@/lib/types';
 import type { PreAdversaryDetails } from '../types';
 
 const preAdversaries: PreAdversaryDetails[] = [

@@ -9,6 +9,11 @@ import { AdversaryDisplayPreview } from '@/components/adversary-creation/preview
 import { MultipleSelector, Option } from '@/components/common';
 import { Input } from '@/components/ui/input';
 
+const SOURCE_OPTIONS: Option[] = [
+  { value: 'SRD', label: 'SRD' },
+  { value: 'The Void', label: 'The Void' },
+];
+
 export const FilteredAdversaries = ({
   adversaries,
 }: {
@@ -28,10 +33,11 @@ export const FilteredAdversaries = ({
   const [searchName, setSearchName] = React.useState<string>('');
   const [selectedSubtypes, setSelectedSubtypes] = React.useState<Option[]>([]);
   const [selectedTiers, setSelectedTiers] = React.useState<Option[]>([]);
+  const [selectedSources, setSelectedSources] = React.useState<Option[]>([]);
 
   return (
     <div>
-      <div className='mb-4 grid grid-cols-3 gap-2'>
+      <div className='mb-4 grid grid-cols-2 gap-2'>
         <div className='relative'>
           <Search className='text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2' />
           <Input
@@ -41,6 +47,18 @@ export const FilteredAdversaries = ({
             onChange={(e) => setSearchName(e.target.value)}
           />
         </div>
+        <MultipleSelector
+          commandProps={{ label: 'Select Sources' }}
+          defaultOptions={SOURCE_OPTIONS}
+          value={selectedSources}
+          onChange={setSelectedSources}
+          placeholder='Filter by source'
+          emptyIndicator={
+            <p className='text-muted-foreground text-center text-sm'>
+              No results
+            </p>
+          }
+        />
         <MultipleSelector
           commandProps={{ label: 'Select Subtypes' }}
           defaultOptions={subtypes}
@@ -74,6 +92,13 @@ export const FilteredAdversaries = ({
                 ? adversary.name
                     .toLowerCase()
                     .includes(searchName.toLowerCase())
+                : true,
+            )
+            .filter((adversary) =>
+              selectedSources.length > 0
+                ? selectedSources
+                    .map((o) => o.value)
+                    .includes(adversary.source ?? 'SRD')
                 : true,
             )
             .filter((adversary) =>

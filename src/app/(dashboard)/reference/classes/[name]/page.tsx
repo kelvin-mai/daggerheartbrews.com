@@ -4,11 +4,7 @@ import { Collapsible, CollapsibleContent } from '@/components/ui/collapsible';
 import { CollapsibleSectionTrigger, PageHeader } from '@/components/common';
 import { Label } from '@/components/ui/label';
 import { initialSettings } from '@/lib/constants';
-import {
-  classes,
-  subclasses,
-  domainColor,
-} from '@/lib/constants/reference/srd';
+import { classes, subclasses, domainColor } from '@/lib/constants/reference';
 import { getClassAdditional, getSubclassAdditional } from '@/lib/mdx';
 import { capitalize } from '@/lib/utils';
 
@@ -58,7 +54,9 @@ export default async function Page({ params }: PageProps) {
             name,
             type: 'class',
             subtitle: 'Class Features',
-            image: `/assets/images/srd/class/${classSubclasses[0].image}`,
+            image: classSubclasses[0].image
+              ? `/assets/images/srd/class/${classSubclasses[0].image}`
+              : undefined,
             artist: classSubclasses[0].artist,
             evasion: current.startEvasion,
             domainPrimary: current.domains[0],
@@ -142,7 +140,9 @@ export default async function Page({ params }: PageProps) {
                     type: 'subclass',
                     subtype: current.name,
                     subtitle: 'Foundation',
-                    image: `/assets/images/srd/class/${sc.image}`,
+                    image: sc.image
+                      ? `/assets/images/srd/class/${sc.image}`
+                      : undefined,
                     artist: sc.artist,
                     domainPrimary: current.domains[0],
                     domainPrimaryColor: domainColor(current.domains[0]),
@@ -171,7 +171,9 @@ export default async function Page({ params }: PageProps) {
                     type: 'subclass',
                     subtype: current.name,
                     subtitle: 'Specialization',
-                    image: `/assets/images/srd/class/${sc.image}`,
+                    image: sc.image
+                      ? `/assets/images/srd/class/${sc.image}`
+                      : undefined,
                     artist: sc.artist,
                     domainPrimary: current.domains[0],
                     domainPrimaryColor: domainColor(current.domains[0]),
@@ -195,7 +197,9 @@ export default async function Page({ params }: PageProps) {
                     type: 'subclass',
                     subtype: current.name,
                     subtitle: 'Mastery',
-                    image: `/assets/images/srd/class/${sc.image}`,
+                    image: sc.image
+                      ? `/assets/images/srd/class/${sc.image}`
+                      : undefined,
                     artist: sc.artist,
                     domainPrimary: current.domains[0],
                     domainPrimaryColor: domainColor(current.domains[0]),

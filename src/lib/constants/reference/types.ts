@@ -12,9 +12,10 @@ export type Feature = {
 export type SubclassReference = {
   className: string;
   name: string;
-  image: string;
+  image: string | null;
   artist: string;
   description: string;
+  source?: string;
   trait?: string;
   foundation: Feature[];
   specialization: Feature[];
@@ -24,6 +25,7 @@ export type SubclassReference = {
 export type ClassReference = {
   name: string;
   flavor: string;
+  source?: string;
   domains: [string, string];
   startEvasion: number;
   startHp: number;

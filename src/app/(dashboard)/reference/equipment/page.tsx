@@ -1,9 +1,4 @@
-import {
-  armor,
-  weapons,
-  consumables,
-  items,
-} from '@/lib/constants/reference/srd';
+import { armor, weapons, consumables, items } from '@/lib/constants/reference';
 import { PageHeader } from '@/components/common';
 import { FilteredEquipment } from './client';
 

@@ -48,6 +48,7 @@ export type CardDetails = {
   id?: string;
   name: string;
   type: CardType;
+  source?: string;
   image?: string;
   text?: string;
   artist?: string;

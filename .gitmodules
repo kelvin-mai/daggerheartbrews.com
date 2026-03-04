@@ -1,0 +1,3 @@
+[submodule "srd-source"]
+	path = srd-source
+	url = https://github.com/seansbox/daggerheart-srd.git
