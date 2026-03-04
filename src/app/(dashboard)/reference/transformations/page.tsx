@@ -13,7 +13,7 @@ export default function Page() {
     <>
       <PageHeader
         title='Transformations'
-        subtitle='Browse transformations for custom card creation.'
+        subtitle='Browse transformations for custom card creation'
         className='mb-4'
       >
         <span className='text-muted-foreground text-sm'>

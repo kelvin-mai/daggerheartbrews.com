@@ -13,7 +13,7 @@ export default function Page() {
     <>
       <PageHeader
         title='Adversaries'
-        subtitle='Browse SRD adversaries to populate your next encounter.'
+        subtitle='Browse SRD adversaries to populate your next encounter'
         className='mb-4'
       >
         <span className='text-muted-foreground text-sm'>

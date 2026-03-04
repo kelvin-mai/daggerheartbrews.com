@@ -13,7 +13,7 @@ export default function Page() {
     <>
       <PageHeader
         title='Environments'
-        subtitle='Browse SRD environments to inspire your next session.'
+        subtitle='Browse SRD environments to inspire your next session'
         className='mb-4'
       >
         <span className='text-muted-foreground text-sm'>

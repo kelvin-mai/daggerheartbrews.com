@@ -15,7 +15,7 @@ export default function Page() {
     <>
       <PageHeader
         title='Equipment'
-        subtitle='Browse SRD equipment for use in custom card creation.'
+        subtitle='Browse SRD equipment for use in custom card creation'
         className='mb-4'
       >
         <span className='text-muted-foreground text-sm'>

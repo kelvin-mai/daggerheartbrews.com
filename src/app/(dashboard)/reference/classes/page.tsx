@@ -13,7 +13,7 @@ export default function Page() {
     <>
       <PageHeader
         title='Classes'
-        subtitle='Browse SRD classes and their subclasses from the System Reference Document.'
+        subtitle='Browse SRD classes and their subclasses from the System Reference Document'
       >
         <span className='text-muted-foreground text-sm'>
           {classes.length} available

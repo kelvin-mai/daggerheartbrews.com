@@ -22,11 +22,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useCardActions } from '@/store';
 
-const SOURCE_OPTIONS: Option[] = [
-  { value: 'SRD', label: 'SRD' },
-  { value: 'The Void', label: 'The Void' },
-];
-
 const CATEGORIES: Option[] = [
   { value: 'Armor', label: 'Armor' },
   { value: 'Weapon', label: 'Weapon' },
@@ -75,7 +70,6 @@ export const FilteredEquipment = ({
   const [selectedDamageTypes, setSelectedDamageTypes] = React.useState<
     Option[]
   >([]);
-  const [selectedSources, setSelectedSources] = React.useState<Option[]>([]);
   const [currentPage, setCurrentPage] = React.useState(1);
   const [pageSize, setPageSize] = React.useState(24);
 
@@ -87,7 +81,6 @@ export const FilteredEquipment = ({
     selectedTiers,
     selectedHands,
     selectedDamageTypes,
-    selectedSources,
   ]);
 
   const filtered = equipment
@@ -119,11 +112,6 @@ export const FilteredEquipment = ({
       selectedDamageTypes.length > 0
         ? selectedDamageTypes.some((dt) => item.subtype?.includes(dt.value))
         : true,
-    )
-    .filter((item) =>
-      selectedSources.length > 0
-        ? selectedSources.map((o) => o.value).includes(item.source ?? 'SRD')
-        : true,
     );
 
   const pages = Math.max(1, Math.ceil(filtered.length / pageSize));
@@ -140,9 +128,9 @@ export const FilteredEquipment = ({
 
   return (
     <div>
-      <div className='mb-4 flex items-start gap-2'>
-        <div className='grid flex-1 grid-cols-3 gap-2'>
-          <div className='relative'>
+      <div className='mb-4 flex flex-col gap-2'>
+        <div className='flex gap-2'>
+          <div className='relative flex-1'>
             <Search className='text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2' />
             <Input
               className='pl-9'
@@ -151,6 +139,26 @@ export const FilteredEquipment = ({
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
+          <div className='flex shrink-0 gap-1'>
+            <Button
+              size='icon'
+              variant={view === 'posts' ? 'secondary' : 'ghost'}
+              onClick={() => setView('posts')}
+              aria-label='Posts view'
+            >
+              <LayoutList />
+            </Button>
+            <Button
+              size='icon'
+              variant={view === 'cards' ? 'secondary' : 'ghost'}
+              onClick={() => setView('cards')}
+              aria-label='Cards view'
+            >
+              <LayoutGrid />
+            </Button>
+          </div>
+        </div>
+        <div className='grid grid-cols-2 gap-2 sm:grid-cols-4'>
           <MultipleSelector
             commandProps={{ label: 'Select Categories' }}
             defaultOptions={CATEGORIES}
@@ -183,32 +191,6 @@ export const FilteredEquipment = ({
             placeholder='Filter by damage type'
             emptyIndicator={emptyIndicator}
           />
-          <MultipleSelector
-            commandProps={{ label: 'Select Sources' }}
-            defaultOptions={SOURCE_OPTIONS}
-            value={selectedSources}
-            onChange={setSelectedSources}
-            placeholder='Filter by source'
-            emptyIndicator={emptyIndicator}
-          />
-        </div>
-        <div className='flex shrink-0 gap-1'>
-          <Button
-            size='icon'
-            variant={view === 'posts' ? 'secondary' : 'ghost'}
-            onClick={() => setView('posts')}
-            aria-label='Posts view'
-          >
-            <LayoutList />
-          </Button>
-          <Button
-            size='icon'
-            variant={view === 'cards' ? 'secondary' : 'ghost'}
-            onClick={() => setView('cards')}
-            aria-label='Cards view'
-          >
-            <LayoutGrid />
-          </Button>
         </div>
       </div>
 

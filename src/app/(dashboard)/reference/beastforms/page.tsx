@@ -13,7 +13,7 @@ export default function Page() {
     <>
       <PageHeader
         title='Beastforms'
-        subtitle='Browse SRD beastforms across tiers 1–4 for custom card creation.'
+        subtitle='Browse SRD beastforms across tiers 1–4 for custom card creation'
         className='mb-4'
       >
         <span className='text-muted-foreground text-sm'>
