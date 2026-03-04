@@ -4,6 +4,10 @@ vi.mock('@/lib/auth', () => ({
   auth: { api: { getSession: vi.fn() } },
 }));
 
+vi.mock('@/lib/email', () => ({
+  syncAudienceContact: vi.fn(),
+}));
+
 vi.mock('@/lib/database', () => ({
   db: { update: vi.fn() },
 }));

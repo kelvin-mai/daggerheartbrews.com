@@ -9,6 +9,10 @@ vi.mock('@/lib/auth', () => ({
   },
 }));
 
+vi.mock('@/lib/email', () => ({
+  addAudienceContact: vi.fn(),
+}));
+
 import { login, register } from '@/actions/auth';
 import { auth } from '@/lib/auth';
 

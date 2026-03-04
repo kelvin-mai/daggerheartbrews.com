@@ -12,9 +12,9 @@ Unit tests live in the `test/` directory and mirror the source structure. They u
 ### Running Unit Tests
 
 ```bash
-npm run test              # Run tests in watch mode
-npm run test:ui           # Run with Vitest's browser UI
-npm run test:coverage     # Run with coverage report
+pnpm run test              # Run tests in watch mode
+pnpm run test:ui           # Run with Vitest's browser UI
+pnpm run test:coverage     # Run with coverage report
 ```
 
 ### Writing Unit Tests
@@ -70,32 +70,25 @@ Install Playwright browsers (one-time setup):
 pnpm exec playwright install
 ```
 
-If prompted for missing system dependencies, install them with your system package manager. For example on Arch-based Linux:
-
-```bash
-yay -S icu libxml2 flite
-```
-
 ### Running E2E Tests
 
 ```bash
-npm run test:e2e          # Run all E2E tests (headless)
-npm run test:e2e:ui       # Run with Playwright's interactive UI
+pnpm run test:e2e          # Run all E2E tests (headless)
+pnpm run test:e2e:ui       # Run with Playwright's interactive UI
 ```
 
 Run a single test file or filter by name:
 
 ```bash
-npx playwright test e2e/home.spec.ts
-npx playwright test --grep "homepage"
+pnpm exec playwright test e2e/home/home.spec.ts
+pnpm exec playwright test --grep "homepage"
 ```
 
 Run against a specific browser:
 
 ```bash
-npx playwright test --project=chromium
-npx playwright test --project=firefox
-npx playwright test --project=webkit
+pnpm exec playwright test --project=chromium
+pnpm exec playwright test --project=firefox
 ```
 
 ### Viewing Test Reports
@@ -103,28 +96,40 @@ npx playwright test --project=webkit
 After a test run, open the HTML report:
 
 ```bash
-npx playwright show-report
+pnpm exec playwright show-report
 ```
 
 ### Configuration
 
 The Playwright config (`playwright.config.ts`) is set up to:
 
-- Automatically start the dev server (`npm run dev`) before tests
+- Automatically start the dev server (`pnpm run dev`) before tests
 - Reuse an existing dev server if one is already running locally
-- Run against Chromium, Firefox, and WebKit
+- Run against Chromium and Firefox
 - Retry failed tests twice in CI, zero retries locally
 - Capture traces on first retry for debugging
 
 ### Writing E2E Tests
 
-Test files should be named `*.spec.ts` and placed in the `e2e/` directory:
+Test files should be named `*.spec.ts` and placed in a directory that mirrors the page route being tested:
 
 ```
 e2e/
-├── home.spec.ts
-├── card-creation.spec.ts
-└── auth.spec.ts
+├── fixtures.ts
+├── global-setup.ts
+├── auth.setup.ts
+├── home/
+│   └── home.spec.ts
+├── card/
+│   └── create/
+│       ├── card-creator.spec.ts
+│       └── card-creation-authenticated.spec.ts
+├── adversary/
+│   └── create/
+│       ├── adversary-creator.spec.ts
+│       └── adversary-creation-authenticated.spec.ts
+└── community/
+    └── community-template.spec.ts
 ```
 
 Example:
@@ -136,12 +141,22 @@ test('homepage loads and renders', async ({ page }) => {
   await page.goto('/');
   await expect(page).toHaveTitle(/DaggerheartBrews/);
 });
+```
 
-test('can navigate to card builder', async ({ page }) => {
-  await page.goto('/');
-  await page.click('text=Card Builder');
-  await expect(page).toHaveURL(/\/card/);
-});
+### Authenticated Tests
+
+Tests that require a logged-in user are split into their own `*-authenticated.spec.ts` files and run in a dedicated `chromium-authenticated` Playwright project. The auth flow works as follows:
+
+1. **`e2e/global-setup.ts`** runs once before all tests. It seeds a test user directly in the database (credentials from `TEST_USER_EMAIL` / `TEST_USER_PASSWORD` env vars, defaulting to `test@example.com` / `password123`). It also cleans up any leftover items from previous test runs.
+
+2. **`e2e/auth.setup.ts`** runs the login flow in a browser and saves the session to `e2e/.auth/user.json`.
+
+3. Authenticated spec files load that saved session via `storageState`, so every test starts already logged in.
+
+When writing authenticated tests, import helpers from `fixtures.ts` using a path relative to the spec file's location:
+
+```typescript
+import { getItemRow } from '../../fixtures'; // from e2e/card/create/
 ```
 
 ### What to E2E Test
@@ -157,6 +172,11 @@ test('can navigate to card builder', async ({ page }) => {
 - Use `await expect(locator).toBeVisible()` over manual waits
 - Use Playwright's [codegen](https://playwright.dev/docs/codegen) to help write selectors:
   ```bash
-  npx playwright codegen http://localhost:3000
+  pnpm exec playwright codegen http://localhost:3000
   ```
-- For tests that require authentication, create a shared auth state using Playwright's [storage state](https://playwright.dev/docs/auth) feature
+- For pages with async session loading, wait for the Save button to become enabled before interacting:
+  ```typescript
+  await expect(page.getByRole('button', { name: 'Save' })).not.toHaveAttribute(
+    'aria-disabled',
+  );
+  ```

@@ -67,8 +67,8 @@ describe('user-items', () => {
       ).rejects.toThrow('Insert limit met for current user');
     });
 
-    it('uses default limit of 10', async () => {
-      vi.mocked(db.select).mockReturnValue(makeSelectChain([{ count: 10 }]));
+    it('uses default limit of 50', async () => {
+      vi.mocked(db.select).mockReturnValue(makeSelectChain([{ count: 50 }]));
       await expect(limitCardInserts({ session: mockSession })).rejects.toThrow(
         'Insert limit met for current user',
       );
