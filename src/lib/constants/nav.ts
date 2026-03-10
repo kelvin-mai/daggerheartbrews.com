@@ -1,5 +1,19 @@
 import type { NavCategory } from '@/lib/types';
 
+export const adminNav: NavCategory[] = [
+  {
+    name: 'Overview',
+    children: [
+      { name: 'Dashboard', url: '/admin' },
+      { name: 'Email Previews', url: '/admin/emails' },
+    ],
+  },
+  {
+    name: 'Data',
+    children: [{ name: 'Users', url: '/admin/users' }],
+  },
+];
+
 export const nav: NavCategory[] = [
   {
     name: 'Community',

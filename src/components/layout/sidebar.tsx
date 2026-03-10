@@ -14,7 +14,8 @@ import {
 import { toast } from 'sonner';
 
 import { useSession, logout } from '@/lib/auth/client';
-import { nav } from '@/lib/constants';
+import { adminNav, nav } from '@/lib/constants';
+import type { NavCategory } from '@/lib/types';
 import {
   Sidebar,
   SidebarContent,
@@ -142,78 +143,82 @@ const AppSidebarFooter = () => {
   );
 };
 
-const AppSidebarContent = () => {
+const NavContent = ({ categories }: { categories: NavCategory[] }) => {
   const pathname = usePathname();
-  const { data } = useSession();
   return (
     <SidebarContent>
-      {nav
-        .filter(
-          (category) =>
-            !category.requireAuth || (category.requireAuth && data?.user),
-        )
-        .map((category) => (
-          <SidebarGroup key={category.name}>
-            <SidebarMenu>
-              <Collapsible defaultOpen className='group/collapsible'>
-                <SidebarMenuItem>
-                  <CollapsibleTrigger asChild>
-                    <SidebarMenuButton
-                      isActive={category.children
-                        ?.filter((item) => item.type !== 'divider')
-                        .map((item) => item.url)
-                        .includes(pathname)}
-                    >
-                      {category.name}
-                      {category.badge && (
-                        <Badge className='capitalize'>{category.badge}</Badge>
-                      )}
-                      <ChevronRight className='ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90' />
-                    </SidebarMenuButton>
-                  </CollapsibleTrigger>
-                </SidebarMenuItem>
-                <CollapsibleContent>
-                  <SidebarMenuSub>
-                    {category.children?.map((item, index) =>
-                      item.type === 'divider' ? (
-                        <SidebarSeparator key={index} className='mx-0 my-1' />
-                      ) : (
-                        <SidebarMenuSubItem key={item.name}>
-                          <SidebarMenuSubButton
-                            asChild
-                            isActive={pathname === item.url}
-                          >
-                            <Link href={item.url}>
-                              {item.name}
-                              {item.badge && (
-                                <Badge className='capitalize'>
-                                  {item.badge}
-                                </Badge>
-                              )}
-                            </Link>
-                          </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
-                      ),
+      {categories.map((category) => (
+        <SidebarGroup key={category.name}>
+          <SidebarMenu>
+            <Collapsible defaultOpen className='group/collapsible'>
+              <SidebarMenuItem>
+                <CollapsibleTrigger asChild>
+                  <SidebarMenuButton
+                    isActive={category.children
+                      ?.filter((item) => item.type !== 'divider')
+                      .map((item) => item.url)
+                      .includes(pathname)}
+                  >
+                    {category.name}
+                    {category.badge && (
+                      <Badge className='capitalize'>{category.badge}</Badge>
                     )}
-                  </SidebarMenuSub>
-                </CollapsibleContent>
-              </Collapsible>
-            </SidebarMenu>
-          </SidebarGroup>
-        ))}
+                    <ChevronRight className='ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90' />
+                  </SidebarMenuButton>
+                </CollapsibleTrigger>
+              </SidebarMenuItem>
+              <CollapsibleContent>
+                <SidebarMenuSub>
+                  {category.children?.map((item, index) =>
+                    item.type === 'divider' ? (
+                      <SidebarSeparator key={index} className='mx-0 my-1' />
+                    ) : (
+                      <SidebarMenuSubItem key={item.name}>
+                        <SidebarMenuSubButton
+                          asChild
+                          isActive={pathname === item.url}
+                        >
+                          <Link href={item.url}>
+                            {item.name}
+                            {item.badge && (
+                              <Badge className='capitalize'>{item.badge}</Badge>
+                            )}
+                          </Link>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                    ),
+                  )}
+                </SidebarMenuSub>
+              </CollapsibleContent>
+            </Collapsible>
+          </SidebarMenu>
+        </SidebarGroup>
+      ))}
     </SidebarContent>
   );
 };
 
-type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {};
+const AppSidebarContent = () => {
+  const { data } = useSession();
+  const filtered = nav.filter(
+    (category) => !category.requireAuth || (category.requireAuth && data?.user),
+  );
+  return <NavContent categories={filtered} />;
+};
 
-export const AppSidebar: React.FC<AppSidebarProps> = ({ ...props }) => {
+const AdminSidebarContent = () => <NavContent categories={adminNav} />;
+
+type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {
+  admin?: boolean;
+};
+
+export const AppSidebar: React.FC<AppSidebarProps> = ({ admin, ...props }) => {
   return (
     <Sidebar variant='inset' {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuButton size='lg' asChild>
-            <Link href='/'>
+            <Link href={admin ? '/admin' : '/'}>
               <Image
                 src='/assets/images/dh-cgl-logo.png'
                 alt='Brand'
@@ -222,12 +227,15 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({ ...props }) => {
               />
               <div className='flex flex-col gap-1 leading-none'>
                 <span className='font-eveleth-clean'>Daggerheart Brews</span>
+                {admin && (
+                  <span className='text-muted-foreground text-xs'>Admin</span>
+                )}
               </div>
             </Link>
           </SidebarMenuButton>
         </SidebarMenu>
       </SidebarHeader>
-      <AppSidebarContent />
+      {admin ? <AdminSidebarContent /> : <AppSidebarContent />}
       <AppSidebarFooter />
     </Sidebar>
   );

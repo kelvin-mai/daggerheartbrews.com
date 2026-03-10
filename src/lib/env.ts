@@ -19,6 +19,7 @@ const schema = z.object({
   RESEND_API_KEY: z.string(),
   RESEND_AUDIENCE_ID: z.string().optional(),
   BROADCAST_SECRET: z.string().optional(),
+  ADMIN_USER_EMAIL: z.string().optional(),
 });
 
 export const env = schema.parse(process.env);
