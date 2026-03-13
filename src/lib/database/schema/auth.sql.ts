@@ -25,7 +25,6 @@ export const userSettings = pgTable('user_settings', {
   userId: uuid('user_id')
     .notNull()
     .references(() => users.id, { onDelete: 'cascade' }),
-  emailUpdates: boolean('email_updates').notNull().default(true),
   defaultVisibility: boolean('default_visibility').notNull().default(false),
   defaultExportResolution: smallint('default_export_resolution')
     .notNull()

@@ -91,15 +91,10 @@ export const updateEmailPreference = async (
   try {
     const session = await auth.api.getSession({ headers: await headers() });
     if (!session) throw new Error('Unauthorized');
-    await db
-      .update(userSettings)
-      .set({ emailUpdates, updatedAt: sql`now()` })
-      .where(eq(userSettings.userId, session.user.id));
     await syncAudienceContact({
       email: session.user.email,
       unsubscribed: !emailUpdates,
     });
-    revalidatePath('/profile');
     return { success: true };
   } catch (e) {
     return { success: false, error: (e as Error).message };

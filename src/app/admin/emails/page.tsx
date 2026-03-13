@@ -5,6 +5,7 @@ import {
   ResetPasswordEmail,
   ChangelogEmail,
   ContactEmail,
+  UpdateEmail,
   EmailPreviewClient,
 } from '@/components/email';
 
@@ -42,6 +43,10 @@ export default async function EmailPreviewPage() {
           message='This is a preview of the contact email template.'
         />,
       ),
+    },
+    {
+      name: 'Update (Draft)',
+      html: await render(<UpdateEmail />),
     },
   ]);
 

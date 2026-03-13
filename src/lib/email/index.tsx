@@ -5,6 +5,7 @@ import {
   ChangelogEmail,
   ContactEmail,
   ResetPasswordEmail,
+  UpdateEmail,
   VerificationEmail,
 } from '@/components/email';
 
@@ -69,29 +70,72 @@ export const syncAudienceContact = async ({
   unsubscribed: boolean;
 }) => {
   if (!env.RESEND_AUDIENCE_ID) return;
-  const { data } = await resend.contacts.list({
+  return await resend.contacts.create({
     audienceId: env.RESEND_AUDIENCE_ID,
-  });
-  const contact = data?.data.find((c) => c.email === email);
-  if (!contact) return;
-  return await resend.contacts.update({
-    audienceId: env.RESEND_AUDIENCE_ID,
-    id: contact.id,
+    email,
     unsubscribed,
   });
 };
 
-export const sendChangelogEmail = async ({ version }: { version: string }) => {
-  if (!env.RESEND_AUDIENCE_ID) return { data: null, error: null };
+export const getContactSubscriptionStatus = async (
+  email: string,
+): Promise<boolean> => {
+  if (!env.RESEND_AUDIENCE_ID) return true;
+  const { data } = await resend.contacts.list({
+    audienceId: env.RESEND_AUDIENCE_ID,
+  });
+  const contact = data?.data.find((c) => c.email === email);
+  return contact ? !contact.unsubscribed : true;
+};
+
+type BroadcastParams = {
+  subject: string;
+  name: string;
+};
+
+export const sendChangelogBroadcast = async ({
+  subject,
+  name,
+}: BroadcastParams & { version?: string }) => {
+  if (!env.RESEND_AUDIENCE_ID)
+    return { data: null, error: 'RESEND_AUDIENCE_ID is not configured' };
+  const version = name;
   const { data, error } = await resend.broadcasts.create({
     audienceId: env.RESEND_AUDIENCE_ID,
     from: 'updates@daggerheartbrews.com',
-    subject: `[dev update] DaggerheartBrews ${version}`,
-    name: `changelog-${version}`,
+    subject,
+    name,
     react: <ChangelogEmail version={version} />,
   });
-  if (error || !data) return { data: null, error };
-  return await resend.broadcasts.send(data.id);
+  if (error || !data)
+    return {
+      data: null,
+      error: error?.message ?? 'Failed to create broadcast',
+    };
+  const result = await resend.broadcasts.send(data.id);
+  return { data: result.data, error: result.error?.message ?? null };
+};
+
+export const sendUpdateBroadcast = async ({
+  subject,
+  name,
+}: BroadcastParams) => {
+  if (!env.RESEND_AUDIENCE_ID)
+    return { data: null, error: 'RESEND_AUDIENCE_ID is not configured' };
+  const { data, error } = await resend.broadcasts.create({
+    audienceId: env.RESEND_AUDIENCE_ID,
+    from: 'updates@daggerheartbrews.com',
+    subject,
+    name,
+    react: <UpdateEmail />,
+  });
+  if (error || !data)
+    return {
+      data: null,
+      error: error?.message ?? 'Failed to create broadcast',
+    };
+  const result = await resend.broadcasts.send(data.id);
+  return { data: result.data, error: result.error?.message ?? null };
 };
 
 export const sendContactEmail = async (params: ContactEmailParams) => {

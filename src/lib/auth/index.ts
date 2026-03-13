@@ -2,7 +2,11 @@ import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { nextCookies } from 'better-auth/next-js';
 
-import { sendResetPasswordEmail, sendVerificationEmail } from '@/lib/email';
+import {
+  addAudienceContact,
+  sendResetPasswordEmail,
+  sendVerificationEmail,
+} from '@/lib/email';
 import { env } from '@/lib/env';
 import { getBaseUrl } from '../utils';
 import { db } from '@/lib/database';
@@ -57,6 +61,10 @@ export const auth = betterAuth({
       create: {
         after: async (user) => {
           await db.insert(userSettings).values({ userId: user.id });
+          await addAudienceContact({
+            email: user.email,
+            firstName: user.name.split(' ')[0],
+          });
         },
       },
     },

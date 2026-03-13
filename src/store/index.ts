@@ -9,3 +9,8 @@ export {
   useAdversaryActions,
   useAdversaryEffects,
 } from './adversary/index';
+export {
+  useAudienceSyncStore,
+  useAudienceSyncActions,
+  useAudienceSyncEffects,
+} from './admin/index';
