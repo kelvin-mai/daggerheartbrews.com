@@ -13,7 +13,7 @@ allowed-tools:
 
 # Precommit command
 
-Run the pre-commit quality checks in order: tests → lint → format → docs. Do NOT commit anything.
+Run the pre-commit quality checks in order: build → tests → lint → format → docs. Do NOT commit anything.
 
 Output the checklist as plain assistant text before starting, and reprint it as plain assistant text after each step completes. Never use `echo` or a Bash tool call to render the checklist — always output it directly in your response so it is never collapsed in the UI.
 
@@ -22,6 +22,7 @@ Use this exact markdown format for the checklist:
 ```
 **Pre-commit checks**
 ─────────────────
+[ ] Build
 [ ] Tests
 [ ] Lint
 [ ] Format
@@ -36,27 +37,34 @@ After each step, reprint the full checklist with updated status for completed st
 
 ---
 
-## Step 1 — Tests
+## Step 1 — Build
+
+Run: `pnpm run build`
+
+- If it exits 0: mark Build as `[✓]` and reprint the checklist, then proceed.
+- If it exits non-zero: show the relevant error output, attempt to fix the build error(s), re-run, and only proceed once passing (or report that you could not fix them and mark `[✗]`). Reprint the checklist after resolving.
+
+## Step 2 — Tests
 
 Run: `pnpm run test --run`
 
 - If it exits 0: mark Tests as `[✓]` and reprint the checklist, then proceed.
 - If it exits non-zero: show the relevant error output, attempt to fix the failing test(s), re-run, and only proceed once passing (or report that you could not fix them and mark `[✗]`). Reprint the checklist after resolving.
 
-## Step 2 — Lint
+## Step 3 — Lint
 
 Run: `pnpm run lint:fix`
 
 - If it exits 0: mark Lint as `[✓]` and reprint the checklist, then proceed.
 - If it exits non-zero: show the relevant error output, attempt to fix the remaining lint errors, re-run `pnpm run lint:fix`, and only proceed once passing (or report that you could not fix them and mark `[✗]`). Reprint the checklist after resolving.
 
-## Step 3 — Format
+## Step 4 — Format
 
 Run: `pnpm run format`
 
 - This always rewrites files; mark Format as `[✓]` and reprint the checklist when the command completes.
 
-## Step 4 — Docs
+## Step 5 — Docs
 
 Review the staged changes (`git diff --cached`) and any unstaged changes (`git diff`) to determine if any documentation needs updating.
 
@@ -83,6 +91,7 @@ After all steps, output the final checklist as plain assistant text with the sum
 
 **Pre-commit checks**
 ─────────────────
+[✓] Build
 [✓] Tests
 [✓] Lint
 [✓] Format

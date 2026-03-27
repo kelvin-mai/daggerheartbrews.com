@@ -191,6 +191,7 @@ export const PersonalCard: React.FC<PersonalCardProps> = ({
           artist: true,
           credits: true,
           placeholderImage: true,
+          resolution: 2,
         }}
       />
     }

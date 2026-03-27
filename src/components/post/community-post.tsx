@@ -123,6 +123,7 @@ export const CommunityCard: React.FC<CommunityCardProps> = ({
             artist: true,
             credits: true,
             placeholderImage: true,
+            resolution: 2,
           }}
         />
       }
