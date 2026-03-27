@@ -16,8 +16,12 @@ export const fileToBase64 = (file: Blob | File): Promise<string> =>
 export const downloadElementAsImage = async (
   element: HTMLElement,
   fileName: string,
+  options?: { pixelRatio?: number },
 ): Promise<void> => {
-  const data = await toPng(element, { cacheBust: true });
+  const data = await toPng(element, {
+    cacheBust: true,
+    pixelRatio: options?.pixelRatio ?? 1,
+  });
   const link = document.createElement('a');
   link.download = `${fileName}.png`;
   link.href = data;

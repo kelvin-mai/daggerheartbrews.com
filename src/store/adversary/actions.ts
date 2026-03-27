@@ -17,4 +17,7 @@ export const createActions = (
   setUserAdversary: (userAdversary) => set({ userAdversary }),
   setPreviewStatblockRef: (ref: React.RefObject<HTMLDivElement | null>) =>
     set({ previewStatblock: ref }),
+  setExportStatblockRef: (ref: React.RefObject<HTMLDivElement | null>) =>
+    set({ exportStatblock: ref }),
+  setResolution: (resolution) => set({ resolution }),
 });

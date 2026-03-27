@@ -36,12 +36,15 @@ export type CardDomainOption = {
   source: string;
 };
 
+export type ExportResolution = 1 | 2 | 3;
+
 export type CardSettings = {
   border: boolean;
   boldRulesText: boolean;
   artist: boolean;
   credits: boolean;
   placeholderImage: boolean;
+  resolution: ExportResolution;
 };
 
 export type CardDetails = {

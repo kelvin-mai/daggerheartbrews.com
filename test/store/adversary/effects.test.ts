@@ -18,6 +18,8 @@ const makeGet = (overrides: Partial<AdversaryStore> = {}) => {
       setAdversaryDetails: vi.fn(),
       setUserAdversary: vi.fn(),
       setPreviewStatblockRef: vi.fn(),
+      setExportStatblockRef: vi.fn(),
+      setResolution: vi.fn(),
     },
     effects: {} as AdversaryStore['effects'],
     ...overrides,
@@ -44,7 +46,7 @@ describe('adversary/effects', () => {
           name: 'Goblin',
           type: 'minion',
         },
-        previewStatblock: { current: element },
+        exportStatblock: { current: element },
       });
 
       const effects = createEffects(vi.fn(), get);
@@ -53,11 +55,12 @@ describe('adversary/effects', () => {
       expect(downloadElementAsImage).toHaveBeenCalledWith(
         element,
         'daggerheart-minion-Goblin',
+        { pixelRatio: 1 },
       );
     });
 
-    it('does nothing when previewStatblock ref is null', async () => {
-      const { get } = makeGet({ previewStatblock: { current: null } });
+    it('does nothing when exportStatblock ref is null', async () => {
+      const { get } = makeGet({ exportStatblock: { current: null } });
 
       const effects = createEffects(vi.fn(), get);
       await effects.downloadStatblock();
@@ -65,8 +68,8 @@ describe('adversary/effects', () => {
       expect(downloadElementAsImage).not.toHaveBeenCalled();
     });
 
-    it('does nothing when previewStatblock is undefined', async () => {
-      const { get } = makeGet({ previewStatblock: undefined });
+    it('does nothing when exportStatblock is undefined', async () => {
+      const { get } = makeGet({ exportStatblock: undefined });
 
       const effects = createEffects(vi.fn(), get);
       await effects.downloadStatblock();
@@ -79,7 +82,7 @@ describe('adversary/effects', () => {
         new Error('render failed'),
       );
       const element = document.createElement('div');
-      const { get } = makeGet({ previewStatblock: { current: element } });
+      const { get } = makeGet({ exportStatblock: { current: element } });
 
       const effects = createEffects(vi.fn(), get);
       await expect(effects.downloadStatblock()).resolves.toBeUndefined();

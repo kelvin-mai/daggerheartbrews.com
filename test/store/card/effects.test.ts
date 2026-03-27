@@ -21,6 +21,7 @@ const makeGet = (overrides: Partial<CardStore> = () => {}) => {
       setLoading,
       setOptions,
       setPreviewRef: vi.fn(),
+      setExportPreviewRef: vi.fn(),
       setCardTypeDefaults: vi.fn(),
       setCardDetails: vi.fn(),
       setUserCard: vi.fn(),
@@ -47,7 +48,7 @@ describe('card/effects', () => {
       const element = document.createElement('div');
       const { get } = makeGet({
         card: { ...initialState.card, name: 'Fireball', type: 'domain' },
-        preview: { current: element },
+        exportPreview: { current: element },
       });
 
       const effects = createEffects(vi.fn(), get);
@@ -56,11 +57,12 @@ describe('card/effects', () => {
       expect(downloadElementAsImage).toHaveBeenCalledWith(
         element,
         'daggerheart-domain-Fireball',
+        { pixelRatio: 1 },
       );
     });
 
-    it('does nothing when preview ref is null', async () => {
-      const { get } = makeGet({ preview: { current: null } });
+    it('does nothing when exportPreview ref is null', async () => {
+      const { get } = makeGet({ exportPreview: { current: null } });
 
       const effects = createEffects(vi.fn(), get);
       await effects.downloadImage();
@@ -68,8 +70,8 @@ describe('card/effects', () => {
       expect(downloadElementAsImage).not.toHaveBeenCalled();
     });
 
-    it('does nothing when preview is undefined', async () => {
-      const { get } = makeGet({ preview: undefined });
+    it('does nothing when exportPreview is undefined', async () => {
+      const { get } = makeGet({ exportPreview: undefined });
 
       const effects = createEffects(vi.fn(), get);
       await effects.downloadImage();
@@ -82,7 +84,7 @@ describe('card/effects', () => {
         new Error('render failed'),
       );
       const element = document.createElement('div');
-      const { get } = makeGet({ preview: { current: element } });
+      const { get } = makeGet({ exportPreview: { current: element } });
 
       const effects = createEffects(vi.fn(), get);
       await expect(effects.downloadImage()).resolves.toBeUndefined();

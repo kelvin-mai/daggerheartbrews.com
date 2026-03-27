@@ -7,13 +7,14 @@ export const createEffects = (
   get: ZustandGet<AdversaryStore>,
 ): AdversaryEffects => ({
   downloadStatblock: async () => {
-    const { previewStatblock, adversary } = get();
+    const { exportStatblock, adversary, resolution } = get();
     const { name, type } = adversary;
     try {
-      if (previewStatblock?.current) {
+      if (exportStatblock?.current) {
         await downloadElementAsImage(
-          previewStatblock.current,
+          exportStatblock.current,
           `daggerheart-${type}-${name}`,
+          { pixelRatio: resolution },
         );
       }
     } catch (e) {

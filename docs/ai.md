@@ -1,6 +1,6 @@
 # Using AI with This Project
 
-This project was initially set up with [Claude Code](https://claude.ai/code) and is being expanded to also support [OpenCode](https://opencode.ai). Both tools share the same goal — an AI coding agent that understands your codebase and helps you build — but they use different config files and conventions.
+This project was initially set up with [Claude Code](https://claude.ai/code) and since been expanded to also support [OpenCode](https://opencode.ai). Both tools share the same goal — an AI coding agent that understands your codebase and helps you build — but they use different config files and conventions.
 
 ---
 

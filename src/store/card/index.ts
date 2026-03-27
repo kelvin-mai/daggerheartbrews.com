@@ -13,6 +13,7 @@ export const initialState: CardState = {
     artist: true,
     credits: true,
     placeholderImage: true,
+    resolution: 1,
   },
   card: {
     name: '',

@@ -6,6 +6,7 @@ import { db } from '@/lib/database';
 import { userSettings } from '@/lib/database/schema';
 import {
   EmailPreferenceForm,
+  ExportResolutionForm,
   LogoutButton,
   ProfileSettingsForm,
   PublicDefaultForm,
@@ -21,11 +22,17 @@ export default async function Page() {
         .select({
           emailUpdates: userSettings.emailUpdates,
           defaultVisibility: userSettings.defaultVisibility,
+          defaultExportResolution: userSettings.defaultExportResolution,
         })
         .from(userSettings)
         .where(eq(userSettings.userId, session.user.id))
         .then(
-          (rows) => rows[0] ?? { emailUpdates: true, defaultVisibility: false },
+          (rows) =>
+            rows[0] ?? {
+              emailUpdates: true,
+              defaultVisibility: false,
+              defaultExportResolution: 1,
+            },
         )
     : null;
   return (
@@ -71,6 +78,11 @@ export default async function Page() {
             <h2 className='text-lg font-bold'>Preferences</h2>
             <EmailPreferenceForm emailUpdates={prefs.emailUpdates} />
             <PublicDefaultForm defaultVisibility={prefs.defaultVisibility} />
+            <ExportResolutionForm
+              defaultExportResolution={
+                (prefs.defaultExportResolution as 1 | 2 | 3) ?? 1
+              }
+            />
           </div>
         )}
       </div>

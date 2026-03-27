@@ -6,6 +6,7 @@ import { createEffects } from './effects';
 
 export const initialState: AdversaryState = {
   loading: true,
+  resolution: 1,
   adversary: {
     name: '',
     type: 'adversary',

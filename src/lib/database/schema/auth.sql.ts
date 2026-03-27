@@ -1,4 +1,11 @@
-import { pgTable, text, uuid, timestamp, boolean } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  text,
+  uuid,
+  timestamp,
+  boolean,
+  smallint,
+} from 'drizzle-orm/pg-core';
 
 import { uuidPrimaryKey, timestamps } from './columns.helpers';
 
@@ -20,6 +27,9 @@ export const userSettings = pgTable('user_settings', {
     .references(() => users.id, { onDelete: 'cascade' }),
   emailUpdates: boolean('email_updates').notNull().default(true),
   defaultVisibility: boolean('default_visibility').notNull().default(false),
+  defaultExportResolution: smallint('default_export_resolution')
+    .notNull()
+    .default(1),
   ...timestamps,
 });
 

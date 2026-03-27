@@ -5,7 +5,7 @@ import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { eq, sql } from 'drizzle-orm';
 
-import type { ActionState } from '@/lib/types';
+import type { ActionState, ExportResolution } from '@/lib/types';
 import { db } from '@/lib/database';
 import { users, userSettings } from '@/lib/database/schema';
 import { auth } from '@/lib/auth';
@@ -62,6 +62,23 @@ export const updatePublicByDefault = async (
       .update(userSettings)
       .set({ defaultVisibility, updatedAt: sql`now()` })
       .where(eq(userSettings.userId, session.user.id));
+    return { success: true };
+  } catch (e) {
+    return { success: false, error: (e as Error).message };
+  }
+};
+
+export const updateExportResolution = async (
+  resolution: ExportResolution,
+): Promise<{ success: boolean; error?: string }> => {
+  try {
+    const session = await auth.api.getSession({ headers: await headers() });
+    if (!session) throw new Error('Unauthorized');
+    await db
+      .update(userSettings)
+      .set({ defaultExportResolution: resolution, updatedAt: sql`now()` })
+      .where(eq(userSettings.userId, session.user.id));
+    revalidatePath('/profile');
     return { success: true };
   } catch (e) {
     return { success: false, error: (e as Error).message };

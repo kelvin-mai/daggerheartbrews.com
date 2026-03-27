@@ -6,13 +6,14 @@ import type { CardEffects, CardState, CardStore } from './types';
 const downloadImage =
   (get: ZustandGet<CardStore>): CardEffects['downloadImage'] =>
   async () => {
-    const { preview, card } = get();
+    const { exportPreview, card, settings } = get();
     const { name, type } = card;
     try {
-      if (preview?.current) {
+      if (exportPreview?.current) {
         await downloadElementAsImage(
-          preview.current,
+          exportPreview.current,
           `daggerheart-${type}-${name}`,
+          { pixelRatio: settings.resolution },
         );
       }
     } catch (e) {

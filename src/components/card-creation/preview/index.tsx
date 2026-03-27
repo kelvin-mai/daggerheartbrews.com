@@ -7,12 +7,24 @@ import { useRouter } from 'next/navigation';
 import { LayoutTemplate, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
-import type { CardDetails, CardSettings, UserCard } from '@/lib/types';
+import type {
+  CardDetails,
+  CardSettings,
+  ExportResolution,
+  UserCard,
+} from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { useCardActions, useCardEffects, useCardStore } from '@/store/card';
 import { DaggerheartBrewsIcon } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { DisplayContainer, SavePreviewButton } from '@/components/common';
 import {
   Banner,
@@ -23,6 +35,12 @@ import {
   Thresholds,
 } from './template/core';
 import { SettingsForm } from '../forms';
+
+const resolutionOptions: { value: ExportResolution; label: string }[] = [
+  { value: 1, label: '96 DPI' },
+  { value: 2, label: '192 DPI' },
+  { value: 3, label: '288 DPI' },
+];
 
 type CardPreviewProps = React.ComponentProps<'div'> & {
   card: CardDetails;
@@ -129,15 +147,20 @@ export const CardPreview: React.FC<CardPreviewProps> = ({
 export const CardCreationPreview = () => {
   const router = useRouter();
   const { card, settings } = useCardStore();
-  const { setPreviewRef } = useCardActions();
+  const { setPreviewRef, setExportPreviewRef, setSettings } = useCardActions();
   const { downloadImage, saveCardPreview } = useCardEffects();
   const [pending, setPending] = React.useState(false);
 
   const ref = React.useRef<HTMLDivElement>(null);
+  const exportRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
     setPreviewRef(ref);
   }, [ref]);
+
+  React.useEffect(() => {
+    setExportPreviewRef(exportRef);
+  }, [exportRef]);
 
   const handleClick = async () => {
     setPending(true);
@@ -157,7 +180,30 @@ export const CardCreationPreview = () => {
   return (
     <div className='flex w-[340px] shrink-0 flex-col items-center space-y-2'>
       <CardPreview ref={ref} card={card} settings={settings} />
+      <div
+        className='pointer-events-none fixed top-0 left-[-9999px] w-[340px]'
+        aria-hidden
+      >
+        <CardPreview ref={exportRef} card={card} settings={settings} />
+      </div>
       <div className='flex w-full gap-2'>
+        <Select
+          value={String(settings.resolution)}
+          onValueChange={(v) =>
+            setSettings({ resolution: Number(v) as ExportResolution })
+          }
+        >
+          <SelectTrigger className='w-[100px] shrink-0'>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {resolutionOptions.map(({ value, label }) => (
+              <SelectItem key={value} value={String(value)}>
+                {label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         <Button className='grow' onClick={downloadImage}>
           Export as PNG
         </Button>

@@ -6,4 +6,5 @@ export const initialSettings: CardSettings = {
   artist: true,
   credits: true,
   placeholderImage: true,
+  resolution: 1,
 };
