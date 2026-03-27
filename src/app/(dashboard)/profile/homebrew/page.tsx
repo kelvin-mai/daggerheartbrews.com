@@ -105,7 +105,7 @@ export default async function Page() {
         className='bg-card group/collapsible rounded-lg border'
       >
         <CollapsibleSectionTrigger>
-          <div className='bg-primary/10 text-primary flex size-8 shrink-0 items-center justify-center rounded-md'>
+          <div className='bg-primary/10 text-primary dark:bg-sidebar dark:text-primary-foreground flex size-8 shrink-0 items-center justify-center rounded-md'>
             <Layers className='size-4' />
           </div>
           <Label className='font-eveleth-clean text-sm'>Cards</Label>
@@ -153,7 +153,7 @@ export default async function Page() {
         className='bg-card group/collapsible rounded-lg border'
       >
         <CollapsibleSectionTrigger>
-          <div className='bg-primary/10 text-primary flex size-8 shrink-0 items-center justify-center rounded-md'>
+          <div className='bg-primary/10 text-primary dark:bg-sidebar dark:text-primary-foreground flex size-8 shrink-0 items-center justify-center rounded-md'>
             <Skull className='size-4' />
           </div>
           <Label className='font-eveleth-clean text-sm'>Adversaries</Label>

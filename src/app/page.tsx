@@ -189,8 +189,8 @@ export default async function Home() {
                   key={feature.title}
                   className='bg-card rounded-xl border p-6 transition-shadow duration-200 hover:shadow-lg'
                 >
-                  <div className='bg-primary/10 mb-4 inline-flex h-11 w-11 items-center justify-center rounded-lg'>
-                    <feature.icon className='text-primary h-5 w-5' />
+                  <div className='bg-primary/10 dark:bg-sidebar mb-4 inline-flex h-11 w-11 items-center justify-center rounded-lg'>
+                    <feature.icon className='text-primary dark:text-primary-foreground h-5 w-5' />
                   </div>
                   <h3 className='mb-2 font-semibold tracking-tight'>
                     {feature.title}
