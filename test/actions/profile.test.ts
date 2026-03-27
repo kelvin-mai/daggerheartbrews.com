@@ -20,6 +20,10 @@ vi.mock('next/cache', () => ({
   revalidatePath: vi.fn(),
 }));
 
+vi.mock('@/lib/email', () => ({
+  syncAudienceContact: vi.fn(),
+}));
+
 import { updateProfile } from '@/actions/profile';
 import { auth } from '@/lib/auth';
 import { db } from '@/lib/database';
