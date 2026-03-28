@@ -50,13 +50,11 @@ Migrations are stored in `sql/` directory with numbered prefixes (e.g., `0000_op
 ### Directory Structure
 
 - **`src/app/`** - Next.js App Router pages
-
   - `(auth)/` - Authentication routes: login, register, forgot-password, reset-password, verify
   - `(dashboard)/` - Protected routes: card/adversary creation, profile, reference pages, community
   - `api/` - API routes for previews, auth, community items
 
 - **`src/components/`** - React components organized by feature
-
   - `card-creation/` - Card builder components
   - `adversary-creation/` - Adversary builder components
   - `game-master/` - GM screen tools
@@ -64,7 +62,6 @@ Migrations are stored in `sql/` directory with numbered prefixes (e.g., `0000_op
   - `ui/` - Reusable UI components (Radix UI based)
 
 - **`src/lib/`** - Core library code
-
   - `auth/` - Better Auth configuration and client
   - `database/` - Drizzle setup and schemas
   - `constants/` - Game data (SRD content for ancestries, classes, domains, etc.)
@@ -89,13 +86,11 @@ import type { CardState } from '@/store/card/types';
 ### Database Architecture
 
 - **Setup**: Drizzle ORM with PostgreSQL
-
   - Production uses `drizzle-orm/neon-serverless` for Neon database
   - Development uses `drizzle-orm/node-postgres`
   - Client selection is environment-based (see `src/lib/database/index.ts`)
 
 - **Schemas**: Located in `src/lib/database/schema/`
-
   - `auth.sql.ts` - Better Auth tables (users, sessions, accounts, verification)
   - `user-items.sql.ts` - User-created content (cards, adversaries)
   - `constants.sql.ts` - Reference data tables
@@ -134,16 +129,21 @@ const effects = useCardEffects();
 
 ### Environment Variables
 
-Environment variables are validated with Zod in `src/lib/env.ts`. Required variables:
+Environment variables are validated with Zod in `src/lib/env.ts`.
+
+Required:
 
 - `DATABASE_URL` - PostgreSQL connection string
 - `BETTER_AUTH_SECRET` - Auth secret key
 - `BETTER_AUTH_URL` - Base URL for auth callbacks
-- `DISCORD_CLIENT_ID` / `DISCORD_CLIENT_SECRET` - Discord OAuth
-- `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` - Google OAuth
-- `RESEND_API_KEY` - Email service API key
+
+Optional:
+
+- `DISCORD_CLIENT_ID` / `DISCORD_CLIENT_SECRET` - Discord OAuth (social login hidden when not configured)
+- `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` - Google OAuth (social login hidden when not configured)
+- `RESEND_API_KEY` - Email service API key (emails logged to console when not configured)
 - `ENV` - Environment (development/testing/production)
-- `PORT` - Optional port number
+- `PORT` - Port number
 
 ## Key Patterns
 

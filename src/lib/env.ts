@@ -1,5 +1,10 @@
 import { z } from 'zod';
 
+const optionalString = z
+  .string()
+  .optional()
+  .transform((v) => (v && v.length > 0 ? v : undefined));
+
 const schema = z.object({
   PORT: z.coerce.number().min(1000).optional(),
   ENV: z
@@ -12,11 +17,11 @@ const schema = z.object({
   DATABASE_URL: z.string(),
   BETTER_AUTH_SECRET: z.string(),
   BETTER_AUTH_URL: z.string(),
-  DISCORD_CLIENT_ID: z.string(),
-  DISCORD_CLIENT_SECRET: z.string(),
-  GOOGLE_CLIENT_ID: z.string(),
-  GOOGLE_CLIENT_SECRET: z.string(),
-  RESEND_API_KEY: z.string(),
+  DISCORD_CLIENT_ID: optionalString,
+  DISCORD_CLIENT_SECRET: optionalString,
+  GOOGLE_CLIENT_ID: optionalString,
+  GOOGLE_CLIENT_SECRET: optionalString,
+  RESEND_API_KEY: optionalString,
   RESEND_AUDIENCE_ID: z.string().optional(),
   BROADCAST_SECRET: z.string().optional(),
   ADMIN_USER_EMAIL: z.string().optional(),

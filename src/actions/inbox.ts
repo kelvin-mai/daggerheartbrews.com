@@ -43,6 +43,9 @@ export const listReceivedEmails = async ({
   data: ReceivedEmail[] | null;
   error: string | null;
 }> => {
+  if (!env.RESEND_API_KEY) {
+    return { data: null, error: 'Resend not configured' };
+  }
   try {
     const params = new URLSearchParams({ limit: String(limit) });
     if (after) params.set('after', after);
@@ -75,6 +78,9 @@ export const listReceivedEmails = async ({
 export const getReceivedEmail = async (
   id: string,
 ): Promise<{ data: ReceivedEmailDetail | null; error: string | null }> => {
+  if (!env.RESEND_API_KEY) {
+    return { data: null, error: 'Resend not configured' };
+  }
   try {
     const res = await resendFetch(`/emails/receiving/${id}`);
     const json = await res.json();
@@ -107,6 +113,9 @@ const replySchema = z.object({
 export const replyToEmail = async (
   params: z.infer<typeof replySchema>,
 ): Promise<{ error: string | null }> => {
+  if (!env.RESEND_API_KEY) {
+    return { error: 'Resend not configured' };
+  }
   const validation = replySchema.safeParse(params);
   if (!validation.success) {
     const firstError = Object.values(
