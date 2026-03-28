@@ -46,15 +46,12 @@ type DivederProps = {
 
 export const Divider: React.FC<DivederProps> = ({ card }) => {
   const { type, subtype, domainPrimaryColor, domainSecondaryColor } = card;
-  const subtypeText = [
-    'ancestry',
-    'community',
-    'equipment',
-    'class',
-    'transformation',
-  ].includes(type)
-    ? type
-    : subtype;
+  const subtypeText =
+    type === 'class'
+      ? card.name
+      : ['ancestry', 'community', 'equipment', 'transformation'].includes(type)
+        ? type
+        : subtype;
   const dividerBadge = ['class', 'subclass', 'domain'].includes(type);
   const background = `linear-gradient(to right, ${domainPrimaryColor}, ${domainSecondaryColor})`;
   return (
