@@ -18,22 +18,23 @@ import { ResendVerificationForm } from './client';
 export default async function Page() {
   const session = await auth.api.getSession({ headers: await headers() });
   const prefs = session
-    ? await db
-        .select({
-          emailUpdates: userSettings.emailUpdates,
-          defaultVisibility: userSettings.defaultVisibility,
-          defaultExportResolution: userSettings.defaultExportResolution,
-        })
-        .from(userSettings)
-        .where(eq(userSettings.userId, session.user.id))
-        .then(
-          (rows) =>
-            rows[0] ?? {
-              emailUpdates: true,
-              defaultVisibility: false,
-              defaultExportResolution: 1,
-            },
-        )
+    ? await Promise.all([
+        db
+          .select({
+            defaultVisibility: userSettings.defaultVisibility,
+            defaultExportResolution: userSettings.defaultExportResolution,
+          })
+          .from(userSettings)
+          .where(eq(userSettings.userId, session.user.id))
+          .then(
+            (rows) =>
+              rows[0] ?? {
+                defaultVisibility: false,
+                defaultExportResolution: 1,
+              },
+          ),
+        getContactSubscriptionStatus(session.user.email),
+      ]).then(([settings, emailUpdates]) => ({ ...settings, emailUpdates }))
     : null;
   return (
     <div>
