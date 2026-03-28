@@ -84,18 +84,25 @@ export const CardPreview: React.FC<CardPreviewProps> = ({
         </div>
         <div className='flex-start absolute bottom-[10.59cqw] flex min-h-[58.82cqw] w-full flex-col items-center gap-[1.76cqw] bg-white'>
           <Divider card={card} />
-          <p
-            className={cn(
-              'font-eveleth-clean z-20 w-full px-[7.06cqw] pt-[4.71cqw]',
-              ['ancestry', 'community'].includes(card.type)
-                ? 'text-[7.06cqw]'
-                : 'text-center text-[4.71cqw]',
-            )}
-          >
-            {card.name}
-          </p>
+          {card.type !== 'class' ? (
+            <p
+              className={cn(
+                'font-eveleth-clean z-20 w-full px-[7.06cqw] pt-[4.71cqw]',
+                ['ancestry', 'community'].includes(card.type)
+                  ? 'text-[7.06cqw]'
+                  : 'text-center text-[4.71cqw]',
+              )}
+            >
+              {card.name}
+            </p>
+          ) : null}
           {['class', 'subclass', 'equipment'].includes(card.type) ? (
-            <p className='text-[3.53cqw] font-semibold capitalize italic'>
+            <p
+              className={cn(
+                'text-[3.53cqw] font-semibold capitalize italic',
+                card.type === 'class' && 'pt-[4.71cqw]',
+              )}
+            >
               {card.subtitle}
             </p>
           ) : null}
