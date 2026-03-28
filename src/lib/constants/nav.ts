@@ -12,8 +12,9 @@ export const adminNav: NavCategory[] = [
   {
     name: 'Email',
     children: [
-      { name: 'Previews', url: '/admin/emails' },
+      { name: 'Inbox', url: '/admin/inbox' },
       { name: 'Broadcast', url: '/admin/broadcast' },
+      { name: 'Previews', url: '/admin/emails' },
     ],
   },
 ];

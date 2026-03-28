@@ -4,6 +4,7 @@ import { env } from '../env';
 import {
   ChangelogEmail,
   ContactEmail,
+  ReplyEmail,
   ResetPasswordEmail,
   UpdateEmail,
   VerificationEmail,
@@ -141,9 +142,26 @@ export const sendUpdateBroadcast = async ({
 export const sendContactEmail = async (params: ContactEmailParams) => {
   return await resend.emails.send({
     from: 'contact@daggerheartbrews.com',
-    to: ['me@kelvinmai.io'],
+    to: ['me@kelvinmai.io', 'contact@daggerheartbrews.com'],
     replyTo: params.email,
     subject: `[Contact] ${params.subject}`,
     react: <ContactEmail {...params} />,
+  });
+};
+
+type ReplyEmailParams = {
+  toName: string;
+  toEmail: string;
+  originalSubject: string;
+  replyMessage: string;
+};
+
+export const sendReplyEmail = async (params: ReplyEmailParams) => {
+  return await resend.emails.send({
+    from: 'contact@daggerheartbrews.com',
+    to: [params.toEmail],
+    replyTo: 'contact@daggerheartbrews.com',
+    subject: `Re: ${params.originalSubject}`,
+    react: <ReplyEmail {...params} />,
   });
 };
