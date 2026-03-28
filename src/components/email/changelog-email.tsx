@@ -30,24 +30,33 @@ const sections: ChangelogSection[] = [
     heading: 'New',
     items: [
       {
-        title: 'Contact page',
-        description:
-          'Send messages directly via a contact form. Emails are delivered with a branded template.',
+        title: 'Reference pages completed',
+        description: 'Reference data is now up to date with the latest SRD.',
       },
       {
-        title: 'About & Privacy Policy pages',
+        title: 'The Void content',
         description:
-          'An overview of the project, its creator, the Community Gaming License, and full data transparency.',
+          'The Void ancestries and abilities added to reference pages.',
       },
       {
-        title: 'Outdated version banner',
+        title: 'Blood domain',
         description:
-          'Users on a stale cached version of the app are prompted to refresh.',
+          'New domain option and icon available in the card creator.',
       },
       {
-        title: 'Theme toggle on public pages',
+        title: 'Privacy Policy',
         description:
-          'Light, dark, and system mode is now available from the header on all public-facing pages.',
+          'Full disclosure of data collection, third-party services, and user rights.',
+      },
+      {
+        title: 'Public by default',
+        description:
+          'Account setting to automatically make newly created homebrew content public.',
+      },
+      {
+        title: 'Separate create and edit workflows',
+        description:
+          'Card and adversary creators now have distinct create and edit modes.',
       },
     ],
   },
@@ -55,19 +64,29 @@ const sections: ChangelogSection[] = [
     heading: 'Redesigned',
     items: [
       {
-        title: 'Landing page',
-        description:
-          'Fully redesigned with a cleaner layout and clearer call-to-action sections.',
-      },
-      {
         title: 'Reference pages',
         description:
           'Ancestries, classes, beastforms, environments, and domains pages refreshed with consistent headers and improved filter controls.',
       },
       {
-        title: 'Homebrew & community pages',
+        title: 'Class card previews',
         description:
-          'Personal post list, card layout, and empty states redesigned for better readability.',
+          'New layout for class cards on the classes reference page.',
+      },
+      {
+        title: 'Community posts',
+        description:
+          'Card layout and post list redesigned for better readability.',
+      },
+      {
+        title: 'Homebrew page',
+        description:
+          'Personal post list redesigned to match the updated community layout.',
+      },
+      {
+        title: 'Collapsible section trigger',
+        description:
+          'Refactored for consistency across the card and adversary creators.',
       },
     ],
   },
@@ -75,24 +94,26 @@ const sections: ChangelogSection[] = [
     heading: 'Improvements',
     items: [
       {
-        title: 'Consistent page headers',
+        title: 'Higher resolution image exports',
         description:
-          'All dashboard pages use a unified header component with rewritten subtitle copy throughout.',
+          'Card and adversary exports now support 96, 192, and 288 DPI. A resolution selector appears next to the export button, and a preferred default can be saved in account settings.',
       },
       {
-        title: 'Standardised filter controls',
+        title: 'Consistent filter controls',
         description:
-          'Reference and community pages share a consistent multi-select filter pattern that stays stable as selections change.',
+          'Reference and community pages now have search and filtering enabled.',
       },
       {
-        title: 'Adversary creator layout',
-        description:
-          'Switched to CSS grid so the preview column no longer shifts when collapsible forms expand or collapse.',
+        title: 'Responsive card templates',
+        description: 'Card template sizes scale correctly across screen sizes.',
       },
       {
-        title: 'Dice roller shapes',
-        description:
-          'Damage tab buttons now use polygon shapes that match each die type.',
+        title: 'Homebrew content limit raised',
+        description: 'Users can now save more homebrew items per account.',
+      },
+      {
+        title: 'User settings page',
+        description: 'Profile settings page reorganised with clearer sections.',
       },
     ],
   },
@@ -105,13 +126,38 @@ const sections: ChangelogSection[] = [
           'Inputs, textareas, and selects now render white instead of inheriting the tinted page background.',
       },
       {
-        title: 'Preview modal sizing',
-        description: 'Preview modals were oversized on some screen sizes.',
+        title: 'Oversized preview modals',
+        description: 'Fixed oversized preview modals on some screen sizes.',
       },
       {
-        title: 'Beastform filter shifting',
+        title: 'Beastform tier filter',
         description:
-          'The tier filter no longer causes the search bar to resize when multiple tiers are selected.',
+          'Beastform tier filter no longer causes the search bar to resize when multiple tiers are selected.',
+      },
+      {
+        title: 'Adversary creation layout',
+        description:
+          'Adversary creation forms no longer shift layout when collapsible panels expand or collapse.',
+      },
+      {
+        title: 'Save button size',
+        description:
+          'Save button no longer grows when the user is not logged in.',
+      },
+      {
+        title: 'Image lost on edit',
+        description:
+          'Uploaded images are no longer dropped when returning to edit an existing card or adversary.',
+      },
+      {
+        title: 'Use as template',
+        description:
+          'Using a community item as a template now correctly copies the source content.',
+      },
+      {
+        title: 'Community browse link',
+        description:
+          'Community browse link on the home page now navigates correctly.',
       },
     ],
   },
@@ -126,7 +172,8 @@ export const ChangelogEmail: React.FC<ChangelogEmailProps> = ({ version }) => {
       <Html>
         <Head />
         <Preview>
-          Daggerheart Brews {version} — new pages, redesigned UI, and bug fixes
+          Daggerheart Brews {version} — new content, community features, and a
+          site-wide refresh
         </Preview>
         <Body className='font-sans'>
           <Container>

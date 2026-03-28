@@ -1,43 +1,53 @@
 ---
 version: '1.1.0'
 date: 'March 2026'
-title: 'Community features, redesigns, and fixes'
+title: 'New content, community features, and a site-wide refresh'
 ---
 
 ## New
 
-- **Contact page** — send messages directly via a contact form. Emails are delivered through Resend with a branded template matching the rest of the app.
-- **About page** — an overview of the project, its creator, and the Darrington Press Community Gaming License.
+- **Reference pages completed** — reference data now up to date to the latest SRD.
+- **The Void content** — The Void ancestries and abilities added to reference pages.
+- **Blood domain** — new domain option and icon available in the card creator.
 - **Privacy Policy** — full disclosure of data collection, third-party services, and user rights.
-- **Outdated version banner** — users on an old cached version of the app are prompted to refresh.
-- **Theme toggle on public pages** — light/dark/system mode is now accessible from the header on all public-facing pages.
+- **Public by default** — account setting to automatically make newly created homebrew content public.
+- **Separate create and edit workflows** — card and adversary creators now have distinct create and edit modes.
 
 ## Redesigned
 
-- **Landing page** — fully redesigned with a cleaner layout and clearer call-to-action sections.
 - **Reference pages** — ancestries, classes, beastforms, environments, and domains pages refreshed with consistent headers and improved filter controls.
-- **Homebrew page** — personal post list and card layout redesigned for better readability.
-- **Community empty states** — empty community pages now show a more polished illustrated placeholder.
+- **Class card previews** — new layout for class cards on the classes reference page.
+- **Community posts** — card layout and post list redesigned for better readability.
+- **Homebrew page** — personal post list redesigned to match the updated community layout.
 - **Collapsible section trigger** — refactored for consistency across the card and adversary creators.
 
 ## Improvements
 
-- **Shared page header component** — all dashboard pages now use a unified `PageHeader` component, and subtitle copy has been rewritten throughout.
-- **Standardised filter controls** — reference and community pages use a consistent `MultipleSelector` pattern with grid layouts that don't shift when selections change.
-- **Footer** — condensed to two columns; all site pages including Contact are linked under a single Pages list.
-- **Adversary creator layout** — switched from flex to CSS grid so the preview column no longer changes width when collapsible forms expand or collapse.
-- **Dice roller shapes** — the damage tab buttons now use polygon shapes that match each die type (d4 triangle, d6 square, d8 diamond, and so on).
-- **Sidebar divider** — visual separator added between navigation sections in the dashboard sidebar.
+- **Higher resolution image exports** — card and adversary exports now support 96, 192, and 288 DPI. A resolution selector appears next to the export button, and a preferred default can be saved in account settings.
+- **Consistent filter controls** — reference and community pages now have search and filtering enabled.
+- **Responsive card templates** — card template sizes scale correctly across screen sizes.
+- **Homebrew content limit raised** — users can now save more homebrew items per account.
+- **User settings page** — profile settings page reorganised with clearer sections.
 
 ## Bug Fixes
 
 - Input, textarea, and select backgrounds now render white in light mode instead of inheriting the tinted page background.
-- Preview modals were incorrectly oversized on some screen sizes.
-- Fixed a table hydration error in server-rendered pages.
+- Fixed oversized preview modals on some screen sizes.
+- Fixed a table hydration error on server-rendered pages.
 - Beastform tier filter no longer causes the search bar to resize when multiple tiers are selected.
+- Adversary creation forms no longer shift layout when collapsible panels expand or collapse.
+- Save button no longer grows when the user is not logged in.
+- Image is no longer lost when editing an existing card or adversary.
+- Use as template functionality now correctly copies the source item.
+- Community browse link on the home page now navigates correctly.
 
 ## Internal
 
+- Next.js upgraded from 15 to 16.1.6.
 - shadcn/ui updated to the latest release.
 - Version instrumentation added for cache-busting.
-- Seed data updated — local development now includes test users and sample homebrew content loaded automatically via Docker.
+- Unit tests and Playwright end-to-end tests set up.
+- Pre-commit hook configured with Husky and lint-staged.
+- Seed data updated — local development now includes test users and sample homebrew content via Docker.
+- Proper open source documents and availability.
+- Documentation for contributions.
