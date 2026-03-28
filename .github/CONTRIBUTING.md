@@ -47,7 +47,20 @@ Feature suggestions are welcome! Please:
 
 ## Development Setup
 
-See the [README.md](README.md#getting-started) for detailed setup instructions.
+The quickest way to get started:
+
+```bash
+git clone https://github.com/kelvin-mai/daggerheartbrews.com.git
+cd daggerheartbrews.com
+npm install
+cp .env.local.example .env
+docker compose up -d
+npm run dev
+```
+
+> **Tip:** If you already have a `.env.local` file, delete it first — it overrides `.env` in Next.js.
+
+No third-party accounts needed — OAuth and email are optional. See the [README.md Quick Start](../README.md#quick-start-local-development) for details.
 
 ## Project Guidelines
 
@@ -92,6 +105,7 @@ type(scope): description
 ```
 
 Types:
+
 - `feat`: New feature
 - `fix`: Bug fix
 - `docs`: Documentation changes
@@ -101,6 +115,7 @@ Types:
 - `chore`: Maintenance tasks
 
 Examples:
+
 ```
 feat(cards): add export to PDF functionality
 fix(auth): resolve Discord OAuth redirect issue

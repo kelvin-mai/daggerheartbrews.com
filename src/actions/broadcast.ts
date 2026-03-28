@@ -26,6 +26,9 @@ export const syncContact = async (
   email: string,
   name: string,
 ): Promise<SyncContactResult> => {
+  if (!resend) {
+    return { success: false, error: 'Resend not configured' };
+  }
   if (!env.RESEND_AUDIENCE_ID) {
     return { success: false, error: 'RESEND_AUDIENCE_ID is not configured' };
   }
@@ -51,6 +54,9 @@ export type ListAudiencesResult = {
 };
 
 export const listAudiences = async (): Promise<ListAudiencesResult> => {
+  if (!resend) {
+    return { data: null, error: 'Resend not configured' };
+  }
   const { data, error } = await resend.audiences.list();
   if (error || !data)
     return { data: null, error: error?.message ?? 'Failed to list audiences' };
@@ -72,6 +78,9 @@ export type CreateAudienceResult = {
 export const createAudience = async (
   name: string,
 ): Promise<CreateAudienceResult> => {
+  if (!resend) {
+    return { data: null, error: 'Resend not configured' };
+  }
   const { data, error } = await resend.audiences.create({ name });
   if (error || !data)
     return { data: null, error: error?.message ?? 'Failed to create audience' };
@@ -98,9 +107,8 @@ export const sendBroadcast = async (
     return { data: null, error: 'RESEND_AUDIENCE_ID is not configured' };
   }
 
-  const { sendUpdateBroadcast, sendChangelogBroadcast } = await import(
-    '@/lib/email'
-  );
+  const { sendUpdateBroadcast, sendChangelogBroadcast } =
+    await import('@/lib/email');
 
   if (params.template === 'update') {
     return sendUpdateBroadcast({

@@ -26,14 +26,50 @@ A Next.js web application for creating and sharing homebrew content for the Dagg
 
 ## Getting Started
 
+### Quick Start (Local Development)
+
+1. **Clone and install:**
+
+   ```bash
+   git clone https://github.com/kelvin-mai/daggerheartbrews.com.git
+   cd daggerheartbrews.com
+   npm install
+   ```
+
+2. **Set up environment:**
+
+   ```bash
+   cp .env.local.example .env
+   ```
+
+   > **Important:** If you already have a `.env.local` file, delete it — Next.js loads `.env.local` with higher priority than `.env`, which can cause unexpected connection errors.
+
+3. **Start the database** (requires [Docker](https://www.docker.com/get-started)):
+
+   ```bash
+   docker compose up -d
+   ```
+
+   > Make sure Docker Desktop (or the Docker daemon via [Colima](https://github.com/ablemachine/colima)) is running first.
+
+4. **Start the dev server:**
+   ```bash
+   npm run dev
+   ```
+
+Open http://localhost:3000. Log in with `admin@test.com` / `Password1`.
+
+> **Note:** Social login and email sending are disabled by default.
+> To enable them, see [.env.example](.env.example) for the full list of optional environment variables.
+
 ### Prerequisites
 
 - Node.js 20+
-- PostgreSQL database (local or Neon)
-- OAuth credentials (Discord, Google)
-- Resend API key
+- [Docker Desktop](https://www.docker.com/get-started) or [Colima](https://github.com/ablemachine/colima) (for local PostgreSQL)
 
-### Installation
+### Full Installation
+
+For production-like setup or when you need all features:
 
 1. Clone the repository:
 
@@ -59,9 +95,9 @@ Edit `.env` with your credentials:
 - **DATABASE_URL**: PostgreSQL connection string
 - **BETTER_AUTH_SECRET**: Generate with `openssl rand -base64 32`
 - **BETTER_AUTH_URL**: Your app URL (http://localhost:3000 for dev)
-- **DISCORD_CLIENT_ID/SECRET**: From [Discord Developer Portal](https://discord.com/developers/applications)
-- **GOOGLE_CLIENT_ID/SECRET**: From [Google Cloud Console](https://console.cloud.google.com/apis/credentials)
-- **RESEND_API_KEY**: From [Resend](https://resend.com/api-keys)
+- **DISCORD_CLIENT_ID/SECRET** (optional): From [Discord Developer Portal](https://discord.com/developers/applications)
+- **GOOGLE_CLIENT_ID/SECRET** (optional): From [Google Cloud Console](https://console.cloud.google.com/apis/credentials)
+- **RESEND_API_KEY** (optional): From [Resend](https://resend.com/api-keys)
 
 4. Generate and run database migrations:
 

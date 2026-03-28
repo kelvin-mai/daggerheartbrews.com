@@ -10,7 +10,24 @@ import {
   VerificationEmail,
 } from '@/components/email';
 
-export const resend = new Resend(env.RESEND_API_KEY);
+export const resend = env.RESEND_API_KEY
+  ? new Resend(env.RESEND_API_KEY)
+  : null;
+
+const devLogEmail = ({
+  to,
+  subject,
+  url,
+}: {
+  to: string;
+  subject: string;
+  url?: string;
+}) => {
+  console.log(`\n[DEV EMAIL] To: ${to}`);
+  console.log(`Subject: ${subject}`);
+  if (url) console.log(`URL: ${url}`);
+  console.log('');
+};
 
 type AuthEmailParams = {
   user: { name: string; email: string };
@@ -18,6 +35,14 @@ type AuthEmailParams = {
 };
 
 export const sendVerificationEmail = async ({ user, url }: AuthEmailParams) => {
+  if (!resend) {
+    devLogEmail({
+      to: user.email,
+      subject: '[Action Required] Verify your email',
+      url,
+    });
+    return { data: null, error: null };
+  }
   return await resend.emails.send({
     from: 'no-reply@daggerheartbrews.com',
     to: [user.email],
@@ -30,6 +55,14 @@ export const sendResetPasswordEmail = async ({
   user,
   url,
 }: AuthEmailParams) => {
+  if (!resend) {
+    devLogEmail({
+      to: user.email,
+      subject: '[Action Required] Reset your password',
+      url,
+    });
+    return { data: null, error: null };
+  }
   return await resend.emails.send({
     from: 'no-reply@daggerheartbrews.com',
     to: [user.email],
@@ -55,6 +88,7 @@ export const addAudienceContact = async ({
   unsubscribed?: boolean;
 }) => {
   if (!env.RESEND_AUDIENCE_ID) return;
+  if (!resend) return;
   return await resend.contacts.create({
     audienceId: env.RESEND_AUDIENCE_ID,
     email,
@@ -71,6 +105,7 @@ export const syncAudienceContact = async ({
   unsubscribed: boolean;
 }) => {
   if (!env.RESEND_AUDIENCE_ID) return;
+  if (!resend) return;
   return await resend.contacts.create({
     audienceId: env.RESEND_AUDIENCE_ID,
     email,
@@ -82,6 +117,7 @@ export const getContactSubscriptionStatus = async (
   email: string,
 ): Promise<boolean> => {
   if (!env.RESEND_AUDIENCE_ID) return true;
+  if (!resend) return true;
   const { data } = await resend.contacts.list({
     audienceId: env.RESEND_AUDIENCE_ID,
   });
@@ -100,6 +136,7 @@ export const sendChangelogBroadcast = async ({
 }: BroadcastParams & { version?: string }) => {
   if (!env.RESEND_AUDIENCE_ID)
     return { data: null, error: 'RESEND_AUDIENCE_ID is not configured' };
+  if (!resend) return { data: null, error: 'Resend not configured' };
   const version = name;
   const { data, error } = await resend.broadcasts.create({
     audienceId: env.RESEND_AUDIENCE_ID,
@@ -123,6 +160,7 @@ export const sendUpdateBroadcast = async ({
 }: BroadcastParams) => {
   if (!env.RESEND_AUDIENCE_ID)
     return { data: null, error: 'RESEND_AUDIENCE_ID is not configured' };
+  if (!resend) return { data: null, error: 'Resend not configured' };
   const { data, error } = await resend.broadcasts.create({
     audienceId: env.RESEND_AUDIENCE_ID,
     from: 'updates@daggerheartbrews.com',
@@ -140,6 +178,13 @@ export const sendUpdateBroadcast = async ({
 };
 
 export const sendContactEmail = async (params: ContactEmailParams) => {
+  if (!resend) {
+    devLogEmail({
+      to: 'contact@daggerheartbrews.com',
+      subject: `[Contact] ${params.subject}`,
+    });
+    return { data: null, error: null };
+  }
   return await resend.emails.send({
     from: 'contact@daggerheartbrews.com',
     to: ['me@kelvinmai.io', 'contact@daggerheartbrews.com'],
@@ -157,6 +202,13 @@ type ReplyEmailParams = {
 };
 
 export const sendReplyEmail = async (params: ReplyEmailParams) => {
+  if (!resend) {
+    devLogEmail({
+      to: params.toEmail,
+      subject: `Re: ${params.originalSubject}`,
+    });
+    return { data: null, error: null };
+  }
   return await resend.emails.send({
     from: 'contact@daggerheartbrews.com',
     to: [params.toEmail],
