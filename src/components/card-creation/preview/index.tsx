@@ -72,7 +72,7 @@ export const CardPreview: React.FC<CardPreviewProps> = ({
         <div className='overflow-hidden'>
           {card.image ? (
             <img
-              className='object-center-top -z-10 w-full object-cover'
+              className='object-center-top -z-10 h-[73.53cqw] w-full object-cover'
               src={card.image}
               alt='Card artwork'
             />

@@ -182,6 +182,7 @@ export const ImageForm = () => {
               className='h-64 rounded'
               image={file.preview}
               onCropChange={handleCropChange}
+              aspectRatio={100 / 73.53}
             >
               <ImageCropperImage />
               <ImageCropperArea />
