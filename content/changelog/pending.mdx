@@ -1,0 +1,16 @@
+---
+version: 'pending'
+date: 'Unreleased'
+title: 'Pending'
+---
+
+## Fixed
+
+- Uploaded images are no longer cropped to a square — the crop area now matches the card's rectangular image region.
+- Class card divider now shows the class name instead of the generic label "CLASS".
+
+## Internal
+
+- `ImageCropper` in `forms/image.tsx` now receives `aspectRatio={100 / 73.53}` to match the card image placeholder height (`h-[73.53cqw]`).
+- Card `<img>` in `preview/index.tsx` now has `h-[73.53cqw]` so `object-cover` renders at a consistent height.
+- Local development no longer requires third-party accounts (Google, Discord, Resend) to be configured.

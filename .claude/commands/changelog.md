@@ -1,6 +1,6 @@
 # Write Changelog
 
-Draft a new changelog entry for Daggerheart Brews.
+Draft or update the pending changelog entry for Daggerheart Brews.
 
 ## Step 1 — Gather commits
 
@@ -22,19 +22,21 @@ git log v1.1.0..HEAD --oneline --no-merges
 git log --oneline --no-merges
 ```
 
-Also read the most recent existing changelog file in `content/changelog/` to understand what was already documented, so you don't repeat it.
+Check whether `content/changelog/pending.mdx` already exists. If it does, read it so you understand what's already been documented — don't repeat entries already present.
+
+Also read the most recent versioned changelog file in `content/changelog/` (e.g. `v1.1.0.mdx`) so you don't repeat anything already released.
 
 ## Step 2 — Categorise commits
 
 Sort each commit into one of five buckets:
 
-| Bucket            | Goes in section                | Examples                                                  |
-| ----------------- | ------------------------------ | --------------------------------------------------------- |
-| New feature       | User → **New**                 | "add blood domain", "add public by default setting"       |
-| Redesign / visual | User → **Redesigned**          | "redesign class card previews", "refresh reference pages" |
-| Improvement       | User → **Improved**            | "update filtering ui", "raise homebrew content limit"     |
-| Bug fix           | User → **Fixed**               | "fix broken community link", "fix table hydration error"  |
-| Internal / infra  | Developer → **Under the Hood** | "add e2e testing", "upgrade next.js", "add admin portal"  |
+| Bucket            | Goes in section          | Examples                                                  |
+| ----------------- | ------------------------ | --------------------------------------------------------- |
+| New feature       | User → **New**           | "add blood domain", "add public by default setting"       |
+| Redesign / visual | User → **Redesigned**    | "redesign class card previews", "refresh reference pages" |
+| Improvement       | User → **Improved**      | "update filtering ui", "raise homebrew content limit"     |
+| Bug fix           | User → **Fixed**         | "fix broken community link", "fix table hydration error"  |
+| Internal / infra  | Developer → **Internal** | "add e2e testing", "upgrade next.js", "add admin portal"  |
 
 Rules:
 
@@ -44,21 +46,19 @@ Rules:
 
 ## Step 3 — Write the entry
 
-Ask the user for:
+Do **not** ask the user for a version number or title — the file is always saved as `pending.mdx` with `version: 'pending'`, `date: 'Unreleased'`, and `title: 'Pending'`.
 
-- The new version number (e.g. `1.2.0`)
-- The release month (e.g. `April 2026`)
-- A one-line title summarising the release (e.g. `Email updates, audience sync, and admin tools`)
+**If `pending.mdx` already exists:** merge the new commits into the existing file, adding bullets under the appropriate sections. Do not duplicate entries that are already there.
 
-Then produce the MDX frontmatter and two sections.
+**If `pending.mdx` does not exist:** create it from scratch.
 
 ### Format
 
 ```mdx
 ---
-version: '<version>'
-date: '<month year>'
-title: '<one-line summary>'
+version: 'pending'
+date: 'Unreleased'
+title: 'Pending'
 ---
 
 ## New
@@ -77,12 +77,12 @@ title: '<one-line summary>'
 
 - Description of the bug that was fixed, written from the user's perspective.
 
-<DevNotes>
+## Internal
 
 - Technical detail — framework versions, schema changes, tooling, infrastructure.
-
-</DevNotes>
 ```
+
+Omit any section that has no entries.
 
 ### Copywriting rules for the user sections
 
@@ -92,7 +92,7 @@ title: '<one-line summary>'
 - Keep each bullet to one sentence.
 - Omit anything the user would never notice (internal refactors, test setup, CI changes).
 
-### Copywriting rules for Under the Hood
+### Copywriting rules for Internal
 
 - Be specific: include version numbers, file names, schema field names where useful.
 - Audience is a developer reading the repo or considering contributing.
@@ -103,10 +103,22 @@ title: '<one-line summary>'
 Write the finished entry to:
 
 ```
-content/changelog/v<version>.mdx
+content/changelog/pending.mdx
 ```
 
 Then confirm the file path and show the user a preview of the content.
+
+## Releasing — renaming pending to a version
+
+When the user creates a release tag (e.g. `v1.2.0`), rename `pending.mdx` to the versioned filename and update its frontmatter:
+
+1. Read `content/changelog/pending.mdx`
+2. Replace the frontmatter fields:
+   - `version: 'pending'` → `version: '<version>'` (e.g. `'1.2.0'`)
+   - `date: 'Unreleased'` → `date: '<month year>'` (e.g. `'April 2026'`)
+   - `title: 'Pending'` → `title: '<one-line summary>'` (ask the user for month and title)
+3. Write the updated content to `content/changelog/v<version>.mdx`
+4. Delete `content/changelog/pending.mdx`
 
 ## Notes
 

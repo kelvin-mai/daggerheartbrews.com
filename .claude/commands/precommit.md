@@ -13,7 +13,7 @@ allowed-tools:
 
 # Precommit command
 
-Run the pre-commit quality checks in order: build → tests → lint → format → docs. Do NOT commit anything.
+Run the pre-commit quality checks in order: build → tests → lint → format → docs → changelog. Do NOT commit anything.
 
 Output the checklist as plain assistant text before starting, and reprint it as plain assistant text after each step completes. Never use `echo` or a Bash tool call to render the checklist — always output it directly in your response so it is never collapsed in the UI.
 
@@ -27,6 +27,7 @@ Use this exact markdown format for the checklist:
 [ ] Lint
 [ ] Format
 [ ] Docs
+[ ] Changelog
 ```
 
 - Pending: `[ ] Label`
@@ -83,6 +84,13 @@ Rules:
 - If no docs need updating, mark Docs as `[✓]` and note "No documentation changes needed"
 - If docs were updated, mark Docs as `[✓]` and list which files were changed and why
 
+## Step 6 — Changelog
+
+Run the `/changelog` command to update `content/changelog/pending.mdx` with any commits not yet documented there.
+
+- If new entries were added: mark Changelog as `[✓]` and note which bullets were added.
+- If no new commits needed documenting: mark Changelog as `[✓]` and note "No changelog changes needed".
+
 ---
 
 ## Final output
@@ -96,6 +104,7 @@ After all steps, output the final checklist as plain assistant text with the sum
 [✓] Lint
 [✓] Format
 [✓] Docs
+[✓] Changelog
 
 All checks passed. Ready to commit.
 
