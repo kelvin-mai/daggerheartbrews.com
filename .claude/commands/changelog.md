@@ -1,3 +1,8 @@
+---
+name: changelog
+description: Drafts or updates the pending changelog entry for Daggerheart Brews from git commit history. Use this whenever the user asks to write a changelog, update release notes, document recent changes, or runs `/changelog` — even if they just say "update the changelog" or "what's changed since the last release".
+---
+
 # Write Changelog
 
 Draft or update the pending changelog entry for Daggerheart Brews.

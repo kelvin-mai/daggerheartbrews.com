@@ -1,8 +1,7 @@
 ---
 name: precommit
-description: Runs pre-commit quality checks in order
+description: Runs the full pre-commit quality check pipeline for Daggerheart Brews — build, tests, lint, format, docs, and changelog — in order, fixing issues along the way. Use this whenever the user wants to verify their changes are clean before committing, asks to "run pre-commit checks", or says something like "make sure everything passes".
 allowed-tools:
-  - Task
   - Bash
   - Read
   - Write
@@ -11,65 +10,64 @@ allowed-tools:
   - Glob
 ---
 
-# Precommit command
+# Precommit
 
 Run the pre-commit quality checks in order: build → tests → lint → format → docs → changelog. Do NOT commit anything.
 
-Output the checklist as plain assistant text before starting, and reprint it as plain assistant text after each step completes. Never use `echo` or a Bash tool call to render the checklist — always output it directly in your response so it is never collapsed in the UI.
+## Output style
 
-Use this exact markdown format for the checklist:
+Announce each step before running it, then report the result on a single line once done. Use emoji to signal status — this is the closest we can get to color in Claude Code:
 
-```
-**Pre-commit checks**
-─────────────────
-[ ] Build
-[ ] Tests
-[ ] Lint
-[ ] Format
-[ ] Docs
-[ ] Changelog
-```
+- ▶ **Running Build...** _(before running)_
+- ✅ **Build passed** _(on success)_
+- ❌ **Build failed** — brief reason _(on failure)_
 
-- Pending: `[ ] Label`
-- Passing: `[✓] Label`
-- Failing: `[✗] Label`
+Never use `echo` or a Bash tool call to print status — output it as assistant text so it's always visible and never collapsed.
 
-After each step, reprint the full checklist with updated status for completed steps.
+Reserve the full summary checklist for the very end.
 
 ---
 
 ## Step 1 — Build
 
+Announce: `▶ **Running Build...**`
+
 Run: `pnpm run build`
 
-- If it exits 0: mark Build as `[✓]` and reprint the checklist, then proceed.
-- If it exits non-zero: show the relevant error output, attempt to fix the build error(s), re-run, and only proceed once passing (or report that you could not fix them and mark `[✗]`). Reprint the checklist after resolving.
+- Passes → output `✅ **Build passed**` and continue.
+- Fails → show the relevant error output, attempt to fix, re-run. Output `✅ **Build passed**` once fixed, or `❌ **Build failed** — could not auto-fix` if not.
 
 ## Step 2 — Tests
 
+Announce: `▶ **Running Tests...**`
+
 Run: `pnpm run test --run`
 
-- If it exits 0: mark Tests as `[✓]` and reprint the checklist, then proceed.
-- If it exits non-zero: show the relevant error output, attempt to fix the failing test(s), re-run, and only proceed once passing (or report that you could not fix them and mark `[✗]`). Reprint the checklist after resolving.
+- Passes → output `✅ **Tests passed**` and continue.
+- Fails → show the relevant error output, attempt to fix the failing test(s), re-run. Output `✅ **Tests passed**` once fixed, or `❌ **Tests failed** — could not auto-fix` if not.
 
 ## Step 3 — Lint
 
+Announce: `▶ **Running Lint...**`
+
 Run: `pnpm run lint:fix`
 
-- If it exits 0: mark Lint as `[✓]` and reprint the checklist, then proceed.
-- If it exits non-zero: show the relevant error output, attempt to fix the remaining lint errors, re-run `pnpm run lint:fix`, and only proceed once passing (or report that you could not fix them and mark `[✗]`). Reprint the checklist after resolving.
+- Passes → output `✅ **Lint passed**` and continue.
+- Fails → show the remaining errors, attempt to fix, re-run `pnpm run lint:fix`. Output `✅ **Lint passed**` once fixed, or `❌ **Lint failed** — could not auto-fix` if not.
 
 ## Step 4 — Format
 
+Announce: `▶ **Running Format...**`
+
 Run: `pnpm run format`
 
-- This always rewrites files; mark Format as `[✓]` and reprint the checklist when the command completes.
+This always rewrites files. Output `✅ **Format done**` when the command completes.
 
 ## Step 5 — Docs
 
-Review the staged changes (`git diff --cached`) and any unstaged changes (`git diff`) to determine if any documentation needs updating.
+Announce: `▶ **Checking Docs...**`
 
-Check for:
+Review staged changes (`git diff --cached`) and unstaged changes (`git diff`) to determine if any documentation needs updating. Check for:
 
 - New or removed features, CLI options, env vars, or configuration that should be reflected in README files
 - API or schema changes that affect documented interfaces
@@ -80,32 +78,35 @@ Rules:
 
 - Only update docs that exist — do not create new documentation files
 - Only update docs that are genuinely incorrect or incomplete as a result of the changes
-- Do not document internal implementation details; focus on user-facing or contributor-facing information
-- If no docs need updating, mark Docs as `[✓]` and note "No documentation changes needed"
-- If docs were updated, mark Docs as `[✓]` and list which files were changed and why
+- Do not document internal implementation details
+
+Output `✅ **Docs up to date**` if nothing needed, or `✅ **Docs updated** — <list files changed>` if you made changes.
 
 ## Step 6 — Changelog
 
+Announce: `▶ **Updating Changelog...**`
+
 Run the `/changelog` command to update `content/changelog/pending.mdx` with any commits not yet documented there.
 
-- If new entries were added: mark Changelog as `[✓]` and note which bullets were added.
-- If no new commits needed documenting: mark Changelog as `[✓]` and note "No changelog changes needed".
+Output `✅ **Changelog updated**` if new entries were added, or `✅ **Changelog up to date**` if nothing was missing.
 
 ---
 
-## Final output
+## Final summary
 
-After all steps, output the final checklist as plain assistant text with the summary line. Never use a tool call to output this.
+After all steps complete, output the full checklist as assistant text with a summary line:
 
+```
 **Pre-commit checks**
-─────────────────
-[✓] Build
-[✓] Tests
-[✓] Lint
-[✓] Format
-[✓] Docs
-[✓] Changelog
+─────────────────────
+✅ Build
+✅ Tests
+✅ Lint
+✅ Format
+✅ Docs
+✅ Changelog
 
 All checks passed. Ready to commit.
+```
 
-Replace `[✓]` with `[✗]` for any failed step, and change the summary to "Some checks failed. Review the errors above before committing." if any step failed.
+Replace ✅ with ❌ for any failed step, and change the summary to `Some checks failed. Review the errors above before committing.`

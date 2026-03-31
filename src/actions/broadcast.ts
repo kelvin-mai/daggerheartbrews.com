@@ -107,8 +107,9 @@ export const sendBroadcast = async (
     return { data: null, error: 'RESEND_AUDIENCE_ID is not configured' };
   }
 
-  const { sendUpdateBroadcast, sendChangelogBroadcast } =
-    await import('@/lib/email');
+  const { sendUpdateBroadcast, sendChangelogBroadcast } = await import(
+    '@/lib/email'
+  );
 
   if (params.template === 'update') {
     return sendUpdateBroadcast({

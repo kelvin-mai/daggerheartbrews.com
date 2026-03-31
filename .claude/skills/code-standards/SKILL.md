@@ -1,6 +1,6 @@
 ---
 name: code-standards
-description: Coding conventions and standards for Daggerheart Brews. Reference when writing or reviewing code.
+description: Coding conventions and standards for Daggerheart Brews. Load this skill whenever writing new code, reviewing existing code, or helping with refactors — it covers TypeScript style, React/Next.js patterns, Tailwind v4, Zustand stores, server actions, Drizzle ORM, and what to avoid. Use it proactively any time you're about to touch a file in this repo.
 ---
 
 # Code Standards
