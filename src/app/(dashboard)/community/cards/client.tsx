@@ -1,7 +1,11 @@
 'use client';
 
 import * as React from 'react';
-import { useQuery, keepPreviousData } from '@tanstack/react-query';
+import {
+  useQuery,
+  useQueryClient,
+  keepPreviousData,
+} from '@tanstack/react-query';
 import { Layers } from 'lucide-react';
 
 import type {
@@ -46,11 +50,23 @@ async function fetchCards({
 }
 
 export const CommunityCards = () => {
+  const queryClient = useQueryClient();
   const [currentPage, setCurrentPage] = React.useState(1);
   const [pageSize, setPageSize] = React.useState(10);
   const [selectedTypes, setSelectedTypes] = React.useState<Option[]>([]);
 
   const selectedTypeValues = selectedTypes.map((o) => o.value);
+
+  const { data: bookmarksData } = useQuery({
+    queryKey: ['bookmarks', 'cards'],
+    queryFn: () =>
+      fetch('/api/bookmarks/cards').then((r) => r.json()) as Promise<{
+        data: { ids: string[] } | null;
+      }>,
+    staleTime: 60_000,
+  });
+
+  const bookmarkedIds = new Set(bookmarksData?.data?.ids ?? []);
 
   const { data, isLoading } = useQuery({
     queryKey: ['community-cards', currentPage, pageSize, selectedTypeValues],
@@ -99,6 +115,10 @@ export const CommunityCards = () => {
           cardPreview={card.cardPreview}
           user={card.user}
           userCard={card.userCard}
+          isBookmarked={bookmarkedIds.has(card.userCard.id)}
+          onBookmarkToggle={() =>
+            queryClient.invalidateQueries({ queryKey: ['bookmarks', 'cards'] })
+          }
         />
       ))}
       {cards.length > 0 ? (

@@ -4,6 +4,7 @@ import * as React from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { ImageIcon, LayoutTemplate, MoreHorizontal } from 'lucide-react';
+import { toast } from 'sonner';
 
 import type {
   AdversaryDetails,
@@ -12,10 +13,16 @@ import type {
   UserAdversary,
   UserCard,
 } from '@/lib/types';
+import {
+  toggleAdversaryBookmark,
+  toggleCardBookmark,
+} from '@/actions/bookmarks';
 import { useAdversaryActions, useCardActions } from '@/store';
+import { useSession } from '@/lib/auth/client';
 import { ResponsiveDialog } from '@/components/common/responsive-dialog';
 import { CardPreview } from '@/components/card-creation/preview';
 import { AdversaryPreviewStatblock } from '../adversary-creation/preview/statblock';
+import { BookmarkButton } from './bookmark-button';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -31,6 +38,7 @@ type CommunityPostProps = React.ComponentProps<'div'> & {
   creator: string;
   preview: React.ReactNode;
   onUseAsTemplate: () => void;
+  bookmarkButton?: React.ReactNode;
 };
 
 export const CommunityPost: React.FC<CommunityPostProps> = ({
@@ -40,6 +48,7 @@ export const CommunityPost: React.FC<CommunityPostProps> = ({
   creator,
   preview,
   onUseAsTemplate,
+  bookmarkButton,
   ...props
 }) => (
   <div
@@ -66,6 +75,7 @@ export const CommunityPost: React.FC<CommunityPostProps> = ({
       </p>
     </div>
     <div className='flex shrink-0 items-center gap-1'>
+      {bookmarkButton}
       <ResponsiveDialog label='Preview' variant='ghost' size='sm'>
         <div className='flex items-center justify-center'>{preview}</div>
       </ResponsiveDialog>
@@ -91,20 +101,45 @@ type CommunityCardProps = React.ComponentProps<'div'> & {
   cardPreview: CardDetails;
   user: User;
   userCard: UserCard;
+  isBookmarked?: boolean;
+  onBookmarkToggle?: () => void;
 };
 
 export const CommunityCard: React.FC<CommunityCardProps> = ({
   cardPreview,
   user,
   userCard,
+  isBookmarked = false,
+  onBookmarkToggle,
   ...props
 }) => {
   const { setCardDetails } = useCardActions();
   const router = useRouter();
+  const session = useSession();
+  const [bookmarked, setBookmarked] = React.useState(isBookmarked);
+  const [isPending, startTransition] = React.useTransition();
+
+  React.useEffect(() => {
+    setBookmarked(isBookmarked);
+  }, [isBookmarked]);
 
   const handleTemplate = () => {
     setCardDetails(cardPreview);
     router.push('/card/create?template=true');
+  };
+
+  const handleBookmarkToggle = () => {
+    const next = !bookmarked;
+    setBookmarked(next);
+    startTransition(async () => {
+      const result = await toggleCardBookmark({ userCardId: userCard.id });
+      if (result.error) {
+        setBookmarked(!next);
+        toast.error('Failed to update bookmark');
+      } else {
+        onBookmarkToggle?.();
+      }
+    });
   };
 
   return (
@@ -114,6 +149,15 @@ export const CommunityCard: React.FC<CommunityCardProps> = ({
       image={cardPreview.image}
       creator={user.name}
       onUseAsTemplate={handleTemplate}
+      bookmarkButton={
+        session.data?.user ? (
+          <BookmarkButton
+            isBookmarked={bookmarked}
+            onToggle={handleBookmarkToggle}
+            isPending={isPending}
+          />
+        ) : undefined
+      }
       preview={
         <CardPreview
           card={cardPreview}
@@ -136,20 +180,47 @@ type CommunityAdversaryProps = React.ComponentProps<'div'> & {
   adversaryPreview: AdversaryDetails;
   user: User;
   userAdversary: UserAdversary;
+  isBookmarked?: boolean;
+  onBookmarkToggle?: () => void;
 };
 
 export const CommunityAdversary: React.FC<CommunityAdversaryProps> = ({
   adversaryPreview,
   user,
   userAdversary,
+  isBookmarked = false,
+  onBookmarkToggle,
   ...props
 }) => {
   const { setAdversaryDetails } = useAdversaryActions();
   const router = useRouter();
+  const session = useSession();
+  const [bookmarked, setBookmarked] = React.useState(isBookmarked);
+  const [isPending, startTransition] = React.useTransition();
+
+  React.useEffect(() => {
+    setBookmarked(isBookmarked);
+  }, [isBookmarked]);
 
   const handleTemplate = () => {
     setAdversaryDetails(adversaryPreview);
     router.push('/adversary/create?template=true');
+  };
+
+  const handleBookmarkToggle = () => {
+    const next = !bookmarked;
+    setBookmarked(next);
+    startTransition(async () => {
+      const result = await toggleAdversaryBookmark({
+        userAdversaryId: userAdversary.id,
+      });
+      if (result.error) {
+        setBookmarked(!next);
+        toast.error('Failed to update bookmark');
+      } else {
+        onBookmarkToggle?.();
+      }
+    });
   };
 
   return (
@@ -159,6 +230,15 @@ export const CommunityAdversary: React.FC<CommunityAdversaryProps> = ({
       image={adversaryPreview.image}
       creator={user.name}
       onUseAsTemplate={handleTemplate}
+      bookmarkButton={
+        session.data?.user ? (
+          <BookmarkButton
+            isBookmarked={bookmarked}
+            onToggle={handleBookmarkToggle}
+            isPending={isPending}
+          />
+        ) : undefined
+      }
       preview={<AdversaryPreviewStatblock adversary={adversaryPreview} />}
       {...props}
     />

@@ -27,3 +27,25 @@ export const userAdversaries = pgTable('user_adversaries', {
     .references(() => adversaryPreviews.id, { onDelete: 'cascade' }),
   ...timestamps,
 });
+
+export const userCardBookmarks = pgTable('user_card_bookmarks', {
+  ...uuidPrimaryKey,
+  userId: uuid('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  userCardId: uuid('user_card_id')
+    .notNull()
+    .references(() => userCards.id, { onDelete: 'cascade' }),
+  ...timestamps,
+});
+
+export const userAdversaryBookmarks = pgTable('user_adversary_bookmarks', {
+  ...uuidPrimaryKey,
+  userId: uuid('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  userAdversaryId: uuid('user_adversary_id')
+    .notNull()
+    .references(() => userAdversaries.id, { onDelete: 'cascade' }),
+  ...timestamps,
+});

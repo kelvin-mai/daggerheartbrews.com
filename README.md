@@ -4,15 +4,6 @@ A Next.js web application for creating and sharing homebrew content for the Dagg
 
 **Live Site**: [daggerheartbrews.com](https://daggerheartbrews.com)
 
-## Features
-
-- **Card Builder**: Create custom ability cards with domains, colors, images, and stats
-- **Adversary Builder**: Design custom adversaries with customizable stats, attacks, and abilities
-- **Community Sharing**: Browse and share homebrew content with the community
-- **Game Master Tools**: Quick reference for rules, tables, and game mechanics
-- **Authentication**: Secure email/password and social login (Google, Discord)
-- **Export**: Generate printable card images
-
 ## Tech Stack
 
 - **Framework**: Next.js 15 with App Router, TypeScript
@@ -23,6 +14,16 @@ A Next.js web application for creating and sharing homebrew content for the Dagg
 - **Email**: React Email with Resend
 - **Testing**: Vitest + React Testing Library (unit), Playwright (E2E)
 - **Deployment**: Vercel
+
+## Features
+
+- **Card Builder**: Create custom ability cards with domains, colors, images, and stats
+- **Adversary Builder**: Design custom adversaries with customizable stats, attacks, and abilities
+- **Community Sharing**: Browse and share homebrew content with the community
+- **Bookmarks**: Save community cards and adversaries for quick access
+- **Game Master Tools**: Quick reference for rules, tables, and game mechanics
+- **Authentication**: Secure email/password and social login (Google, Discord)
+- **Export**: Generate printable card images
 
 ## Getting Started
 

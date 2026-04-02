@@ -1,7 +1,11 @@
 'use client';
 
 import * as React from 'react';
-import { useQuery, keepPreviousData } from '@tanstack/react-query';
+import {
+  useQuery,
+  useQueryClient,
+  keepPreviousData,
+} from '@tanstack/react-query';
 import { Skull } from 'lucide-react';
 
 import type {
@@ -71,6 +75,7 @@ async function fetchAdversaries({
 }
 
 export const CommunityAdversaries = () => {
+  const queryClient = useQueryClient();
   const [currentPage, setCurrentPage] = React.useState(1);
   const [pageSize, setPageSize] = React.useState(10);
   const [selectedTiers, setSelectedTiers] = React.useState<Option[]>([]);
@@ -78,6 +83,17 @@ export const CommunityAdversaries = () => {
 
   const selectedTierValues = selectedTiers.map((o) => Number(o.value));
   const selectedRoleValues = selectedRoles.map((o) => o.value);
+
+  const { data: bookmarksData } = useQuery({
+    queryKey: ['bookmarks', 'adversaries'],
+    queryFn: () =>
+      fetch('/api/bookmarks/adversaries').then((r) => r.json()) as Promise<{
+        data: { ids: string[] } | null;
+      }>,
+    staleTime: 60_000,
+  });
+
+  const bookmarkedIds = new Set(bookmarksData?.data?.ids ?? []);
 
   const { data, isLoading } = useQuery({
     queryKey: [
@@ -152,6 +168,12 @@ export const CommunityAdversaries = () => {
           adversaryPreview={adversary.adversaryPreview}
           user={adversary.user}
           userAdversary={adversary.userAdversary}
+          isBookmarked={bookmarkedIds.has(adversary.userAdversary.id)}
+          onBookmarkToggle={() =>
+            queryClient.invalidateQueries({
+              queryKey: ['bookmarks', 'adversaries'],
+            })
+          }
         />
       ))}
       {adversaries.length > 0 ? (

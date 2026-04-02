@@ -108,6 +108,10 @@ export const nav: NavCategory[] = [
         name: 'Homebrew',
         url: '/profile/homebrew',
       },
+      {
+        name: 'Bookmarks',
+        url: '/profile/bookmarks',
+      },
     ],
   },
 ];

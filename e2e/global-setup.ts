@@ -30,7 +30,6 @@ async function globalSetup() {
     const email = process.env.TEST_USER_EMAIL ?? 'test@example.com';
     const password = process.env.TEST_USER_PASSWORD ?? 'password123';
 
-    // Ensure user exists
     let userId: string;
     const { rows: existing } = await client.query<{ id: string }>(
       'SELECT id FROM users WHERE email = $1',
@@ -49,7 +48,6 @@ async function globalSetup() {
       userId = inserted[0].id;
     }
 
-    // Ensure userSettings exists (required for card/adversary creation)
     const { rows: settings } = await client.query(
       'SELECT id FROM user_settings WHERE user_id = $1',
       [userId],
@@ -60,7 +58,14 @@ async function globalSetup() {
       ]);
     }
 
-    // Clean up leftover cards/adversaries from previous test runs
+    await client.query('DELETE FROM user_card_bookmarks WHERE user_id = $1', [
+      userId,
+    ]);
+    await client.query(
+      'DELETE FROM user_adversary_bookmarks WHERE user_id = $1',
+      [userId],
+    );
+
     await client.query(
       `DELETE FROM card_previews cp
        WHERE cp.id IN (
@@ -76,7 +81,6 @@ async function globalSetup() {
       [userId],
     );
 
-    // Ensure credential account exists
     const { rows: acct } = await client.query(
       `SELECT id FROM accounts WHERE user_id = $1 AND provider_id = 'credential'`,
       [userId],

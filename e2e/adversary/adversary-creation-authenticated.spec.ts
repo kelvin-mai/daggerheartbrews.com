@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-import { getItemRow } from '../../fixtures';
+import { getItemRow } from '../fixtures';
 
 async function createAdversary(
   page: Parameters<typeof getItemRow>[0],
