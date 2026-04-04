@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { eq } from 'drizzle-orm';
-import { Bookmark, Layers, Skull } from 'lucide-react';
+import { Bookmark, Layers, Printer, Skull } from 'lucide-react';
 
 import type {
   AdversaryDetails,
@@ -63,10 +63,18 @@ export default async function Page() {
 
   return (
     <div className='mb-4 space-y-4'>
-      <PageHeader
-        title='Bookmarks'
-        subtitle='Community content you have saved.'
-      />
+      <div className='flex items-start justify-between gap-4'>
+        <PageHeader
+          title='Bookmarks'
+          subtitle='Community content you have saved.'
+        />
+        <Button asChild size='sm' variant='outline' className='shrink-0'>
+          <Link href='/profile/print'>
+            <Printer className='size-4' />
+            Print Sheet
+          </Link>
+        </Button>
+      </div>
       <div className='grid grid-cols-3 gap-3'>
         <div className='bg-card rounded-lg border p-3 text-center'>
           <p className='text-muted-foreground text-xs font-medium tracking-wider uppercase'>
