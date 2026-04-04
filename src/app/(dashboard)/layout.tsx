@@ -1,3 +1,5 @@
+import { headers } from 'next/headers';
+
 import {
   AdUnit,
   BuyMeCofffeeBanner,
@@ -6,6 +8,7 @@ import {
   ThemeToggle,
   WeMovedBanner,
 } from '@/components/common';
+import { auth } from '@/lib/auth';
 import { AppSidebar, Footer } from '@/components/layout';
 import {
   SidebarInset,
@@ -13,10 +16,16 @@ import {
   SidebarTrigger,
 } from '@/components/ui/sidebar';
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+export default async function Layout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const session = await auth.api.getSession({ headers: await headers() });
+
   return (
     <SidebarProvider>
-      <AppSidebar />
+      <AppSidebar user={session?.user ?? null} />
       <SidebarInset>
         <header className='flex h-16 shrink-0 items-center gap-2'>
           <div className='flex w-full items-center justify-between px-4'>

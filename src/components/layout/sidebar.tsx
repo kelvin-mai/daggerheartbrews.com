@@ -13,9 +13,9 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { useSession, logout } from '@/lib/auth/client';
+import { logout } from '@/lib/auth/client';
 import { adminNav, nav } from '@/lib/constants';
-import type { NavCategory } from '@/lib/types';
+import type { NavCategory, User } from '@/lib/types';
 import {
   Sidebar,
   SidebarContent,
@@ -44,9 +44,8 @@ import { Collapsible } from '@/components/ui/collapsible';
 import { CollapsibleContent, CollapsibleTrigger } from '../ui/collapsible';
 import { Badge } from '../ui/badge';
 
-const AppSidebarFooter = () => {
+const AppSidebarFooter = ({ user }: { user: User | null }) => {
   const { isMobile } = useSidebar();
-  const { data } = useSession();
 
   const handleLogout = async () => {
     await logout({
@@ -65,25 +64,23 @@ const AppSidebarFooter = () => {
     <SidebarFooter>
       <SidebarMenu>
         <SidebarMenuItem>
-          {data?.user ? (
+          {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton size='lg'>
                   <Avatar className='size-8 rounded-lg'>
                     <AvatarImage
-                      src={data.user.image ?? undefined}
-                      alt={data.user.name}
+                      src={user.image ?? undefined}
+                      alt={user.name}
                     />
                     <AvatarFallback className='uppercase'>
-                      {data.user.name.charAt(0) ?? '?'}
+                      {user.name.charAt(0) ?? '?'}
                     </AvatarFallback>
                   </Avatar>
                   <div className='grid flex-1 text-left text-sm leading-tight'>
-                    <span className='truncate font-medium'>
-                      {data.user.name}
-                    </span>
+                    <span className='truncate font-medium'>{user.name}</span>
                     <span className='text-muted-foreground truncate text-xs'>
-                      {data.user.email}
+                      {user.email}
                     </span>
                   </div>
                   <MoreVertical className='ml-auto size-4' />
@@ -99,19 +96,17 @@ const AppSidebarFooter = () => {
                   <div className='flex items-center gap-2'>
                     <Avatar className='size-8 rounded-lg'>
                       <AvatarImage
-                        src={data.user.image ?? undefined}
-                        alt={data.user.name}
+                        src={user.image ?? undefined}
+                        alt={user.name}
                       />
                       <AvatarFallback className='uppercase'>
-                        {data.user.name.charAt(0) ?? '?'}
+                        {user.name.charAt(0) ?? '?'}
                       </AvatarFallback>
                     </Avatar>
                     <div className='grid flex-1 text-left text-sm leading-tight'>
-                      <span className='truncate font-medium'>
-                        {data.user.name}
-                      </span>
+                      <span className='truncate font-medium'>{user.name}</span>
                       <span className='text-muted-foreground truncate text-xs'>
-                        {data.user.email}
+                        {user.email}
                       </span>
                     </div>
                   </div>
@@ -198,11 +193,8 @@ const NavContent = ({ categories }: { categories: NavCategory[] }) => {
   );
 };
 
-const AppSidebarContent = () => {
-  const { data } = useSession();
-  const filtered = nav.filter(
-    (category) => !category.requireAuth || (category.requireAuth && data?.user),
-  );
+const AppSidebarContent = ({ user }: { user: User | null }) => {
+  const filtered = nav.filter((category) => !category.requireAuth || !!user);
   return <NavContent categories={filtered} />;
 };
 
@@ -210,9 +202,14 @@ const AdminSidebarContent = () => <NavContent categories={adminNav} />;
 
 type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {
   admin?: boolean;
+  user?: User | null;
 };
 
-export const AppSidebar: React.FC<AppSidebarProps> = ({ admin, ...props }) => {
+export const AppSidebar: React.FC<AppSidebarProps> = ({
+  admin,
+  user = null,
+  ...props
+}) => {
   return (
     <Sidebar variant='inset' {...props}>
       <SidebarHeader>
@@ -235,8 +232,8 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({ admin, ...props }) => {
           </SidebarMenuButton>
         </SidebarMenu>
       </SidebarHeader>
-      {admin ? <AdminSidebarContent /> : <AppSidebarContent />}
-      <AppSidebarFooter />
+      {admin ? <AdminSidebarContent /> : <AppSidebarContent user={user} />}
+      <AppSidebarFooter user={user} />
     </Sidebar>
   );
 };
