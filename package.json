@@ -27,6 +27,7 @@
     "@neondatabase/serverless": "^1.0.0",
     "@origin-space/image-cropper": "^0.1.9",
     "@react-email/components": "^0.0.41",
+    "@react-pdf/renderer": "^4.3.2",
     "@tanstack/react-query": "^5.90.21",
     "@tanstack/react-query-devtools": "^5.91.3",
     "@tiptap/extension-text-align": "^2.12.0",

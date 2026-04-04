@@ -4,9 +4,10 @@ date: 'Unreleased'
 title: 'Pending'
 ---
 
-### Added
+## New
 
-- Bookmark functionality for community cards and adversaries ([#23](https://github.com/YOUR_USERNAME/daggerheart-brews/pull/23))
+- **Print Sheet** — select cards from your collection and bookmarks, preview them in a print-ready PDF, and download a letter-sized sheet with 9 cards per page in a 3×3 grid at standard trading card size. Optional cut lines and card settings (border, artist name, credits) are configurable before downloading.
+- **Bookmarks** — bookmark community cards and adversaries to your profile for quick access and printing ([#23](https://github.com/YOUR_USERNAME/daggerheart-brews/pull/23)).
 
 ## Fixed
 
@@ -19,3 +20,4 @@ title: 'Pending'
 - `ImageCropper` in `forms/image.tsx` now receives `aspectRatio={100 / 73.53}` to match the card image placeholder height (`h-[73.53cqw]`).
 - Card `<img>` in `preview/index.tsx` now has `h-[73.53cqw]` so `object-cover` renders at a consistent height.
 - Local development no longer requires third-party accounts (Google, Discord, Resend) to be configured ([#21](https://github.com/YOUR_USERNAME/daggerheart-brews/pull/21)).
+- Print sheet uses `@react-pdf/renderer` to generate a deterministic PDF from card PNG captures via `@jpinsonneau/html-to-image`.

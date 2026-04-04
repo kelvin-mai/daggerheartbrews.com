@@ -1,14 +1,11 @@
 -- Seed content: card_previews, adversary_previews, user_cards, user_adversaries
--- Uses test user IDs from 0006_seed-test-users.sql
--- admin@test.com  → a0000000-0000-0000-0000-000000000001
--- user@test.com   → a0000000-0000-0000-0000-000000000002
--- user2@test.com  → a0000000-0000-0000-0000-000000000003
+-- Uses test user emails from 0006_seed-test-users.sql for lookups
 
 -- ─────────────────────────────────────────────
 -- card_previews
 -- ─────────────────────────────────────────────
 insert into card_previews (
-  id, name, type, subtype, subtitle,
+  name, type, subtype, subtitle,
   text,
   level, stress, evasion, thresholds, thresholds_enabled,
   tier, tier_enabled,
@@ -20,7 +17,6 @@ insert into card_previews (
 
 -- 1. Ancestry: Thornborn
 (
-  'c0000000-0000-0000-0000-000000000001',
   'Thornborn', 'ancestry', null, null,
   '<p><em>Thornborn are gnarled, bark-skinned humanoids rooted in ancient forests. Tendrils of living wood curl from their shoulders, and their eyes glow a soft amber in darkness.</em></p><p><strong><em>Briar Skin:</em></strong> Your bark-like hide grants natural protection. When you would take Severe damage, you may mark a Stress to reduce the Hit Points marked by 1.</p><p><strong><em>Deep Roots:</em></strong> Once per long rest, when you are in contact with soil or wood, you may spend a Hope to heal 1d6 HP as the earth restores you.</p>',
   null, 6, 10, '(5,12)', true,
@@ -33,7 +29,6 @@ insert into card_previews (
 
 -- 2. Community: The Wandering Grove
 (
-  'c0000000-0000-0000-0000-000000000002',
   'The Wandering Grove', 'community', null, null,
   '<p><em>You were raised among a nomadic forest enclave that follows the migration of an ancient treant herd. Your people live between the roots, moving with the seasons and trusting in the wisdom of old growth.</em></p><p><strong><em>Communal Bond:</em></strong> Once per long rest, you may call upon the memory of your Grove. Ask the GM one question about the natural world or the history of a place; they must answer honestly.</p><p><strong><em>Wayfarer''s Pack:</em></strong> Your community taught you to carry only what matters. You begin each session with one additional Supply.</p>',
   null, null, null, null, false,
@@ -46,7 +41,6 @@ insert into card_previews (
 
 -- 3. Domain ability: Shadowstep (Midnight + Grace)
 (
-  'c0000000-0000-0000-0000-000000000003',
   'Shadowstep', 'domain', 'ability', null,
   '<p>Spend a Hope. Melt into the nearest shadow and reappear at any shadow within Far range. Until the start of your next turn, attacks against you have disadvantage.</p>',
   1, null, null, null, false,
@@ -59,7 +53,6 @@ insert into card_previews (
 
 -- 4. Equipment: Soulrender Scythe (Blade)
 (
-  'c0000000-0000-0000-0000-000000000004',
   'Soulrender Scythe', 'equipment', null, 'One-Handed Melee',
   '<p><em>A weapon forged from the spine of a fallen warlord, its edge permanently stained with spectral residue.</em></p><p>On a Critical Success with this weapon, deal an additional 1d8 magic damage as the blade tears through the target''s soul.</p>',
   null, null, null, null, false,
@@ -72,7 +65,6 @@ insert into card_previews (
 
 -- 5. Transformation: Voidmeld
 (
-  'c0000000-0000-0000-0000-000000000005',
   'Voidmeld', 'transformation', null, null,
   '<p><em>Your body unmakes itself at the seams, reforming as a creature of pure void-stuff — eyes like collapsed stars, limbs trailing frozen dark.</em></p><p><strong><em>Void Body:</em></strong> While transformed, you are immune to physical damage but vulnerability to radiant damage doubles.</p><p><strong><em>Event Horizon:</em></strong> Once per round, you may pull one target within Close range to Very Close range as a free action.</p>',
   5, 8, 14, '(8,18)', true,
@@ -85,7 +77,6 @@ insert into card_previews (
 
 -- 6. Subclass: Path of the Ashen Flame (Sorcerer subclass)
 (
-  'c0000000-0000-0000-0000-000000000006',
   'Path of the Ashen Flame', 'subclass', null, 'Sorcerer Subclass',
   '<p><em>You have bargained with the remnant heat of a dead god, and in exchange carry a flame that consumes without burning — a fire of pure erasure.</em></p><p><strong><em>Ashen Touch (Passive):</em></strong> Your spells that deal magic damage ignore resistance.</p><p><strong><em>Cinderfall (Action):</em></strong> Spend 3 Hope. Rain ash-fire across a Close area. Make a Presence attack against all targets in range; on a success each takes 2d10 magic damage and is Restrained until end of their next turn.</p>',
   null, null, null, null, false,
@@ -101,7 +92,7 @@ insert into card_previews (
 -- adversary_previews
 -- ─────────────────────────────────────────────
 insert into adversary_previews (
-  id, name, type, subtype,
+  name, type, subtype,
   tier, description, sub_description, experience,
   text,
   difficulty, hp, stress, thresholds,
@@ -110,7 +101,6 @@ insert into adversary_previews (
 
 -- 1. Gravewarden (Solo Standard)
 (
-  'd0000000-0000-0000-0000-000000000001',
   'Gravewarden', 'adversary', 'standard',
   2,
   'A hulking knight who died mid-oath and refused to stop. The Gravewarden patrols cursed crypts in silence, its armour sealed shut over centuries of decay. It cannot be reasoned with — only outlasted.',
@@ -123,7 +113,6 @@ insert into adversary_previews (
 
 -- 2. Thornmaw Hydra (Solo)
 (
-  'd0000000-0000-0000-0000-000000000002',
   'Thornmaw Hydra', 'adversary', 'solo',
   3,
   'A six-headed serpent whose necks are wrapped in living thorns. Each head operates independently, snapping and lunging from different angles. Severing a head only accelerates its hunger — two grow back, each angrier than the last.',
@@ -136,7 +125,6 @@ insert into adversary_previews (
 
 -- 3. Cult Zealot (Standard)
 (
-  'd0000000-0000-0000-0000-000000000003',
   'Cult Zealot', 'adversary', 'standard',
   1,
   'Hollow-eyed and feverish, the Zealot fights not with skill but with utter conviction. They feel no fear because they''ve traded it away for certainty. Their patron''s symbol is burned into their palm.',
@@ -149,7 +137,6 @@ insert into adversary_previews (
 
 -- 4. Deepmire Lurker (Skulk)
 (
-  'd0000000-0000-0000-0000-000000000004',
   'Deepmire Lurker', 'adversary', 'skulk',
   2,
   'Something that used to be an eel before the dark water changed it. The Lurker moves through flooded ruins with silent efficiency, striking from below and retreating into murk. It hunts by heat and breath.',
@@ -165,7 +152,7 @@ insert into adversary_previews (
 -- adversary_previews (environments)
 -- ─────────────────────────────────────────────
 insert into adversary_previews (
-  id, name, type, subtype,
+  name, type, subtype,
   tier, description, sub_description, experience,
   text,
   difficulty, hp, stress, thresholds,
@@ -174,7 +161,6 @@ insert into adversary_previews (
 
 -- 5. The Whispering Bog (traversal)
 (
-  'd0000000-0000-0000-0000-000000000005',
   'The Whispering Bog', 'environment', 'traversal',
   null,
   'A vast expanse of black water and sunken earth draped in perpetual mist. Ghostly voices murmur just below hearing, and every path that seemed solid a moment ago has since swallowed itself in mud.',
@@ -187,7 +173,6 @@ insert into adversary_previews (
 
 -- 6. The Sunken Bazaar (social)
 (
-  'd0000000-0000-0000-0000-000000000006',
   'The Sunken Bazaar', 'environment', 'social',
   null,
   'A drowned trading post that somehow still operates beneath thirty feet of seawater. Merchants in glass helmets haggle over secrets and stolen names. Coin is worthless here — only information has value.',
@@ -202,22 +187,70 @@ insert into adversary_previews (
 -- ─────────────────────────────────────────────
 -- user_cards (links users → card_previews)
 -- ─────────────────────────────────────────────
-insert into user_cards (id, user_id, public, card_preview_id, created_at) values
-('e0000000-0000-0000-0000-000000000001', 'a0000000-0000-0000-0000-000000000001', true,  'c0000000-0000-0000-0000-000000000001', now()),
-('e0000000-0000-0000-0000-000000000002', 'a0000000-0000-0000-0000-000000000002', true,  'c0000000-0000-0000-0000-000000000002', now()),
-('e0000000-0000-0000-0000-000000000003', 'a0000000-0000-0000-0000-000000000001', true,  'c0000000-0000-0000-0000-000000000003', now()),
-('e0000000-0000-0000-0000-000000000004', 'a0000000-0000-0000-0000-000000000003', true,  'c0000000-0000-0000-0000-000000000004', now()),
-('e0000000-0000-0000-0000-000000000005', 'a0000000-0000-0000-0000-000000000002', true,  'c0000000-0000-0000-0000-000000000005', now()),
-('e0000000-0000-0000-0000-000000000006', 'a0000000-0000-0000-0000-000000000003', false, 'c0000000-0000-0000-0000-000000000006', now());
+insert into user_cards (user_id, public, card_preview_id) values
+(
+  (select id from users where email = 'admin@test.com'),
+  true,
+  (select id from card_previews where name = 'Thornborn')
+),
+(
+  (select id from users where email = 'user@test.com'),
+  true,
+  (select id from card_previews where name = 'The Wandering Grove')
+),
+(
+  (select id from users where email = 'admin@test.com'),
+  true,
+  (select id from card_previews where name = 'Shadowstep')
+),
+(
+  (select id from users where email = 'user2@test.com'),
+  true,
+  (select id from card_previews where name = 'Soulrender Scythe')
+),
+(
+  (select id from users where email = 'user@test.com'),
+  true,
+  (select id from card_previews where name = 'Voidmeld')
+),
+(
+  (select id from users where email = 'user2@test.com'),
+  false,
+  (select id from card_previews where name = 'Path of the Ashen Flame')
+);
 --> statement-breakpoint
 
 -- ─────────────────────────────────────────────
 -- user_adversaries (links users → adversary_previews)
 -- ─────────────────────────────────────────────
-insert into user_adversaries (id, user_id, public, adversary_preview_id, created_at) values
-('f0000000-0000-0000-0000-000000000001', 'a0000000-0000-0000-0000-000000000001', true,  'd0000000-0000-0000-0000-000000000001', now()),
-('f0000000-0000-0000-0000-000000000002', 'a0000000-0000-0000-0000-000000000002', true,  'd0000000-0000-0000-0000-000000000002', now()),
-('f0000000-0000-0000-0000-000000000003', 'a0000000-0000-0000-0000-000000000003', true,  'd0000000-0000-0000-0000-000000000003', now()),
-('f0000000-0000-0000-0000-000000000004', 'a0000000-0000-0000-0000-000000000001', false, 'd0000000-0000-0000-0000-000000000004', now()),
-('f0000000-0000-0000-0000-000000000005', 'a0000000-0000-0000-0000-000000000002', true,  'd0000000-0000-0000-0000-000000000005', now()),
-('f0000000-0000-0000-0000-000000000006', 'a0000000-0000-0000-0000-000000000003', true,  'd0000000-0000-0000-0000-000000000006', now());
+insert into user_adversaries (user_id, public, adversary_preview_id) values
+(
+  (select id from users where email = 'admin@test.com'),
+  true,
+  (select id from adversary_previews where name = 'Gravewarden')
+),
+(
+  (select id from users where email = 'user@test.com'),
+  true,
+  (select id from adversary_previews where name = 'Thornmaw Hydra')
+),
+(
+  (select id from users where email = 'user2@test.com'),
+  true,
+  (select id from adversary_previews where name = 'Cult Zealot')
+),
+(
+  (select id from users where email = 'admin@test.com'),
+  false,
+  (select id from adversary_previews where name = 'Deepmire Lurker')
+),
+(
+  (select id from users where email = 'user@test.com'),
+  true,
+  (select id from adversary_previews where name = 'The Whispering Bog')
+),
+(
+  (select id from users where email = 'user2@test.com'),
+  true,
+  (select id from adversary_previews where name = 'The Sunken Bazaar')
+);

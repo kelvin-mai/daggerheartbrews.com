@@ -1,21 +1,57 @@
-insert into user_card_bookmarks (id, user_id, user_card_id, created_at) values
+insert into user_card_bookmarks (user_id, user_card_id) values
 -- user@test.com bookmarks admin's and user2's cards
-('g0000000-0000-0000-0000-000000000001', 'a0000000-0000-0000-0000-000000000002', 'e0000000-0000-0000-0000-000000000001', now()),
-('g0000000-0000-0000-0000-000000000002', 'a0000000-0000-0000-0000-000000000002', 'e0000000-0000-0000-0000-000000000003', now()),
-('g0000000-0000-0000-0000-000000000003', 'a0000000-0000-0000-0000-000000000002', 'e0000000-0000-0000-0000-000000000004', now()),
+(
+  (select id from users where email = 'user@test.com'),
+  (select uc.id from user_cards uc join card_previews cp on uc.card_preview_id = cp.id where cp.name = 'Thornborn')
+),
+(
+  (select id from users where email = 'user@test.com'),
+  (select uc.id from user_cards uc join card_previews cp on uc.card_preview_id = cp.id where cp.name = 'Shadowstep')
+),
+(
+  (select id from users where email = 'user@test.com'),
+  (select uc.id from user_cards uc join card_previews cp on uc.card_preview_id = cp.id where cp.name = 'Soulrender Scythe')
+),
 -- user2@test.com bookmarks admin's and user's cards
-('g0000000-0000-0000-0000-000000000004', 'a0000000-0000-0000-0000-000000000003', 'e0000000-0000-0000-0000-000000000001', now()),
-('g0000000-0000-0000-0000-000000000005', 'a0000000-0000-0000-0000-000000000003', 'e0000000-0000-0000-0000-000000000005', now()),
+(
+  (select id from users where email = 'user2@test.com'),
+  (select uc.id from user_cards uc join card_previews cp on uc.card_preview_id = cp.id where cp.name = 'Thornborn')
+),
+(
+  (select id from users where email = 'user2@test.com'),
+  (select uc.id from user_cards uc join card_previews cp on uc.card_preview_id = cp.id where cp.name = 'Voidmeld')
+),
 -- admin@test.com bookmarks user2's card
-('g0000000-0000-0000-0000-000000000006', 'a0000000-0000-0000-0000-000000000001', 'e0000000-0000-0000-0000-000000000004', now());
+(
+  (select id from users where email = 'admin@test.com'),
+  (select uc.id from user_cards uc join card_previews cp on uc.card_preview_id = cp.id where cp.name = 'Soulrender Scythe')
+);
 
-insert into user_adversary_bookmarks (id, user_id, user_adversary_id, created_at) values
+insert into user_adversary_bookmarks (user_id, user_adversary_id) values
 -- user@test.com bookmarks admin's and user2's adversaries
-('h0000000-0000-0000-0000-000000000001', 'a0000000-0000-0000-0000-000000000002', 'f0000000-0000-0000-0000-000000000001', now()),
-('h0000000-0000-0000-0000-000000000002', 'a0000000-0000-0000-0000-000000000002', 'f0000000-0000-0000-0000-000000000003', now()),
+(
+  (select id from users where email = 'user@test.com'),
+  (select ua.id from user_adversaries ua join adversary_previews ap on ua.adversary_preview_id = ap.id where ap.name = 'Gravewarden')
+),
+(
+  (select id from users where email = 'user@test.com'),
+  (select ua.id from user_adversaries ua join adversary_previews ap on ua.adversary_preview_id = ap.id where ap.name = 'Cult Zealot')
+),
 -- user2@test.com bookmarks user's adversaries
-('h0000000-0000-0000-0000-000000000003', 'a0000000-0000-0000-0000-000000000003', 'f0000000-0000-0000-0000-000000000002', now()),
-('h0000000-0000-0000-0000-000000000004', 'a0000000-0000-0000-0000-000000000003', 'f0000000-0000-0000-0000-000000000005', now()),
+(
+  (select id from users where email = 'user2@test.com'),
+  (select ua.id from user_adversaries ua join adversary_previews ap on ua.adversary_preview_id = ap.id where ap.name = 'Thornmaw Hydra')
+),
+(
+  (select id from users where email = 'user2@test.com'),
+  (select ua.id from user_adversaries ua join adversary_previews ap on ua.adversary_preview_id = ap.id where ap.name = 'The Whispering Bog')
+),
 -- admin@test.com bookmarks user's and user2's adversaries
-('h0000000-0000-0000-0000-000000000005', 'a0000000-0000-0000-0000-000000000001', 'f0000000-0000-0000-0000-000000000002', now()),
-('h0000000-0000-0000-0000-000000000006', 'a0000000-0000-0000-0000-000000000001', 'f0000000-0000-0000-0000-000000000006', now());
+(
+  (select id from users where email = 'admin@test.com'),
+  (select ua.id from user_adversaries ua join adversary_previews ap on ua.adversary_preview_id = ap.id where ap.name = 'Thornmaw Hydra')
+),
+(
+  (select id from users where email = 'admin@test.com'),
+  (select ua.id from user_adversaries ua join adversary_previews ap on ua.adversary_preview_id = ap.id where ap.name = 'The Sunken Bazaar')
+);

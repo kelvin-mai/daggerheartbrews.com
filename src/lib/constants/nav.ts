@@ -112,6 +112,10 @@ export const nav: NavCategory[] = [
         name: 'Bookmarks',
         url: '/profile/bookmarks',
       },
+      {
+        name: 'Print',
+        url: '/profile/print',
+      },
     ],
   },
 ];

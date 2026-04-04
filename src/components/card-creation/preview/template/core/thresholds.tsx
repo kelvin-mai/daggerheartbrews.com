@@ -1,7 +1,5 @@
 import * as React from 'react';
 
-import Image from 'next/image';
-
 export const Thresholds: React.FC<{
   thresholds?: [number, number];
   thresholdsEnabled?: boolean;
@@ -11,11 +9,10 @@ export const Thresholds: React.FC<{
   }
   return (
     <div className='relative flex h-[12.35cqw] w-[88.24cqw] items-center'>
-      <Image
+      <img
         src='/assets/card/damage-thresholds.webp'
         alt='damage-thresholds'
-        className='absolute'
-        fill
+        className='absolute inset-0 h-full w-full'
       />
       <div className='z-10 flex w-[20.59cqw] flex-col justify-center gap-[1.76cqw] pt-[5.88cqw] text-center'>
         <div className='text-[3.53cqw] font-semibold text-white uppercase'>
