@@ -42,28 +42,25 @@ export default async function Page() {
       .where(eq(userCardBookmarks.userId, session.user.id)),
   ]);
 
-  const seen = new Set<string>();
-  const cards: PrintableCard[] = [];
-
-  for (const row of ownData) {
-    if (!row.card_previews) continue;
-    seen.add(row.user_cards.id);
-    cards.push({
+  const ownCards: PrintableCard[] = ownData
+    .filter((row) => row.card_previews !== null)
+    .map((row) => ({
       cardPreview: row.card_previews as CardDetails,
       userCard: row.user_cards as UserCard,
-      source: 'own',
-    });
-  }
+      source: 'own' as const,
+    }));
 
-  for (const row of bookmarkData) {
-    if (seen.has(row.user_cards.id)) continue;
-    seen.add(row.user_cards.id);
-    cards.push({
+  const ownIds = new Set(ownCards.map((c) => c.userCard.id));
+
+  const bookmarkedCards: PrintableCard[] = bookmarkData
+    .filter((row) => !ownIds.has(row.user_cards.id))
+    .map((row) => ({
       cardPreview: row.card_previews as CardDetails,
       userCard: row.user_cards as UserCard,
-      source: 'bookmarked',
-    });
-  }
+      source: 'bookmarked' as const,
+    }));
+
+  const cards = [...ownCards, ...bookmarkedCards];
 
   return (
     <div className='mb-4 space-y-4'>

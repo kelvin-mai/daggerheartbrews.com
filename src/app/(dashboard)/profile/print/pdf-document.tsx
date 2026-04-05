@@ -3,6 +3,8 @@
 import * as React from 'react';
 import { Document, Page, View, Image, StyleSheet } from '@react-pdf/renderer';
 
+import { chunk } from '@/lib/utils';
+
 // All units in pt (1in = 72pt)
 const CARD_W = 180; // 2.5in
 const CARD_H = 252; // 3.5in
@@ -33,11 +35,6 @@ type PdfDocumentProps = {
   cutLines: boolean;
 };
 
-const chunk = <T,>(arr: T[], size: number): T[][] =>
-  Array.from({ length: Math.ceil(arr.length / size) }, (_, i) =>
-    arr.slice(i * size, i * size + size),
-  );
-
 export const PdfDocument: React.FC<PdfDocumentProps> = ({
   images,
   cutLines,
@@ -47,32 +44,27 @@ export const PdfDocument: React.FC<PdfDocumentProps> = ({
       <Page key={pageIndex} size='LETTER' style={styles.page}>
         <View style={styles.grid}>
           {pageImages.map((src, cellIndex) => {
-            const col = cellIndex % 3;
-            const row = Math.floor(cellIndex / 3);
-            const totalRows = Math.ceil(pageImages.length / 3);
             return (
               <View
                 key={cellIndex}
-                style={[
-                  styles.cell,
-                  cutLines && col < 2
-                    ? {
-                        borderRightWidth: 0.5,
-                        borderRightStyle: 'dashed',
-                        borderRightColor: '#aaa',
-                      }
-                    : {},
-                  cutLines && row < totalRows - 1
-                    ? {
-                        borderBottomWidth: 0.5,
-                        borderBottomStyle: 'dashed',
-                        borderBottomColor: '#aaa',
-                      }
-                    : {},
-                ]}
+                style={[styles.cell, { position: 'relative' }]}
               >
                 {/* eslint-disable-next-line jsx-a11y/alt-text */}
                 <Image src={src} style={styles.image} />
+                {cutLines && (
+                  <View
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      width: CARD_W,
+                      height: CARD_H,
+                      borderWidth: 0.75,
+                      borderStyle: 'dashed',
+                      borderColor: '#555',
+                    }}
+                  />
+                )}
               </View>
             );
           })}

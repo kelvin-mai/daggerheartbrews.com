@@ -14,3 +14,4 @@ export {
   useAudienceSyncActions,
   useAudienceSyncEffects,
 } from './admin/index';
+export { usePrintStore, usePrintActions, usePrintEffects } from './print/index';

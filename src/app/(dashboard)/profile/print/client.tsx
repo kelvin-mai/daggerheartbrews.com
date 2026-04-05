@@ -14,8 +14,8 @@ import {
 } from 'lucide-react';
 
 import type { CardDetails, CardSettings } from '@/lib/types';
-import { captureElementAsDataUrl } from '@/lib/utils/images';
 import { useMounted } from '@/hooks/use-mounted';
+import { usePrintActions, usePrintEffects, usePrintStore } from '@/store';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
@@ -57,36 +57,26 @@ const PdfPreview = React.memo<PdfPreviewProps>(function PdfPreview({
   );
 });
 
-const defaultSettings: CardSettings = {
-  border: true,
-  boldRulesText: true,
-  artist: true,
-  credits: true,
-  placeholderImage: true,
-  resolution: 1,
-};
-
 type PrintCardListItemProps = {
   card: PrintableCard;
   selected: boolean;
-  onToggle: () => void;
   settings: CardSettings;
 };
 
 const PrintCardListItem: React.FC<PrintCardListItemProps> = ({
   card,
   selected,
-  onToggle,
   settings,
 }) => {
   const { cardPreview, userCard } = card;
+  const { toggleCard } = usePrintActions();
 
   return (
     <div className='group bg-background hover:bg-accent/30 flex items-center gap-3 rounded-lg border p-3 transition-colors'>
       <Checkbox
         id={`card-${userCard.id}`}
         checked={selected}
-        onCheckedChange={onToggle}
+        onCheckedChange={() => toggleCard(userCard.id)}
         className='shrink-0'
       />
       <label
@@ -130,59 +120,24 @@ type Props = {
 
 export const PrintSheetClient: React.FC<Props> = ({ cards }) => {
   const mounted = useMounted();
-  const [selectedIds, setSelectedIds] = React.useState<Set<string>>(
-    () => new Set(cards.map((c) => c.userCard.id)),
-  );
-  const [cutLines, setCutLines] = React.useState(true);
-  const [settings, setSettings] = React.useState<CardSettings>(defaultSettings);
-  const [capturing, setCapturing] = React.useState(false);
-  const [pdfSnapshot, setPdfSnapshot] = React.useState<{
-    images: string[];
-    cutLines: boolean;
-  } | null>(null);
+  const { selectedIds, cutLines, settings, capturing, pdfSnapshot } =
+    usePrintStore();
+  const { init, setCutLines, setSettings } = usePrintActions();
+  const { generatePdf, downloadPdf } = usePrintEffects();
 
   const captureRefs = React.useRef<Map<string, HTMLDivElement>>(new Map());
+
+  React.useEffect(() => {
+    init(cards.map((c) => c.userCard.id));
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const ownCards = cards.filter((c) => c.source === 'own');
   const bookmarkedCards = cards.filter((c) => c.source === 'bookmarked');
   const selectedCards = cards.filter((c) => selectedIds.has(c.userCard.id));
 
-  const toggleCard = (id: string) => {
-    setSelectedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  };
-
-  const handleGeneratePdf = async () => {
+  const handleGeneratePdf = () => {
     if (selectedCards.length === 0) return;
-    setCapturing(true);
-    const images: string[] = [];
-    for (const card of selectedCards) {
-      const el = captureRefs.current.get(card.userCard.id);
-      if (!el) continue;
-      images.push(await captureElementAsDataUrl(el));
-    }
-    setPdfSnapshot({ images, cutLines });
-    setCapturing(false);
-  };
-
-  const handleDownload = async () => {
-    const { pdf } = await import('@react-pdf/renderer');
-    const blob = await pdf(
-      <PdfDocument
-        images={pdfSnapshot?.images ?? []}
-        cutLines={pdfSnapshot?.cutLines ?? true}
-      />,
-    ).toBlob();
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'cards.pdf';
-    a.click();
-    URL.revokeObjectURL(url);
+    generatePdf(selectedCards, captureRefs.current);
   };
 
   if (cards.length === 0) {
@@ -233,7 +188,7 @@ export const PrintSheetClient: React.FC<Props> = ({ cards }) => {
             </Button>
           )}
           {pdfSnapshot && !capturing && (
-            <Button size='sm' variant='outline' onClick={handleDownload}>
+            <Button size='sm' variant='outline' onClick={downloadPdf}>
               <Download className='size-4' />
               Download PDF
             </Button>
@@ -272,9 +227,7 @@ export const PrintSheetClient: React.FC<Props> = ({ cards }) => {
               <Switch
                 id='switch-border'
                 checked={settings.border}
-                onCheckedChange={(v) =>
-                  setSettings((s) => ({ ...s, border: v }))
-                }
+                onCheckedChange={(v) => setSettings({ border: v })}
               />
               <span>Card border</span>
             </label>
@@ -285,9 +238,7 @@ export const PrintSheetClient: React.FC<Props> = ({ cards }) => {
               <Switch
                 id='switch-artist'
                 checked={settings.artist}
-                onCheckedChange={(v) =>
-                  setSettings((s) => ({ ...s, artist: v }))
-                }
+                onCheckedChange={(v) => setSettings({ artist: v })}
               />
               <span>Artist name</span>
             </label>
@@ -298,9 +249,7 @@ export const PrintSheetClient: React.FC<Props> = ({ cards }) => {
               <Switch
                 id='switch-credits'
                 checked={settings.credits}
-                onCheckedChange={(v) =>
-                  setSettings((s) => ({ ...s, credits: v }))
-                }
+                onCheckedChange={(v) => setSettings({ credits: v })}
               />
               <span>Credits</span>
             </label>
@@ -351,7 +300,6 @@ export const PrintSheetClient: React.FC<Props> = ({ cards }) => {
                       key={card.userCard.id}
                       card={card}
                       selected={selectedIds.has(card.userCard.id)}
-                      onToggle={() => toggleCard(card.userCard.id)}
                       settings={settings}
                     />
                   ))}
@@ -361,7 +309,6 @@ export const PrintSheetClient: React.FC<Props> = ({ cards }) => {
           </Collapsible>
         )}
 
-        {/* Bookmarks */}
         {bookmarkedCards.length > 0 && (
           <Collapsible
             defaultOpen
@@ -384,7 +331,6 @@ export const PrintSheetClient: React.FC<Props> = ({ cards }) => {
                       key={card.userCard.id}
                       card={card}
                       selected={selectedIds.has(card.userCard.id)}
-                      onToggle={() => toggleCard(card.userCard.id)}
                       settings={settings}
                     />
                   ))}
