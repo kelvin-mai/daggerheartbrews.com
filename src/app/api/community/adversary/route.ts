@@ -30,16 +30,26 @@ export async function GET(request: NextRequest) {
       : 10;
     const tierParam = searchParams.get('tier');
     const roleParam = searchParams.get('role');
+    const typeParam = searchParams.get('type');
     const tiers = tierParam
       ? tierParam
           .split(',')
           .map((t) => Number(t.trim()))
           .filter((n) => !Number.isNaN(n))
       : [];
+    const types = typeParam
+      ? typeParam
+          .split(',')
+          .map((t) => t.trim())
+          .filter(Boolean)
+      : [];
 
     const baseFilter = eq(userAdversaries.public, true);
     const tierFilter = tiers.length
       ? inArray(adversaryPreviews.tier, tiers)
+      : undefined;
+    const typeFilter = types.length
+      ? inArray(adversaryPreviews.type, types)
       : undefined;
     const predefinedRoles = [
       'bruiser',
@@ -90,6 +100,7 @@ export async function GET(request: NextRequest) {
 
     const composedFilters = [baseFilter] as SQL<unknown>[];
     if (tierFilter) composedFilters.push(tierFilter);
+    if (typeFilter) composedFilters.push(typeFilter);
     if (roleFilter) composedFilters.push(roleFilter);
     const whereFilter =
       composedFilters.length === 1 ? baseFilter : and(...composedFilters);

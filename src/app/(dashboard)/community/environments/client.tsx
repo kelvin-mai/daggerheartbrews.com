@@ -6,7 +6,7 @@ import {
   useQueryClient,
   keepPreviousData,
 } from '@tanstack/react-query';
-import { Skull } from 'lucide-react';
+import { Trees } from 'lucide-react';
 
 import type {
   AdversaryDetails,
@@ -31,58 +31,47 @@ type Data = {
   adversaryPreview: AdversaryDetails;
 };
 
-const predefinedRoles = [
-  'bruiser',
-  'horde',
-  'leader',
-  'minion',
-  'ranged',
-  'skulk',
-  'social',
-  'solo',
-  'standard',
-  'support',
-  'custom',
-];
+const subtypes = ['exploration', 'social', 'traversal', 'event'];
 
-const tierOptions: Option[] = [1, 2, 3, 4, 5].map((n) => ({
+const tierOptions: Option[] = [1, 2, 3, 4].map((n) => ({
   value: String(n),
   label: `Tier ${n}`,
 }));
 
-const roleOptions: Option[] = predefinedRoles.map((r) => ({
-  value: r,
-  label: capitalize(r),
+const subtypeOptions: Option[] = subtypes.map((s) => ({
+  value: s,
+  label: capitalize(s),
 }));
 
-async function fetchAdversaries({
+const fetchEnvironments = async ({
   page,
   pageSize,
   tiers,
-  roles,
+  selectedSubtypes,
 }: {
   page: number;
   pageSize: number;
   tiers: number[];
-  roles: string[];
-}): Promise<ApiResponse<Data[], PaginationMeta>> {
+  selectedSubtypes: string[];
+}): Promise<ApiResponse<Data[], PaginationMeta>> => {
   const tierQuery = tiers.length > 0 ? `&tier=${tiers.join(',')}` : '';
-  const rolesQuery = roles.length > 0 ? `&role=${roles.join(',')}` : '';
+  const subtypeQuery =
+    selectedSubtypes.length > 0 ? `&role=${selectedSubtypes.join(',')}` : '';
   const res = await fetch(
-    `/api/community/adversary?page=${page}&page-size=${pageSize}&type=adversary${tierQuery}${rolesQuery}`,
+    `/api/community/adversary?page=${page}&page-size=${pageSize}&type=environment${tierQuery}${subtypeQuery}`,
   );
   return res.json();
-}
+};
 
-export const CommunityAdversaries = () => {
+export const CommunityEnvironments = () => {
   const queryClient = useQueryClient();
   const [currentPage, setCurrentPage] = React.useState(1);
   const [pageSize, setPageSize] = React.useState(10);
   const [selectedTiers, setSelectedTiers] = React.useState<Option[]>([]);
-  const [selectedRoles, setSelectedRoles] = React.useState<Option[]>([]);
+  const [selectedSubtypes, setSelectedSubtypes] = React.useState<Option[]>([]);
 
   const selectedTierValues = selectedTiers.map((o) => Number(o.value));
-  const selectedRoleValues = selectedRoles.map((o) => o.value);
+  const selectedSubtypeValues = selectedSubtypes.map((o) => o.value);
 
   const { data: bookmarksData } = useQuery({
     queryKey: ['bookmarks', 'adversaries'],
@@ -97,23 +86,23 @@ export const CommunityAdversaries = () => {
 
   const { data, isLoading } = useQuery({
     queryKey: [
-      'community-adversaries',
+      'community-environments',
       currentPage,
       pageSize,
       selectedTierValues,
-      selectedRoleValues,
+      selectedSubtypeValues,
     ],
     queryFn: () =>
-      fetchAdversaries({
+      fetchEnvironments({
         page: currentPage,
         pageSize,
         tiers: selectedTierValues,
-        roles: selectedRoleValues,
+        selectedSubtypes: selectedSubtypeValues,
       }),
     placeholderData: keepPreviousData,
   });
 
-  const adversaries = data?.data ?? [];
+  const environments = data?.data ?? [];
   const total = data?.meta.total ?? 0;
 
   if (isLoading) {
@@ -147,14 +136,14 @@ export const CommunityAdversaries = () => {
           }
         />
         <MultipleSelector
-          commandProps={{ label: 'Select Roles' }}
-          defaultOptions={roleOptions}
-          value={selectedRoles}
+          commandProps={{ label: 'Select Subtypes' }}
+          defaultOptions={subtypeOptions}
+          value={selectedSubtypes}
           onChange={(opts) => {
-            setSelectedRoles(opts);
+            setSelectedSubtypes(opts);
             setCurrentPage(1);
           }}
-          placeholder='Filter by role'
+          placeholder='Filter by subtype'
           emptyIndicator={
             <p className='text-muted-foreground text-center text-sm'>
               No results
@@ -162,13 +151,13 @@ export const CommunityAdversaries = () => {
           }
         />
       </div>
-      {adversaries.map((adversary) => (
+      {environments.map((env) => (
         <CommunityAdversary
-          key={adversary.userAdversary.id}
-          adversaryPreview={adversary.adversaryPreview}
-          user={adversary.user}
-          userAdversary={adversary.userAdversary}
-          isBookmarked={bookmarkedIds.has(adversary.userAdversary.id)}
+          key={env.userAdversary.id}
+          adversaryPreview={env.adversaryPreview}
+          user={env.user}
+          userAdversary={env.userAdversary}
+          isBookmarked={bookmarkedIds.has(env.userAdversary.id)}
           onBookmarkToggle={() =>
             queryClient.invalidateQueries({
               queryKey: ['bookmarks', 'adversaries'],
@@ -176,7 +165,7 @@ export const CommunityAdversaries = () => {
           }
         />
       ))}
-      {adversaries.length > 0 ? (
+      {environments.length > 0 ? (
         <Pagination
           className='justify-end'
           currentPage={currentPage}
@@ -197,12 +186,12 @@ export const CommunityAdversaries = () => {
       ) : (
         <div className='bg-card flex flex-col items-center gap-3 rounded-lg border py-12 text-center'>
           <div className='bg-muted flex size-12 items-center justify-center rounded-full'>
-            <Skull className='text-muted-foreground size-6' />
+            <Trees className='text-muted-foreground size-6' />
           </div>
           <div>
-            <p className='font-medium'>No public adversaries yet</p>
+            <p className='font-medium'>No public environments yet</p>
             <p className='text-muted-foreground text-sm'>
-              There are currently no public adversaries. Please check back
+              There are currently no public environments. Please check back
               later.
             </p>
           </div>

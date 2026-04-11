@@ -159,6 +159,54 @@ describe('GET /api/community/adversary', () => {
     expect(json.success).toBe(true);
   });
 
+  it('applies type filter from comma-separated query param', async () => {
+    setupDb(1, mockRows);
+
+    const res = await GET(makeReq({ type: 'adversary,environment' }));
+    const json = await res.json();
+
+    expect(json.success).toBe(true);
+    expect(json.meta.total).toBe(1);
+  });
+
+  it('applies single type filter', async () => {
+    setupDb(1, mockRows);
+
+    const res = await GET(makeReq({ type: 'environment' }));
+    const json = await res.json();
+
+    expect(json.success).toBe(true);
+    expect(json.meta.total).toBe(1);
+  });
+
+  it('skips type filter when type param is absent', async () => {
+    setupDb(1, mockRows);
+
+    const res = await GET(makeReq());
+    const json = await res.json();
+
+    expect(json.success).toBe(true);
+    expect(json.meta.total).toBe(1);
+  });
+
+  it('ignores empty values in type filter', async () => {
+    setupDb(1, mockRows);
+
+    const res = await GET(makeReq({ type: ',,' }));
+    const json = await res.json();
+
+    expect(json.success).toBe(true);
+  });
+
+  it('handles combined type and tier filters', async () => {
+    setupDb(1, mockRows);
+
+    const res = await GET(makeReq({ type: 'environment', tier: '1,2' }));
+    const json = await res.json();
+
+    expect(json.success).toBe(true);
+  });
+
   it('returns 500 on db error', async () => {
     vi.mocked(db.select).mockReturnValueOnce({
       from: vi.fn().mockReturnThis(),

@@ -31,6 +31,10 @@ export const nav: NavCategory[] = [
         name: 'Adversaries',
         url: '/community/adversaries',
       },
+      {
+        name: 'Environments',
+        url: '/community/environments',
+      },
     ],
   },
   {

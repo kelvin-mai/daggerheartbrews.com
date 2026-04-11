@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { eq } from 'drizzle-orm';
-import { Bookmark, Layers, Printer, Skull } from 'lucide-react';
+import { Bookmark, Layers, Printer, Skull, Trees } from 'lucide-react';
 
 import type {
   AdversaryDetails,
@@ -45,7 +45,7 @@ export default async function Page() {
     .innerJoin(users, eq(userCards.userId, users.id))
     .where(eq(userCardBookmarks.userId, session.user.id));
 
-  const adversaryData = await db
+  const allAdversaryData = await db
     .select()
     .from(userAdversaryBookmarks)
     .innerJoin(
@@ -59,7 +59,14 @@ export default async function Page() {
     .innerJoin(users, eq(userAdversaries.userId, users.id))
     .where(eq(userAdversaryBookmarks.userId, session.user.id));
 
-  const totalBookmarks = cardData.length + adversaryData.length;
+  const adversaryData = allAdversaryData.filter(
+    (d) => d.adversary_previews.type === 'adversary',
+  );
+  const environmentData = allAdversaryData.filter(
+    (d) => d.adversary_previews.type === 'environment',
+  );
+
+  const totalBookmarks = cardData.length + allAdversaryData.length;
 
   return (
     <div className='mb-4 space-y-4'>
@@ -75,7 +82,7 @@ export default async function Page() {
           </Link>
         </Button>
       </div>
-      <div className='grid grid-cols-3 gap-3'>
+      <div className='grid grid-cols-2 gap-3 sm:grid-cols-4'>
         <div className='bg-card rounded-lg border p-3 text-center'>
           <p className='text-muted-foreground text-xs font-medium tracking-wider uppercase'>
             Total
@@ -93,6 +100,14 @@ export default async function Page() {
             Adversaries
           </p>
           <p className='font-eveleth-clean text-2xl'>{adversaryData.length}</p>
+        </div>
+        <div className='bg-card rounded-lg border p-3 text-center'>
+          <p className='text-muted-foreground text-xs font-medium tracking-wider uppercase'>
+            Environments
+          </p>
+          <p className='font-eveleth-clean text-2xl'>
+            {environmentData.length}
+          </p>
         </div>
       </div>
 
@@ -185,6 +200,57 @@ export default async function Page() {
                 </div>
                 <Button asChild size='sm'>
                   <Link href='/community/adversaries'>Browse Adversaries</Link>
+                </Button>
+              </div>
+            )}
+          </div>
+        </CollapsibleContent>
+      </Collapsible>
+
+      <Collapsible
+        defaultOpen
+        className='bg-card group/collapsible rounded-lg border'
+      >
+        <CollapsibleSectionTrigger>
+          <div className='bg-primary/10 text-primary dark:bg-sidebar dark:text-primary-foreground flex size-8 shrink-0 items-center justify-center rounded-md'>
+            <Trees className='size-4' />
+          </div>
+          <Label className='font-eveleth-clean text-sm'>Environments</Label>
+          <Badge variant='secondary' className='ml-1'>
+            {environmentData.length}
+          </Badge>
+        </CollapsibleSectionTrigger>
+        <CollapsibleContent>
+          <div className='border-t px-4 py-3'>
+            {environmentData.length > 0 ? (
+              <div className='space-y-3'>
+                {environmentData.map((data) => (
+                  <CommunityAdversary
+                    key={data.user_adversary_bookmarks.id}
+                    adversaryPreview={
+                      data.adversary_previews as AdversaryDetails
+                    }
+                    userAdversary={data.user_adversaries as UserAdversary}
+                    user={data.users as User}
+                    isBookmarked
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className='flex flex-col items-center gap-3 py-8 text-center'>
+                <div className='bg-muted flex size-12 items-center justify-center rounded-full'>
+                  <Bookmark className='text-muted-foreground size-6' />
+                </div>
+                <div>
+                  <p className='font-medium'>No bookmarked environments</p>
+                  <p className='text-muted-foreground text-sm'>
+                    Browse community environments and save ones you like
+                  </p>
+                </div>
+                <Button asChild size='sm'>
+                  <Link href='/community/environments'>
+                    Browse Environments
+                  </Link>
                 </Button>
               </div>
             )}

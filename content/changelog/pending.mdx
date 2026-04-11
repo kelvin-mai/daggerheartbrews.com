@@ -8,11 +8,17 @@ title: 'Pending'
 
 - **Print Sheet** — select cards from your collection and bookmarks, preview them in a print-ready PDF, and download a letter-sized sheet with 9 cards per page in a 3×3 grid at standard trading card size. Optional cut lines and card settings (border, artist name, credits) are configurable before downloading.
 - **Bookmarks** — bookmark community cards and adversaries to your profile for quick access and printing ([#23](https://github.com/YOUR_USERNAME/daggerheart-brews/pull/23)).
+- **Community Environments** — browse homebrew environments shared by the community, with filters for tier and environment subtype (exploration, social, traversal, event).
+
+## Improved
+
+- **Homebrew and Bookmarks pages** — adversaries and environments are now shown in separate sections instead of a single combined list, each with their own count in the stats summary.
 
 ## Fixed
 
 - Uploaded images are no longer cropped to a square — the crop area now matches the card's rectangular image region.
 - Class card divider now shows the class name instead of the generic label "CLASS" ([#22](https://github.com/YOUR_USERNAME/daggerheart-brews/pull/22)).
+- Sidebar session state no longer causes a hydration mismatch on first load.
 
 ## Internal
 
@@ -21,3 +27,5 @@ title: 'Pending'
 - Card `<img>` in `preview/index.tsx` now has `h-[73.53cqw]` so `object-cover` renders at a consistent height.
 - Local development no longer requires third-party accounts (Google, Discord, Resend) to be configured ([#21](https://github.com/YOUR_USERNAME/daggerheart-brews/pull/21)).
 - Print sheet uses `@react-pdf/renderer` to generate a deterministic PDF from card PNG captures via `@jpinsonneau/html-to-image`.
+- Removed `nodemailer` dependency; email transport is handled solely by Resend.
+- Auth proxy matcher updated to correctly scope protected routes.

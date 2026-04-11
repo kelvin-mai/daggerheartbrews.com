@@ -1,11 +1,3 @@
-/**
- * Tests for using other users' public cards/adversaries as templates.
- *
- * Each describe block creates a public item in setup, runs the feature tests,
- * then deletes the item in cleanup. Tests run serially so the shared items
- * are available to all tests within the block.
- */
-
 import { test, expect } from '@playwright/test';
 
 import { getItemRow } from './fixtures';
