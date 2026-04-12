@@ -10,15 +10,27 @@ const generatePdf =
   async (selectedCards, captureRefs) => {
     set({ capturing: true });
     const { cutLines } = get();
-    const images = (
-      await Promise.all(
-        selectedCards.map((card) => {
-          const el = captureRefs.get(card.userCard.id);
-          return el ? captureElementAsDataUrl(el) : null;
-        }),
-      )
-    ).filter((img): img is string => img !== null);
-    set({ pdfSnapshot: { images, cutLines }, capturing: false });
+
+    const captureTimeout = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error('PDF generation timed out')), 15_000),
+    );
+
+    try {
+      const images = (
+        await Promise.race([
+          Promise.all(
+            selectedCards.map((card) => {
+              const el = captureRefs.get(card.userCard.id);
+              return el ? captureElementAsDataUrl(el) : null;
+            }),
+          ),
+          captureTimeout,
+        ])
+      ).filter((img): img is string => img !== null);
+      set({ pdfSnapshot: { images, cutLines }, capturing: false });
+    } catch {
+      set({ capturing: false });
+    }
   };
 
 const downloadPdf =

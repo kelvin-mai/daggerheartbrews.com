@@ -344,7 +344,7 @@ export const PrintSheetClient: React.FC<Props> = ({ cards }) => {
       {/* Hidden capture container */}
       <div
         aria-hidden
-        className='pointer-events-none fixed top-0 left-0 z-[-9999] opacity-0'
+        className='pointer-events-none fixed top-0 left-[-9999px]'
       >
         {selectedCards.map((card) => (
           <div

@@ -60,6 +60,8 @@ const inlineImages = async (element: HTMLElement): Promise<() => void> => {
   return () => restores.forEach((r) => r());
 };
 
+const CAPTURE_TIMEOUT_MS = 10_000;
+
 export const captureElementAsDataUrl = async (
   element: HTMLElement,
   pixelRatio = 3,
@@ -68,8 +70,18 @@ export const captureElementAsDataUrl = async (
 
   const restoreImages = await inlineImages(element);
 
+  const timeout = new Promise<never>((_, reject) =>
+    setTimeout(
+      () => reject(new Error('captureElementAsDataUrl timed out')),
+      CAPTURE_TIMEOUT_MS,
+    ),
+  );
+
   try {
-    return await toPng(element, { cacheBust: false, pixelRatio });
+    return await Promise.race([
+      toPng(element, { cacheBust: false, pixelRatio }),
+      timeout,
+    ]);
   } finally {
     restoreImages();
   }
