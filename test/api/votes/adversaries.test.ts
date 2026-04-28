@@ -1,0 +1,98 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+
+vi.mock('@/lib/auth', () => ({
+  auth: { api: { getSession: vi.fn() } },
+}));
+
+vi.mock('@/lib/database', () => ({
+  db: { select: vi.fn() },
+}));
+
+vi.mock('next/headers', () => ({
+  headers: vi.fn().mockResolvedValue(new Headers()),
+}));
+
+import { GET } from '@/app/api/votes/adversaries/route';
+import { auth } from '@/lib/auth';
+import { db } from '@/lib/database';
+
+type GetSessionResult = Awaited<ReturnType<typeof auth.api.getSession>>;
+type DbSelectResult = ReturnType<(typeof db)['select']>;
+
+const mockSession = { user: { id: 'user-1', email: 'user@example.com' } };
+
+const ADV_ID_1 = '00000000-0000-0000-0000-000000000001';
+const ADV_ID_2 = '00000000-0000-0000-0000-000000000002';
+
+const makeSelectChain = (resolveValue: unknown) =>
+  ({
+    from: vi.fn().mockReturnThis(),
+    where: vi.fn().mockResolvedValueOnce(resolveValue),
+  }) as unknown as DbSelectResult;
+
+describe('GET /api/votes/adversaries', () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it('returns empty votes object when no session', async () => {
+    vi.mocked(auth.api.getSession).mockResolvedValueOnce(null);
+
+    const res = await GET();
+    const json = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(json.data.votes).toEqual({});
+    expect(json.error).toBeNull();
+  });
+
+  it('returns vote map for authenticated user', async () => {
+    vi.mocked(auth.api.getSession).mockResolvedValueOnce(
+      mockSession as unknown as GetSessionResult,
+    );
+    vi.mocked(db.select).mockReturnValueOnce(
+      makeSelectChain([
+        { userAdversaryId: ADV_ID_1, vote: 'up' },
+        { userAdversaryId: ADV_ID_2, vote: 'down' },
+      ]),
+    );
+
+    const res = await GET();
+    const json = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(json.data.votes).toEqual({
+      [ADV_ID_1]: 'up',
+      [ADV_ID_2]: 'down',
+    });
+    expect(json.error).toBeNull();
+  });
+
+  it('returns empty votes when user has not voted on anything', async () => {
+    vi.mocked(auth.api.getSession).mockResolvedValueOnce(
+      mockSession as unknown as GetSessionResult,
+    );
+    vi.mocked(db.select).mockReturnValueOnce(makeSelectChain([]));
+
+    const res = await GET();
+    const json = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(json.data.votes).toEqual({});
+  });
+
+  it('returns 500 on db error', async () => {
+    vi.mocked(auth.api.getSession).mockResolvedValueOnce(
+      mockSession as unknown as GetSessionResult,
+    );
+    vi.mocked(db.select).mockReturnValueOnce({
+      from: vi.fn().mockReturnThis(),
+      where: vi.fn().mockRejectedValueOnce(new Error('DB connection failed')),
+    } as unknown as DbSelectResult);
+
+    const res = await GET();
+    const json = await res.json();
+
+    expect(res.status).toBe(500);
+    expect(json.data).toBeNull();
+    expect(json.error).toBeDefined();
+  });
+});

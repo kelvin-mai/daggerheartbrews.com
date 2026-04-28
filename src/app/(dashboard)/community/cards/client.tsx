@@ -22,7 +22,7 @@ import {
   PaginationPageSizeDropdown,
 } from '@/components/common';
 import { Skeleton } from '@/components/ui/skeleton';
-import { CommunityCard } from '@/components/post';
+import { CommunityCard, SortTabs, type SortMode } from '@/components/post';
 import { cardTypes } from '@/lib/types/card-creation';
 import { capitalize } from '@/lib/utils';
 
@@ -37,14 +37,16 @@ async function fetchCards({
   page,
   pageSize,
   types,
+  sort,
 }: {
   page: number;
   pageSize: number;
   types: string[];
+  sort: SortMode;
 }): Promise<ApiResponse<Data[], PaginationMeta>> {
   const typeQuery = types.length > 0 ? `&type=${types.join(',')}` : '';
   const res = await fetch(
-    `/api/community/cards?page=${page}&page-size=${pageSize}${typeQuery}`,
+    `/api/community/cards?page=${page}&page-size=${pageSize}&sort=${sort}${typeQuery}`,
   );
   return res.json();
 }
@@ -54,6 +56,7 @@ export const CommunityCards = () => {
   const [currentPage, setCurrentPage] = React.useState(1);
   const [pageSize, setPageSize] = React.useState(10);
   const [selectedTypes, setSelectedTypes] = React.useState<Option[]>([]);
+  const [sort, setSort] = React.useState<SortMode>('hot');
 
   const selectedTypeValues = selectedTypes.map((o) => o.value);
 
@@ -66,12 +69,33 @@ export const CommunityCards = () => {
     staleTime: 60_000,
   });
 
+  const { data: votesData } = useQuery({
+    queryKey: ['votes', 'cards'],
+    queryFn: () =>
+      fetch('/api/votes/cards').then((r) => r.json()) as Promise<{
+        data: { votes: Record<string, 'up' | 'down'> } | null;
+      }>,
+    staleTime: 60_000,
+  });
+
   const bookmarkedIds = new Set(bookmarksData?.data?.ids ?? []);
+  const userVotes = votesData?.data?.votes ?? {};
 
   const { data, isLoading } = useQuery({
-    queryKey: ['community-cards', currentPage, pageSize, selectedTypeValues],
+    queryKey: [
+      'community-cards',
+      currentPage,
+      pageSize,
+      selectedTypeValues,
+      sort,
+    ],
     queryFn: () =>
-      fetchCards({ page: currentPage, pageSize, types: selectedTypeValues }),
+      fetchCards({
+        page: currentPage,
+        pageSize,
+        types: selectedTypeValues,
+        sort,
+      }),
     placeholderData: keepPreviousData,
   });
 
@@ -92,7 +116,14 @@ export const CommunityCards = () => {
 
   return (
     <div className='mb-2 space-y-2'>
-      <div className='mb-6'>
+      <div className='mb-6 space-y-3'>
+        <SortTabs
+          value={sort}
+          onChange={(s) => {
+            setSort(s);
+            setCurrentPage(1);
+          }}
+        />
         <MultipleSelector
           commandProps={{ label: 'Select Types' }}
           defaultOptions={typeOptions}
@@ -118,6 +149,10 @@ export const CommunityCards = () => {
           isBookmarked={bookmarkedIds.has(card.userCard.id)}
           onBookmarkToggle={() =>
             queryClient.invalidateQueries({ queryKey: ['bookmarks', 'cards'] })
+          }
+          userVote={userVotes[card.userCard.id] ?? null}
+          onVoteToggle={() =>
+            queryClient.invalidateQueries({ queryKey: ['votes', 'cards'] })
           }
         />
       ))}

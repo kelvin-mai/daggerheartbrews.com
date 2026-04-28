@@ -22,7 +22,7 @@ import {
   PaginationPageSizeDropdown,
 } from '@/components/common';
 import { Skeleton } from '@/components/ui/skeleton';
-import { CommunityAdversary } from '@/components/post';
+import { CommunityAdversary, SortTabs, type SortMode } from '@/components/post';
 import { capitalize } from '@/lib/utils';
 
 type Data = {
@@ -48,17 +48,19 @@ const fetchEnvironments = async ({
   pageSize,
   tiers,
   selectedSubtypes,
+  sort,
 }: {
   page: number;
   pageSize: number;
   tiers: number[];
   selectedSubtypes: string[];
+  sort: SortMode;
 }): Promise<ApiResponse<Data[], PaginationMeta>> => {
   const tierQuery = tiers.length > 0 ? `&tier=${tiers.join(',')}` : '';
   const subtypeQuery =
     selectedSubtypes.length > 0 ? `&role=${selectedSubtypes.join(',')}` : '';
   const res = await fetch(
-    `/api/community/adversary?page=${page}&page-size=${pageSize}&type=environment${tierQuery}${subtypeQuery}`,
+    `/api/community/adversary?page=${page}&page-size=${pageSize}&type=environment&sort=${sort}${tierQuery}${subtypeQuery}`,
   );
   return res.json();
 };
@@ -69,6 +71,7 @@ export const CommunityEnvironments = () => {
   const [pageSize, setPageSize] = React.useState(10);
   const [selectedTiers, setSelectedTiers] = React.useState<Option[]>([]);
   const [selectedSubtypes, setSelectedSubtypes] = React.useState<Option[]>([]);
+  const [sort, setSort] = React.useState<SortMode>('hot');
 
   const selectedTierValues = selectedTiers.map((o) => Number(o.value));
   const selectedSubtypeValues = selectedSubtypes.map((o) => o.value);
@@ -82,7 +85,17 @@ export const CommunityEnvironments = () => {
     staleTime: 60_000,
   });
 
+  const { data: votesData } = useQuery({
+    queryKey: ['votes', 'adversaries'],
+    queryFn: () =>
+      fetch('/api/votes/adversaries').then((r) => r.json()) as Promise<{
+        data: { votes: Record<string, 'up' | 'down'> } | null;
+      }>,
+    staleTime: 60_000,
+  });
+
   const bookmarkedIds = new Set(bookmarksData?.data?.ids ?? []);
+  const userVotes = votesData?.data?.votes ?? {};
 
   const { data, isLoading } = useQuery({
     queryKey: [
@@ -91,6 +104,7 @@ export const CommunityEnvironments = () => {
       pageSize,
       selectedTierValues,
       selectedSubtypeValues,
+      sort,
     ],
     queryFn: () =>
       fetchEnvironments({
@@ -98,6 +112,7 @@ export const CommunityEnvironments = () => {
         pageSize,
         tiers: selectedTierValues,
         selectedSubtypes: selectedSubtypeValues,
+        sort,
       }),
     placeholderData: keepPreviousData,
   });
@@ -119,37 +134,46 @@ export const CommunityEnvironments = () => {
 
   return (
     <div className='mb-2 space-y-2'>
-      <div className='mb-6 grid grid-cols-2 gap-2'>
-        <MultipleSelector
-          commandProps={{ label: 'Select Tiers' }}
-          defaultOptions={tierOptions}
-          value={selectedTiers}
-          onChange={(opts) => {
-            setSelectedTiers(opts);
+      <div className='mb-6 space-y-3'>
+        <SortTabs
+          value={sort}
+          onChange={(s) => {
+            setSort(s);
             setCurrentPage(1);
           }}
-          placeholder='Filter by tier'
-          emptyIndicator={
-            <p className='text-muted-foreground text-center text-sm'>
-              No results
-            </p>
-          }
         />
-        <MultipleSelector
-          commandProps={{ label: 'Select Subtypes' }}
-          defaultOptions={subtypeOptions}
-          value={selectedSubtypes}
-          onChange={(opts) => {
-            setSelectedSubtypes(opts);
-            setCurrentPage(1);
-          }}
-          placeholder='Filter by subtype'
-          emptyIndicator={
-            <p className='text-muted-foreground text-center text-sm'>
-              No results
-            </p>
-          }
-        />
+        <div className='grid grid-cols-2 gap-2'>
+          <MultipleSelector
+            commandProps={{ label: 'Select Tiers' }}
+            defaultOptions={tierOptions}
+            value={selectedTiers}
+            onChange={(opts) => {
+              setSelectedTiers(opts);
+              setCurrentPage(1);
+            }}
+            placeholder='Filter by tier'
+            emptyIndicator={
+              <p className='text-muted-foreground text-center text-sm'>
+                No results
+              </p>
+            }
+          />
+          <MultipleSelector
+            commandProps={{ label: 'Select Subtypes' }}
+            defaultOptions={subtypeOptions}
+            value={selectedSubtypes}
+            onChange={(opts) => {
+              setSelectedSubtypes(opts);
+              setCurrentPage(1);
+            }}
+            placeholder='Filter by subtype'
+            emptyIndicator={
+              <p className='text-muted-foreground text-center text-sm'>
+                No results
+              </p>
+            }
+          />
+        </div>
       </div>
       {environments.map((env) => (
         <CommunityAdversary
@@ -161,6 +185,12 @@ export const CommunityEnvironments = () => {
           onBookmarkToggle={() =>
             queryClient.invalidateQueries({
               queryKey: ['bookmarks', 'adversaries'],
+            })
+          }
+          userVote={userVotes[env.userAdversary.id] ?? null}
+          onVoteToggle={() =>
+            queryClient.invalidateQueries({
+              queryKey: ['votes', 'adversaries'],
             })
           }
         />

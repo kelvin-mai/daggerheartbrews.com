@@ -1,4 +1,4 @@
-import { and, desc, count, eq, inArray } from 'drizzle-orm';
+import { and, desc, count, eq, inArray, sql } from 'drizzle-orm';
 import { NextResponse, type NextRequest } from 'next/server';
 
 import { db } from '@/lib/database';
@@ -14,6 +14,7 @@ export async function GET(request: NextRequest) {
     const pageSize = searchParams.get('page-size')
       ? Number(searchParams.get('page-size'))
       : 10;
+    const sortParam = searchParams.get('sort') ?? 'hot';
     const typeParam = searchParams.get('type');
     const types = typeParam
       ? typeParam
@@ -43,7 +44,15 @@ export async function GET(request: NextRequest) {
       .leftJoin(users, eq(userCards.userId, users.id))
       .leftJoin(cardPreviews, eq(userCards.cardPreviewId, cardPreviews.id))
       .where(whereFilter)
-      .orderBy(desc(userCards.createdAt))
+      .orderBy(
+        sortParam === 'top'
+          ? desc(sql`${userCards.upvotes} - ${userCards.downvotes}`)
+          : sortParam === 'new'
+            ? desc(userCards.createdAt)
+            : desc(
+                sql`(${userCards.upvotes} - ${userCards.downvotes}) / POWER(EXTRACT(EPOCH FROM (NOW() - ${userCards.createdAt})) / 3600.0 + 2, 1.8)`,
+              ),
+      )
       .limit(pageSize)
       .offset((page - 1) * pageSize);
     return NextResponse.json(

@@ -221,4 +221,47 @@ describe('GET /api/community/adversary', () => {
     expect(json.success).toBe(false);
     expect(json.error.message).toBe('connection refused');
   });
+
+  it('accepts sort=hot and returns results', async () => {
+    setupDb(1, mockRows);
+
+    const res = await GET(makeReq({ sort: 'hot' }));
+    const json = await res.json();
+
+    expect(res.status).toBe(201);
+    expect(json.success).toBe(true);
+    expect(json.data).toHaveLength(1);
+  });
+
+  it('accepts sort=new and returns results', async () => {
+    setupDb(1, mockRows);
+
+    const res = await GET(makeReq({ sort: 'new' }));
+    const json = await res.json();
+
+    expect(res.status).toBe(201);
+    expect(json.success).toBe(true);
+    expect(json.data).toHaveLength(1);
+  });
+
+  it('accepts sort=top and returns results', async () => {
+    setupDb(1, mockRows);
+
+    const res = await GET(makeReq({ sort: 'top' }));
+    const json = await res.json();
+
+    expect(res.status).toBe(201);
+    expect(json.success).toBe(true);
+    expect(json.data).toHaveLength(1);
+  });
+
+  it('defaults to hot sort when sort param is absent', async () => {
+    setupDb(1, mockRows);
+
+    const res = await GET(makeReq());
+    const json = await res.json();
+
+    expect(res.status).toBe(201);
+    expect(json.success).toBe(true);
+  });
 });

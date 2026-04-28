@@ -22,7 +22,7 @@ import {
   PaginationPageSizeDropdown,
 } from '@/components/common';
 import { Skeleton } from '@/components/ui/skeleton';
-import { CommunityAdversary } from '@/components/post';
+import { CommunityAdversary, SortTabs, type SortMode } from '@/components/post';
 import { capitalize } from '@/lib/utils';
 
 type Data = {
@@ -60,16 +60,18 @@ async function fetchAdversaries({
   pageSize,
   tiers,
   roles,
+  sort,
 }: {
   page: number;
   pageSize: number;
   tiers: number[];
   roles: string[];
+  sort: SortMode;
 }): Promise<ApiResponse<Data[], PaginationMeta>> {
   const tierQuery = tiers.length > 0 ? `&tier=${tiers.join(',')}` : '';
   const rolesQuery = roles.length > 0 ? `&role=${roles.join(',')}` : '';
   const res = await fetch(
-    `/api/community/adversary?page=${page}&page-size=${pageSize}&type=adversary${tierQuery}${rolesQuery}`,
+    `/api/community/adversary?page=${page}&page-size=${pageSize}&type=adversary&sort=${sort}${tierQuery}${rolesQuery}`,
   );
   return res.json();
 }
@@ -80,6 +82,7 @@ export const CommunityAdversaries = () => {
   const [pageSize, setPageSize] = React.useState(10);
   const [selectedTiers, setSelectedTiers] = React.useState<Option[]>([]);
   const [selectedRoles, setSelectedRoles] = React.useState<Option[]>([]);
+  const [sort, setSort] = React.useState<SortMode>('hot');
 
   const selectedTierValues = selectedTiers.map((o) => Number(o.value));
   const selectedRoleValues = selectedRoles.map((o) => o.value);
@@ -93,7 +96,17 @@ export const CommunityAdversaries = () => {
     staleTime: 60_000,
   });
 
+  const { data: votesData } = useQuery({
+    queryKey: ['votes', 'adversaries'],
+    queryFn: () =>
+      fetch('/api/votes/adversaries').then((r) => r.json()) as Promise<{
+        data: { votes: Record<string, 'up' | 'down'> } | null;
+      }>,
+    staleTime: 60_000,
+  });
+
   const bookmarkedIds = new Set(bookmarksData?.data?.ids ?? []);
+  const userVotes = votesData?.data?.votes ?? {};
 
   const { data, isLoading } = useQuery({
     queryKey: [
@@ -102,6 +115,7 @@ export const CommunityAdversaries = () => {
       pageSize,
       selectedTierValues,
       selectedRoleValues,
+      sort,
     ],
     queryFn: () =>
       fetchAdversaries({
@@ -109,6 +123,7 @@ export const CommunityAdversaries = () => {
         pageSize,
         tiers: selectedTierValues,
         roles: selectedRoleValues,
+        sort,
       }),
     placeholderData: keepPreviousData,
   });
@@ -130,37 +145,46 @@ export const CommunityAdversaries = () => {
 
   return (
     <div className='mb-2 space-y-2'>
-      <div className='mb-6 grid grid-cols-2 gap-2'>
-        <MultipleSelector
-          commandProps={{ label: 'Select Tiers' }}
-          defaultOptions={tierOptions}
-          value={selectedTiers}
-          onChange={(opts) => {
-            setSelectedTiers(opts);
+      <div className='mb-6 space-y-3'>
+        <SortTabs
+          value={sort}
+          onChange={(s) => {
+            setSort(s);
             setCurrentPage(1);
           }}
-          placeholder='Filter by tier'
-          emptyIndicator={
-            <p className='text-muted-foreground text-center text-sm'>
-              No results
-            </p>
-          }
         />
-        <MultipleSelector
-          commandProps={{ label: 'Select Roles' }}
-          defaultOptions={roleOptions}
-          value={selectedRoles}
-          onChange={(opts) => {
-            setSelectedRoles(opts);
-            setCurrentPage(1);
-          }}
-          placeholder='Filter by role'
-          emptyIndicator={
-            <p className='text-muted-foreground text-center text-sm'>
-              No results
-            </p>
-          }
-        />
+        <div className='grid grid-cols-2 gap-2'>
+          <MultipleSelector
+            commandProps={{ label: 'Select Tiers' }}
+            defaultOptions={tierOptions}
+            value={selectedTiers}
+            onChange={(opts) => {
+              setSelectedTiers(opts);
+              setCurrentPage(1);
+            }}
+            placeholder='Filter by tier'
+            emptyIndicator={
+              <p className='text-muted-foreground text-center text-sm'>
+                No results
+              </p>
+            }
+          />
+          <MultipleSelector
+            commandProps={{ label: 'Select Roles' }}
+            defaultOptions={roleOptions}
+            value={selectedRoles}
+            onChange={(opts) => {
+              setSelectedRoles(opts);
+              setCurrentPage(1);
+            }}
+            placeholder='Filter by role'
+            emptyIndicator={
+              <p className='text-muted-foreground text-center text-sm'>
+                No results
+              </p>
+            }
+          />
+        </div>
       </div>
       {adversaries.map((adversary) => (
         <CommunityAdversary
@@ -172,6 +196,12 @@ export const CommunityAdversaries = () => {
           onBookmarkToggle={() =>
             queryClient.invalidateQueries({
               queryKey: ['bookmarks', 'adversaries'],
+            })
+          }
+          userVote={userVotes[adversary.userAdversary.id] ?? null}
+          onVoteToggle={() =>
+            queryClient.invalidateQueries({
+              queryKey: ['votes', 'adversaries'],
             })
           }
         />

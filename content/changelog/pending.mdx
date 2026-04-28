@@ -9,10 +9,17 @@ title: 'Pending'
 - **Print Sheet** — select cards from your collection and bookmarks, preview them in a print-ready PDF, and download a letter-sized sheet with 9 cards per page in a 3×3 grid at standard trading card size. Optional cut lines and card settings (border, artist name, credits) are configurable before downloading.
 - **Bookmarks** — bookmark community cards and adversaries to your profile for quick access and printing ([#23](https://github.com/YOUR_USERNAME/daggerheart-brews/pull/23)).
 - **Community Environments** — browse homebrew environments shared by the community, with filters for tier and environment subtype (exploration, social, traversal, event).
+- **Community Voting** — upvote or downvote community cards, adversaries, and environments; vote counts are tallied and your vote is remembered across sessions.
+- **Community Sorting** — sort community pages by Hot (score + recency), New, or Top using the sort tabs above each list.
+
+## Redesigned
+
+- **Community post cards** — each post now shows the vote widget on the right and exposes bookmark, preview, and "use as template" as icon buttons with tooltips at the bottom-left of the card, replacing the previous inline row and dropdown.
 
 ## Improved
 
 - **Homebrew and Bookmarks pages** — adversaries and environments are now shown in separate sections instead of a single combined list, each with their own count in the stats summary.
+- **Print Sheet** — PDF generation now surfaces errors clearly when a card fails to render instead of silently producing a blank page.
 
 ## Fixed
 
@@ -29,3 +36,7 @@ title: 'Pending'
 - Print sheet uses `@react-pdf/renderer` to generate a deterministic PDF from card PNG captures via `@jpinsonneau/html-to-image`.
 - Removed `nodemailer` dependency; email transport is handled solely by Resend.
 - Auth proxy matcher updated to correctly scope protected routes.
+- Added `upvotes` and `downvotes` integer columns to `user_cards` and `user_adversaries`; added `user_card_votes` and `user_adversary_votes` tables to track per-user votes (migration `0011_votes.sql`).
+- Community API routes (`/api/community/cards`, `/api/community/adversary`) now accept a `sort` query param (`hot` | `new` | `top`) using a time-decay hot score computed in Postgres.
+- Added `/api/votes/cards` and `/api/votes/adversaries` read endpoints returning the current user's vote map.
+- `ResponsiveDialog` now accepts an optional `icon` prop; when provided the trigger renders as an icon-only button with a Radix tooltip, composing `TooltipTrigger asChild` over `DialogTrigger asChild`.

@@ -7,6 +7,7 @@ import {
   notInArray,
   or,
   ne,
+  sql,
   type SQL,
 } from 'drizzle-orm';
 import { NextResponse, type NextRequest } from 'next/server';
@@ -28,6 +29,7 @@ export async function GET(request: NextRequest) {
     const pageSize = searchParams.get('page-size')
       ? Number(searchParams.get('page-size'))
       : 10;
+    const sortParam = searchParams.get('sort') ?? 'hot';
     const tierParam = searchParams.get('tier');
     const roleParam = searchParams.get('role');
     const typeParam = searchParams.get('type');
@@ -124,7 +126,15 @@ export async function GET(request: NextRequest) {
         eq(userAdversaries.adversaryPreviewId, adversaryPreviews.id),
       )
       .where(whereFilter)
-      .orderBy(desc(userAdversaries.createdAt))
+      .orderBy(
+        sortParam === 'top'
+          ? desc(sql`${userAdversaries.upvotes} - ${userAdversaries.downvotes}`)
+          : sortParam === 'new'
+            ? desc(userAdversaries.createdAt)
+            : desc(
+                sql`(${userAdversaries.upvotes} - ${userAdversaries.downvotes}) / POWER(EXTRACT(EPOCH FROM (NOW() - ${userAdversaries.createdAt})) / 3600.0 + 2, 1.8)`,
+              ),
+      )
       .limit(pageSize)
       .offset((page - 1) * pageSize);
     return NextResponse.json(

@@ -53,8 +53,7 @@ test.describe('Community Environments', () => {
   test('can use a public environment as a template', async ({ page }) => {
     await page.goto('/community/environments');
     const row = getItemRow(page, ENVIRONMENT_NAME);
-    await row.getByRole('button', { name: 'More actions' }).click();
-    await page.getByRole('menuitem', { name: 'Use as Template' }).click();
+    await row.getByRole('button', { name: 'Use as Template' }).click();
 
     await expect(page).toHaveURL(/\/adversary\/create\?template=true/);
     await expect(page.locator('#name')).toHaveValue(ENVIRONMENT_NAME);

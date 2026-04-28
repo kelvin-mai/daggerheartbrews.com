@@ -29,11 +29,10 @@ test.describe('Community Cards – Use as Template', () => {
     page,
   }) => {
     await page.goto('/community/cards');
-    await expect(getItemRow(page, COMMUNITY_CARD)).toBeVisible();
-
     const row = getItemRow(page, COMMUNITY_CARD);
-    await row.getByRole('button', { name: 'More actions' }).click();
-    await page.getByRole('menuitem', { name: 'Use as Template' }).click();
+    await expect(row).toBeVisible();
+
+    await row.getByRole('button', { name: 'Use as Template' }).click();
 
     await expect(page).toHaveURL(/\/card\/create\?template=true/);
     await expect(page.locator('#name')).toHaveValue(COMMUNITY_CARD);
@@ -72,11 +71,10 @@ test.describe('Community Adversaries – Use as Template', () => {
     page,
   }) => {
     await page.goto('/community/adversaries');
-    await expect(getItemRow(page, COMMUNITY_ADVERSARY)).toBeVisible();
-
     const row = getItemRow(page, COMMUNITY_ADVERSARY);
-    await row.getByRole('button', { name: 'More actions' }).click();
-    await page.getByRole('menuitem', { name: 'Use as Template' }).click();
+    await expect(row).toBeVisible();
+
+    await row.getByRole('button', { name: 'Use as Template' }).click();
 
     await expect(page).toHaveURL(/\/adversary\/create\?template=true/);
     await expect(page.locator('#name')).toHaveValue(COMMUNITY_ADVERSARY);
