@@ -9,7 +9,7 @@ vi.mock('@/lib/email', () => ({
 }));
 
 vi.mock('@/lib/database', () => ({
-  db: { update: vi.fn() },
+  db: { update: vi.fn(), transaction: vi.fn() },
 }));
 
 vi.mock('next/headers', () => ({
@@ -24,12 +24,35 @@ vi.mock('@/lib/email', () => ({
   syncAudienceContact: vi.fn(),
 }));
 
-import { updateProfile } from '@/actions/profile';
+import { updateProfile, deleteAccount } from '@/actions/profile';
 import { auth } from '@/lib/auth';
 import { db } from '@/lib/database';
 
 type GetSessionResult = Awaited<ReturnType<typeof auth.api.getSession>>;
 type DbUpdateResult = ReturnType<(typeof db)['update']>;
+type TxCallback = Parameters<(typeof db)['transaction']>[0];
+type Tx = Parameters<TxCallback>[0];
+
+const makeSelectChain = (resolvedValue: unknown[]) => ({
+  from: vi.fn().mockReturnValue({
+    where: vi.fn().mockResolvedValue(resolvedValue),
+  }),
+});
+
+const makeDeleteChain = () => ({
+  where: vi.fn().mockResolvedValue(undefined),
+});
+
+const makeTx = (
+  cardPreviews: unknown[],
+  adversaryPreviews: unknown[],
+): Partial<Tx> => ({
+  select: vi
+    .fn()
+    .mockReturnValueOnce(makeSelectChain(cardPreviews))
+    .mockReturnValueOnce(makeSelectChain(adversaryPreviews)),
+  delete: vi.fn().mockReturnValue(makeDeleteChain()),
+});
 
 const makeFormData = (fields: Record<string, string>) => {
   const fd = new FormData();
@@ -97,5 +120,61 @@ describe('profile/updateProfile', () => {
     );
     expect(result.success).toBe(false);
     expect(result.errors?.action).toBe('DB error');
+  });
+});
+
+describe('profile/deleteAccount', () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it('returns Unauthorized when session is missing', async () => {
+    vi.mocked(auth.api.getSession).mockResolvedValueOnce(null);
+
+    const result = await deleteAccount();
+
+    expect(result.success).toBe(false);
+    expect(result.error).toBe('Unauthorized');
+  });
+
+  it('succeeds and runs 2 deletes when user has no cards or adversaries', async () => {
+    vi.mocked(auth.api.getSession).mockResolvedValueOnce(
+      mockSession as unknown as GetSessionResult,
+    );
+    const tx = makeTx([], []);
+    vi.mocked(db.transaction).mockImplementationOnce((fn) =>
+      fn(tx as unknown as Tx),
+    );
+
+    const result = await deleteAccount();
+
+    expect(result.success).toBe(true);
+    expect(result.error).toBeUndefined();
+    expect(tx.delete).toHaveBeenCalledTimes(2);
+  });
+
+  it('succeeds and runs 4 deletes when user has cards and adversaries', async () => {
+    vi.mocked(auth.api.getSession).mockResolvedValueOnce(
+      mockSession as unknown as GetSessionResult,
+    );
+    const tx = makeTx([{ id: 'card-preview-1' }], [{ id: 'adv-preview-1' }]);
+    vi.mocked(db.transaction).mockImplementationOnce((fn) =>
+      fn(tx as unknown as Tx),
+    );
+
+    const result = await deleteAccount();
+
+    expect(result.success).toBe(true);
+    expect(tx.delete).toHaveBeenCalledTimes(4);
+  });
+
+  it('returns error when transaction throws', async () => {
+    vi.mocked(auth.api.getSession).mockResolvedValueOnce(
+      mockSession as unknown as GetSessionResult,
+    );
+    vi.mocked(db.transaction).mockRejectedValueOnce(new Error('DB error'));
+
+    const result = await deleteAccount();
+
+    expect(result.success).toBe(false);
+    expect(result.error).toBe('DB error');
   });
 });

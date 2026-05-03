@@ -3,11 +3,19 @@
 import { headers } from 'next/headers';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
-import { eq, sql } from 'drizzle-orm';
+import { eq, inArray, sql } from 'drizzle-orm';
 
 import type { ActionState, ExportResolution } from '@/lib/types';
 import { db } from '@/lib/database';
-import { users, userSettings } from '@/lib/database/schema';
+import {
+  users,
+  userSettings,
+  userCards,
+  userAdversaries,
+  cardPreviews,
+  adversaryPreviews,
+  verification,
+} from '@/lib/database/schema';
 import { auth } from '@/lib/auth';
 import { syncAudienceContact } from '@/lib/email';
 
@@ -95,6 +103,56 @@ export const updateEmailPreference = async (
       email: session.user.email,
       unsubscribed: !emailUpdates,
     });
+    return { success: true };
+  } catch (e) {
+    return { success: false, error: (e as Error).message };
+  }
+};
+
+export const deleteAccount = async (): Promise<{
+  success: boolean;
+  error?: string;
+}> => {
+  try {
+    const session = await auth.api.getSession({ headers: await headers() });
+    if (!session) return { success: false, error: 'Unauthorized' };
+
+    await db.transaction(async (tx) => {
+      const cardPreviewRows = await tx
+        .select({ id: userCards.cardPreviewId })
+        .from(userCards)
+        .where(eq(userCards.userId, session.user.id));
+
+      const adversaryPreviewRows = await tx
+        .select({ id: userAdversaries.adversaryPreviewId })
+        .from(userAdversaries)
+        .where(eq(userAdversaries.userId, session.user.id));
+
+      if (cardPreviewRows.length > 0) {
+        await tx.delete(cardPreviews).where(
+          inArray(
+            cardPreviews.id,
+            cardPreviewRows.map((r) => r.id),
+          ),
+        );
+      }
+
+      if (adversaryPreviewRows.length > 0) {
+        await tx.delete(adversaryPreviews).where(
+          inArray(
+            adversaryPreviews.id,
+            adversaryPreviewRows.map((r) => r.id),
+          ),
+        );
+      }
+
+      await tx
+        .delete(verification)
+        .where(eq(verification.identifier, session.user.email));
+
+      await tx.delete(users).where(eq(users.id, session.user.id));
+    });
+
     return { success: true };
   } catch (e) {
     return { success: false, error: (e as Error).message };

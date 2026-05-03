@@ -6,6 +6,7 @@ import { db } from '@/lib/database';
 import { userSettings } from '@/lib/database/schema';
 import { getContactSubscriptionStatus } from '@/lib/email';
 import {
+  DeleteAccountForm,
   EmailPreferenceForm,
   ExportResolutionForm,
   LogoutButton,
@@ -87,6 +88,7 @@ export default async function Page() {
             />
           </div>
         )}
+        {session?.user && <DeleteAccountForm email={session.user.email} />}
       </div>
     </div>
   );

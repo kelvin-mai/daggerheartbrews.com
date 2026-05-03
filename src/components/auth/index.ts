@@ -1,3 +1,4 @@
+export * from './delete-account-form';
 export * from './email-preference-form';
 export * from './export-resolution-form';
 export * from './forgot-password-form';
