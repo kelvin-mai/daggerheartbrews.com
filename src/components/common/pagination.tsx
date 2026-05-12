@@ -22,6 +22,7 @@ type PaginationProps = React.ComponentProps<'nav'> & {
   currentPage: number;
   pages: number;
   onPage: (page: number) => void;
+  disabled?: boolean;
   buttonProps?: Omit<
     React.ComponentProps<typeof Button>,
     'disabled' | 'onClick'
@@ -33,6 +34,7 @@ export const Pagination: React.FC<PaginationProps> = ({
   currentPage,
   pages,
   onPage,
+  disabled,
   buttonProps,
   children,
   ...props
@@ -46,7 +48,7 @@ export const Pagination: React.FC<PaginationProps> = ({
     >
       <Button
         onClick={() => onPage(currentPage - 1)}
-        disabled={currentPage <= 1}
+        disabled={disabled || currentPage <= 1}
         {...buttonProps}
       >
         <ChevronLeft />
@@ -58,7 +60,11 @@ export const Pagination: React.FC<PaginationProps> = ({
         </Button>
       )}
       {currentPage >= 2 && (
-        <Button onClick={() => onPage(currentPage - 1)} {...buttonProps}>
+        <Button
+          onClick={() => onPage(currentPage - 1)}
+          disabled={disabled}
+          {...buttonProps}
+        >
           {currentPage - 1}
         </Button>
       )}
@@ -66,7 +72,11 @@ export const Pagination: React.FC<PaginationProps> = ({
         {currentPage}
       </Button>
       {currentPage < pages - 1 && (
-        <Button onClick={() => onPage(currentPage + 1)} {...buttonProps}>
+        <Button
+          onClick={() => onPage(currentPage + 1)}
+          disabled={disabled}
+          {...buttonProps}
+        >
           {currentPage + 1}
         </Button>
       )}
@@ -76,13 +86,17 @@ export const Pagination: React.FC<PaginationProps> = ({
         </Button>
       )}
       {currentPage !== pages && (
-        <Button onClick={() => onPage(pages)} {...buttonProps}>
+        <Button
+          onClick={() => onPage(pages)}
+          disabled={disabled}
+          {...buttonProps}
+        >
           {pages}
         </Button>
       )}
       <Button
         onClick={() => onPage(currentPage + 1)}
-        disabled={currentPage >= pages}
+        disabled={disabled || currentPage >= pages}
         {...buttonProps}
       >
         <span>Next</span>
@@ -101,6 +115,7 @@ type PaginationPageSizeDropdownProps = React.ComponentProps<
   total: number;
   pageSize: number;
   onPageSize: (pageSize: number) => void;
+  disabled?: boolean;
 };
 
 export const PaginationPageSizeDropdown: React.FC<
@@ -111,12 +126,13 @@ export const PaginationPageSizeDropdown: React.FC<
   total,
   pageSize,
   onPageSize,
+  disabled,
   ...props
 }) => {
   return (
     <DropdownMenu {...props}>
       <DropdownMenuTrigger asChild>
-        <Button {...buttonProps}>
+        <Button disabled={disabled} {...buttonProps}>
           <EllipsisVertical />
         </Button>
       </DropdownMenuTrigger>

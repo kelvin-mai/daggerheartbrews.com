@@ -6,7 +6,7 @@ import {
   useQueryClient,
   keepPreviousData,
 } from '@tanstack/react-query';
-import { Trees } from 'lucide-react';
+import { Loader2, Trees } from 'lucide-react';
 
 import type {
   AdversaryDetails,
@@ -97,7 +97,7 @@ export const CommunityEnvironments = () => {
   const bookmarkedIds = new Set(bookmarksData?.data?.ids ?? []);
   const userVotes = votesData?.data?.votes ?? {};
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isFetching } = useQuery({
     queryKey: [
       'community-environments',
       currentPage,
@@ -135,13 +135,19 @@ export const CommunityEnvironments = () => {
   return (
     <div className='mb-2 space-y-2'>
       <div className='mb-6 space-y-3'>
-        <SortTabs
-          value={sort}
-          onChange={(s) => {
-            setSort(s);
-            setCurrentPage(1);
-          }}
-        />
+        <div className='flex items-center gap-2'>
+          <SortTabs
+            value={sort}
+            onChange={(s) => {
+              setSort(s);
+              setCurrentPage(1);
+            }}
+            disabled={isFetching}
+          />
+          {isFetching && (
+            <Loader2 className='text-muted-foreground size-4 animate-spin' />
+          )}
+        </div>
         <div className='grid grid-cols-2 gap-2'>
           <MultipleSelector
             commandProps={{ label: 'Select Tiers' }}
@@ -152,6 +158,7 @@ export const CommunityEnvironments = () => {
               setCurrentPage(1);
             }}
             placeholder='Filter by tier'
+            disabled={isFetching}
             emptyIndicator={
               <p className='text-muted-foreground text-center text-sm'>
                 No results
@@ -167,6 +174,7 @@ export const CommunityEnvironments = () => {
               setCurrentPage(1);
             }}
             placeholder='Filter by subtype'
+            disabled={isFetching}
             emptyIndicator={
               <p className='text-muted-foreground text-center text-sm'>
                 No results
@@ -201,6 +209,7 @@ export const CommunityEnvironments = () => {
           currentPage={currentPage}
           pages={Math.ceil(total / pageSize)}
           onPage={setCurrentPage}
+          disabled={isFetching}
           buttonProps={{ variant: 'ghost' }}
         >
           <PaginationPageSizeDropdown
@@ -210,6 +219,7 @@ export const CommunityEnvironments = () => {
               setPageSize(size);
               setCurrentPage(1);
             }}
+            disabled={isFetching}
             buttonProps={{ variant: 'ghost' }}
           />
         </Pagination>

@@ -6,7 +6,7 @@ import {
   useQueryClient,
   keepPreviousData,
 } from '@tanstack/react-query';
-import { Layers } from 'lucide-react';
+import { Layers, Loader2 } from 'lucide-react';
 
 import type {
   ApiResponse,
@@ -81,7 +81,7 @@ export const CommunityCards = () => {
   const bookmarkedIds = new Set(bookmarksData?.data?.ids ?? []);
   const userVotes = votesData?.data?.votes ?? {};
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isFetching } = useQuery({
     queryKey: [
       'community-cards',
       currentPage,
@@ -117,13 +117,19 @@ export const CommunityCards = () => {
   return (
     <div className='mb-2 space-y-2'>
       <div className='mb-6 space-y-3'>
-        <SortTabs
-          value={sort}
-          onChange={(s) => {
-            setSort(s);
-            setCurrentPage(1);
-          }}
-        />
+        <div className='flex items-center gap-2'>
+          <SortTabs
+            value={sort}
+            onChange={(s) => {
+              setSort(s);
+              setCurrentPage(1);
+            }}
+            disabled={isFetching}
+          />
+          {isFetching && (
+            <Loader2 className='text-muted-foreground size-4 animate-spin' />
+          )}
+        </div>
         <MultipleSelector
           commandProps={{ label: 'Select Types' }}
           defaultOptions={typeOptions}
@@ -133,6 +139,7 @@ export const CommunityCards = () => {
             setCurrentPage(1);
           }}
           placeholder='Filter by type'
+          disabled={isFetching}
           emptyIndicator={
             <p className='text-muted-foreground text-center text-sm'>
               No results
@@ -162,6 +169,7 @@ export const CommunityCards = () => {
           currentPage={currentPage}
           pages={Math.ceil(total / pageSize)}
           onPage={setCurrentPage}
+          disabled={isFetching}
           buttonProps={{ variant: 'ghost' }}
         >
           <PaginationPageSizeDropdown
@@ -171,6 +179,7 @@ export const CommunityCards = () => {
               setPageSize(size);
               setCurrentPage(1);
             }}
+            disabled={isFetching}
             buttonProps={{ variant: 'ghost' }}
           />
         </Pagination>

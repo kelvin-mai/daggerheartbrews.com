@@ -11,6 +11,7 @@ export type SortMode = 'hot' | 'new' | 'top';
 type SortTabsProps = {
   value: SortMode;
   onChange: (value: SortMode) => void;
+  disabled?: boolean;
 };
 
 const tabs: { value: SortMode; label: string; icon: React.ElementType }[] = [
@@ -19,7 +20,11 @@ const tabs: { value: SortMode; label: string; icon: React.ElementType }[] = [
   { value: 'top', label: 'Top', icon: TrendingUp },
 ];
 
-export const SortTabs: React.FC<SortTabsProps> = ({ value, onChange }) => (
+export const SortTabs: React.FC<SortTabsProps> = ({
+  value,
+  onChange,
+  disabled,
+}) => (
   <div className='flex gap-1'>
     {tabs.map((tab) => {
       const Icon = tab.icon;
@@ -30,6 +35,7 @@ export const SortTabs: React.FC<SortTabsProps> = ({ value, onChange }) => (
           size='sm'
           className={cn('gap-1.5', value === tab.value && 'font-medium')}
           onClick={() => onChange(tab.value)}
+          disabled={disabled}
         >
           <Icon className='size-3.5' />
           {tab.label}
