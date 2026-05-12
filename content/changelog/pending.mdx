@@ -6,6 +6,8 @@ title: 'Pending'
 
 ## New
 
+- **User Profiles** — every user now has a public profile page at `/profile/[id]` showing their public cards, adversaries, and environments in collapsible sections; viewing your own profile shows a Settings button linking to account settings.
+- **Community Detail Pages** — cards, adversaries, and environments now have individual detail pages with full stats and controls, so you no longer need the preview modal to interact with a post; creator names on every post link directly to the creator's profile.
 - **Delete Account** — permanently delete your account and all associated data (cards, adversaries, bookmarks, votes) from the Account settings page; a confirmation dialog requires typing your email address before the deletion proceeds.
 - **Print Sheet** — select cards from your collection and bookmarks, preview them in a print-ready PDF, and download a letter-sized sheet with 9 cards per page in a 3×3 grid at standard trading card size. Optional cut lines and card settings (border, artist name, credits) are configurable before downloading.
 - **Bookmarks** — bookmark community cards and adversaries to your profile for quick access and printing ([#23](https://github.com/YOUR_USERNAME/daggerheart-brews/pull/23)).
@@ -19,6 +21,7 @@ title: 'Pending'
 
 ## Improved
 
+- **Community loading state** — switching sort mode (Hot / New / Top) now shows a spinner and disables sort tabs, filters, and pagination while the new results load.
 - **Homebrew and Bookmarks pages** — adversaries and environments are now shown in separate sections instead of a single combined list, each with their own count in the stats summary.
 - **Print Sheet** — PDF generation now surfaces errors clearly when a card fails to render instead of silently producing a blank page.
 

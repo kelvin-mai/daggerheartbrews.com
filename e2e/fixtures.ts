@@ -21,7 +21,7 @@ export async function login(page: Page) {
 
 export function getItemRow(page: Page, name: string) {
   return page
-    .locator('p.truncate')
+    .locator('.truncate.font-medium')
     .filter({ hasText: name })
     .locator('xpath=../../..');
 }

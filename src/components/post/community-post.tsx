@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Eye, ImageIcon, LayoutTemplate } from 'lucide-react';
 import { toast } from 'sonner';
@@ -42,6 +43,8 @@ type CommunityPostProps = React.ComponentProps<'div'> & {
   onUseAsTemplate: () => void;
   bookmarkButton?: React.ReactNode;
   voteButton?: React.ReactNode;
+  detailHref?: string;
+  creatorHref?: string;
 };
 
 export const CommunityPost: React.FC<CommunityPostProps> = ({
@@ -53,6 +56,8 @@ export const CommunityPost: React.FC<CommunityPostProps> = ({
   onUseAsTemplate,
   bookmarkButton,
   voteButton,
+  detailHref,
+  creatorHref,
   ...props
 }) => (
   <div
@@ -60,23 +65,59 @@ export const CommunityPost: React.FC<CommunityPostProps> = ({
     {...props}
   >
     <div className='flex items-start gap-3 px-3 pt-3'>
-      <div className='bg-muted mt-0.5 flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-md'>
-        {image ? (
-          <Image
-            src={image}
-            alt={`Preview image for ${name || type}`}
-            className='size-10 object-cover'
-            width={40}
-            height={40}
-          />
-        ) : (
-          <ImageIcon className='text-muted-foreground size-5' />
-        )}
-      </div>
+      {detailHref ? (
+        <Link
+          href={detailHref}
+          className='bg-muted mt-0.5 flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-md'
+        >
+          {image ? (
+            <Image
+              src={image}
+              alt={`Preview image for ${name || type}`}
+              className='size-10 object-cover'
+              width={40}
+              height={40}
+            />
+          ) : (
+            <ImageIcon className='text-muted-foreground size-5' />
+          )}
+        </Link>
+      ) : (
+        <div className='bg-muted mt-0.5 flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-md'>
+          {image ? (
+            <Image
+              src={image}
+              alt={`Preview image for ${name || type}`}
+              className='size-10 object-cover'
+              width={40}
+              height={40}
+            />
+          ) : (
+            <ImageIcon className='text-muted-foreground size-5' />
+          )}
+        </div>
+      )}
       <div className='min-w-0 flex-1'>
-        <p className='truncate font-medium'>{name || 'Untitled'}</p>
+        {detailHref ? (
+          <Link
+            href={detailHref}
+            className='truncate font-medium hover:underline'
+          >
+            {name || 'Untitled'}
+          </Link>
+        ) : (
+          <p className='truncate font-medium'>{name || 'Untitled'}</p>
+        )}
         <p className='text-muted-foreground text-sm'>
-          <span className='capitalize'>{type}</span> · {creator}
+          <span className='capitalize'>{type}</span>
+          {' · '}
+          {creatorHref ? (
+            <Link href={creatorHref} className='hover:underline'>
+              {creator}
+            </Link>
+          ) : (
+            creator
+          )}
         </p>
       </div>
       {voteButton}
@@ -218,6 +259,8 @@ export const CommunityCard: React.FC<CommunityCardProps> = ({
       type={cardPreview.type}
       image={cardPreview.image}
       creator={user.name}
+      detailHref={`/community/cards/${userCard.id}`}
+      creatorHref={`/profile/${user.id}`}
       onUseAsTemplate={handleTemplate}
       bookmarkButton={
         session.data?.user ? (
@@ -363,12 +406,19 @@ export const CommunityAdversary: React.FC<CommunityAdversaryProps> = ({
     });
   };
 
+  const detailHref =
+    adversaryPreview.type === 'environment'
+      ? `/community/environments/${userAdversary.id}`
+      : `/community/adversaries/${userAdversary.id}`;
+
   return (
     <CommunityPost
       name={adversaryPreview.name}
       type={adversaryPreview.type}
       image={adversaryPreview.image}
       creator={user.name}
+      detailHref={detailHref}
+      creatorHref={`/profile/${user.id}`}
       onUseAsTemplate={handleTemplate}
       bookmarkButton={
         session.data?.user ? (

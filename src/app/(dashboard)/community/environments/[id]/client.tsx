@@ -1,0 +1,156 @@
+'use client';
+
+import * as React from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { Bookmark, ChevronLeft, LayoutTemplate } from 'lucide-react';
+import { toast } from 'sonner';
+
+import type { AdversaryDetails, User, UserAdversary } from '@/lib/types';
+import { toggleAdversaryBookmark } from '@/actions/bookmarks';
+import { toggleAdversaryVote } from '@/actions/votes';
+import { useAdversaryActions } from '@/store';
+import { cn } from '@/lib/utils';
+import { useSession } from '@/lib/auth/client';
+import { AdversaryPreviewStatblock } from '@/components/adversary-creation/preview/statblock';
+import { VoteButton } from '@/components/post/vote-button';
+import { Button } from '@/components/ui/button';
+
+type Props = {
+  userAdversary: UserAdversary;
+  adversaryPreview: AdversaryDetails;
+  user: User;
+};
+
+export const CommunityEnvironmentDetail: React.FC<Props> = ({
+  userAdversary,
+  adversaryPreview,
+  user,
+}) => {
+  const { setAdversaryDetails } = useAdversaryActions();
+  const router = useRouter();
+  const session = useSession();
+  const [bookmarked, setBookmarked] = React.useState(false);
+  const [isBookmarkPending, startBookmarkTransition] = React.useTransition();
+  const [currentVote, setCurrentVote] = React.useState<'up' | 'down' | null>(
+    null,
+  );
+  const [upvotes, setUpvotes] = React.useState(userAdversary.upvotes ?? 0);
+  const [downvotes, setDownvotes] = React.useState(
+    userAdversary.downvotes ?? 0,
+  );
+  const [isVotePending, startVoteTransition] = React.useTransition();
+
+  const handleTemplate = () => {
+    setAdversaryDetails(adversaryPreview);
+    router.push('/adversary/create?template=true');
+  };
+
+  const handleBookmarkToggle = () => {
+    const next = !bookmarked;
+    setBookmarked(next);
+    startBookmarkTransition(async () => {
+      const result = await toggleAdversaryBookmark({
+        userAdversaryId: userAdversary.id,
+      });
+      if (result.error) {
+        setBookmarked(!next);
+        toast.error('Failed to update bookmark');
+      }
+    });
+  };
+
+  const handleVote = (vote: 'up' | 'down') => {
+    const prevVote = currentVote;
+    const prevUp = upvotes;
+    const prevDown = downvotes;
+
+    if (prevVote === vote) {
+      setCurrentVote(null);
+      if (vote === 'up') setUpvotes((v) => v - 1);
+      else setDownvotes((v) => v - 1);
+    } else {
+      setCurrentVote(vote);
+      if (vote === 'up') {
+        setUpvotes((v) => v + 1);
+        if (prevVote === 'down') setDownvotes((v) => v - 1);
+      } else {
+        setDownvotes((v) => v + 1);
+        if (prevVote === 'up') setUpvotes((v) => v - 1);
+      }
+    }
+
+    startVoteTransition(async () => {
+      const result = await toggleAdversaryVote({
+        userAdversaryId: userAdversary.id,
+        vote,
+      });
+      if (result.error) {
+        setCurrentVote(prevVote);
+        setUpvotes(prevUp);
+        setDownvotes(prevDown);
+        toast.error('Failed to update vote');
+      } else if (result.data) {
+        setUpvotes(result.data.upvotes);
+        setDownvotes(result.data.downvotes);
+        setCurrentVote(result.data.userVote);
+      }
+    });
+  };
+
+  return (
+    <>
+      <Link
+        href='/community/environments'
+        className='text-muted-foreground mb-6 flex items-center gap-1 text-sm'
+      >
+        <ChevronLeft className='size-4' />
+        Back to Community Environments
+      </Link>
+
+      <div className='mb-6 flex flex-wrap items-start justify-between gap-4'>
+        <div>
+          <h1 className='text-2xl font-bold'>
+            {adversaryPreview.name || 'Untitled'}
+          </h1>
+          <p className='text-muted-foreground text-sm'>
+            <span className='capitalize'>
+              {adversaryPreview.subtype ?? adversaryPreview.type}
+            </span>
+            {' · by '}
+            <Link href={`/profile/${user.id}`} className='hover:underline'>
+              {user.name}
+            </Link>
+          </p>
+        </div>
+        <VoteButton
+          upvotes={upvotes}
+          downvotes={downvotes}
+          userVote={currentVote}
+          onVote={handleVote}
+          isPending={isVotePending}
+          disabled={!session.data?.user}
+        />
+      </div>
+
+      <AdversaryPreviewStatblock adversary={adversaryPreview} />
+
+      <div className='mt-4 flex items-center gap-2'>
+        {session.data?.user && (
+          <Button
+            variant='outline'
+            onClick={handleBookmarkToggle}
+            disabled={isBookmarkPending}
+          >
+            <Bookmark className={cn('size-4', bookmarked && 'fill-current')} />
+            Bookmark
+          </Button>
+        )}
+        <Button variant='outline' onClick={handleTemplate}>
+          <LayoutTemplate className='size-4' />
+          Use as Template
+        </Button>
+      </div>
+    </>
+  );
+};

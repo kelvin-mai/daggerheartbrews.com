@@ -11,5 +11,11 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/profile/:path*', '/admin/:path*'],
+  matcher: [
+    '/profile',
+    '/profile/homebrew',
+    '/profile/bookmarks',
+    '/profile/print',
+    '/admin/:path*',
+  ],
 };
