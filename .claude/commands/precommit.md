@@ -12,7 +12,7 @@ allowed-tools:
 
 # Precommit
 
-Run the pre-commit quality checks in order: build → tests → lint → format → docs → changelog. Do NOT commit anything.
+Run the pre-commit quality checks in order: tests coverage → build → tests → lint → format → docs → changelog. Do NOT commit anything.
 
 ## Output style
 
@@ -25,6 +25,60 @@ Announce each step before running it, then report the result on a single line on
 Never use `echo` or a Bash tool call to print status — output it as assistant text so it's always visible and never collapsed.
 
 Reserve the full summary checklist for the very end.
+
+---
+
+## Step 0 — Test Coverage
+
+Announce: `▶ **Checking Test Coverage...**`
+
+Identify what changed in this branch by running:
+
+```bash
+git diff main...HEAD --name-only
+```
+
+Review the changed files and determine whether the changes are adequately covered by existing unit tests (in `test/`) and e2e tests (in `e2e/`). Use the following heuristics:
+
+**Write unit tests when:**
+
+- A new API route handler was added or modified (follow the pattern in `test/api/`)
+- A new server action was added or modified (follow the pattern in `test/actions/`)
+- A new utility function was added (follow the pattern in `test/lib/utils/`)
+- A store action or effect changed significantly (follow the pattern in `test/store/`)
+
+**Write e2e tests when:**
+
+- A new user-facing page or route is accessible at a URL
+- A new interactive feature is added (buttons, toggles, navigation flows)
+- A feature can only be meaningfully verified end-to-end (auth-gated pages, form submissions that hit the DB)
+
+**Skip writing tests when:**
+
+- The change is pure styling or Tailwind class adjustments
+- The change is a config file, migration, or schema with no new logic
+- The change is already covered by existing tests
+- The change is a trivial one-liner with no branches
+
+**E2E test conventions:**
+
+- Authenticated specs: filename must end in `-authenticated.spec.ts` (runs in `chromium-authenticated` project with saved auth state)
+- Unauthenticated specs: any other `.spec.ts` filename (runs across all browsers)
+- Use serial mode (`test.describe.configure({ mode: 'serial' })`) for tests that share state
+- Always include setup and cleanup tests when creating DB records
+- Use `getItemRow(page, name)` from `../fixtures` to locate post rows by title
+- Place specs under `e2e/community/`, `e2e/profile/`, `e2e/card/`, `e2e/adversary/`, etc. to match the route structure
+
+**Unit test conventions:**
+
+- Mock `@/lib/database` and `@/lib/auth` at the top of the file before any imports
+- Mock `next/headers` when the route uses `headers()`
+- Use `vi.fn()` for all db methods and chain `.mockReturnValue` / `.mockResolvedValue`
+- Verify the HTTP status code, `success` field, and key shape of the response body
+
+If coverage is sufficient, output `✅ **Test coverage sufficient**` and continue.
+
+If gaps exist, write the missing tests, then output `✅ **Tests written** — <brief list of files added/updated>` and continue.
 
 ---
 
@@ -99,6 +153,7 @@ After all steps complete, output the full checklist as assistant text with a sum
 ```
 **Pre-commit checks**
 ─────────────────────
+✅ Test coverage
 ✅ Build
 ✅ Tests
 ✅ Lint
