@@ -1,4 +1,4 @@
-import { and, eq } from 'drizzle-orm';
+import { and, eq, sql } from 'drizzle-orm';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 
@@ -7,6 +7,8 @@ import {
   adversaryPreviews,
   cardPreviews,
   userAdversaries,
+  userAdversaryComments,
+  userCardComments,
   userCards,
   users,
 } from '@/lib/database/schema';
@@ -38,13 +40,21 @@ export default async function Page({ params }: Props) {
   if (!user) notFound();
 
   const cards = await db
-    .select()
+    .select({
+      user_cards: userCards,
+      card_previews: cardPreviews,
+      commentCount: sql<number>`(SELECT COUNT(*) FROM ${userCardComments} WHERE ${userCardComments.userCardId} = ${userCards.id})::int`,
+    })
     .from(userCards)
     .leftJoin(cardPreviews, eq(userCards.cardPreviewId, cardPreviews.id))
     .where(and(eq(userCards.userId, id), eq(userCards.public, true)));
 
   const adversaries = await db
-    .select()
+    .select({
+      user_adversaries: userAdversaries,
+      adversary_previews: adversaryPreviews,
+      commentCount: sql<number>`(SELECT COUNT(*) FROM ${userAdversaryComments} WHERE ${userAdversaryComments.userAdversaryId} = ${userAdversaries.id})::int`,
+    })
     .from(userAdversaries)
     .leftJoin(
       adversaryPreviews,
@@ -58,12 +68,17 @@ export default async function Page({ params }: Props) {
     <UserProfile
       user={user as User}
       cards={
-        cards as { user_cards: UserCard; card_previews: CardDetails | null }[]
+        cards as {
+          user_cards: UserCard;
+          card_previews: CardDetails | null;
+          commentCount: number;
+        }[]
       }
       adversaries={
         adversaries as {
           user_adversaries: UserAdversary;
           adversary_previews: AdversaryDetails | null;
+          commentCount: number;
         }[]
       }
     />

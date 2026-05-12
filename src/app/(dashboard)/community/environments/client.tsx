@@ -29,6 +29,7 @@ type Data = {
   userAdversary: UserAdversary;
   user: User;
   adversaryPreview: AdversaryDetails;
+  commentCount: number;
 };
 
 const subtypes = ['exploration', 'social', 'traversal', 'event'];
@@ -201,6 +202,7 @@ export const CommunityEnvironments = () => {
               queryKey: ['votes', 'adversaries'],
             })
           }
+          commentCount={env.commentCount}
         />
       ))}
       {environments.length > 0 ? (

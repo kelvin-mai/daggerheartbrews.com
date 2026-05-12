@@ -20,10 +20,15 @@ import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent } from '@/components/ui/collapsible';
 import { Label } from '@/components/ui/label';
 
-type CardRow = { user_cards: UserCard; card_previews: CardDetails | null };
+type CardRow = {
+  user_cards: UserCard;
+  card_previews: CardDetails | null;
+  commentCount: number;
+};
 type AdversaryRow = {
   user_adversaries: UserAdversary;
   adversary_previews: AdversaryDetails | null;
+  commentCount: number;
 };
 
 type Props = {
@@ -119,14 +124,17 @@ export const UserProfile: React.FC<Props> = ({ user, cards, adversaries }) => {
           <div className='border-t px-4 py-3'>
             {validCards.length > 0 ? (
               <div className='space-y-3'>
-                {validCards.map(({ user_cards, card_previews }) => (
-                  <CommunityCard
-                    key={user_cards.id}
-                    userCard={user_cards}
-                    cardPreview={card_previews!}
-                    user={user}
-                  />
-                ))}
+                {validCards.map(
+                  ({ user_cards, card_previews, commentCount }) => (
+                    <CommunityCard
+                      key={user_cards.id}
+                      userCard={user_cards}
+                      cardPreview={card_previews!}
+                      user={user}
+                      commentCount={commentCount}
+                    />
+                  ),
+                )}
               </div>
             ) : (
               <div className='flex flex-col items-center gap-3 py-8 text-center'>
@@ -163,12 +171,13 @@ export const UserProfile: React.FC<Props> = ({ user, cards, adversaries }) => {
             {validAdversaries.length > 0 ? (
               <div className='space-y-3'>
                 {validAdversaries.map(
-                  ({ user_adversaries, adversary_previews }) => (
+                  ({ user_adversaries, adversary_previews, commentCount }) => (
                     <CommunityAdversary
                       key={user_adversaries.id}
                       userAdversary={user_adversaries}
                       adversaryPreview={adversary_previews!}
                       user={user}
+                      commentCount={commentCount}
                     />
                   ),
                 )}
@@ -208,12 +217,13 @@ export const UserProfile: React.FC<Props> = ({ user, cards, adversaries }) => {
             {validEnvironments.length > 0 ? (
               <div className='space-y-3'>
                 {validEnvironments.map(
-                  ({ user_adversaries, adversary_previews }) => (
+                  ({ user_adversaries, adversary_previews, commentCount }) => (
                     <CommunityAdversary
                       key={user_adversaries.id}
                       userAdversary={user_adversaries}
                       adversaryPreview={adversary_previews!}
                       user={user}
+                      commentCount={commentCount}
                     />
                   ),
                 )}

@@ -6,13 +6,20 @@ import { useRouter } from 'next/navigation';
 import { Bookmark, ChevronLeft, LayoutTemplate } from 'lucide-react';
 import { toast } from 'sonner';
 
-import type { AdversaryDetails, User, UserAdversary } from '@/lib/types';
+import type {
+  AdversaryDetails,
+  CommentWithUser,
+  User,
+  UserAdversary,
+  UserAdversaryComment,
+} from '@/lib/types';
 import { toggleAdversaryBookmark } from '@/actions/bookmarks';
 import { toggleAdversaryVote } from '@/actions/votes';
 import { useAdversaryActions } from '@/store';
 import { cn } from '@/lib/utils';
 import { useSession } from '@/lib/auth/client';
 import { AdversaryPreviewStatblock } from '@/components/adversary-creation/preview/statblock';
+import { CommentSection } from '@/components/post/comment-section';
 import { VoteButton } from '@/components/post/vote-button';
 import { Button } from '@/components/ui/button';
 
@@ -20,12 +27,14 @@ type Props = {
   userAdversary: UserAdversary;
   adversaryPreview: AdversaryDetails;
   user: User;
+  comments: CommentWithUser<UserAdversaryComment>[];
 };
 
 export const CommunityEnvironmentDetail: React.FC<Props> = ({
   userAdversary,
   adversaryPreview,
   user,
+  comments,
 }) => {
   const { setAdversaryDetails } = useAdversaryActions();
   const router = useRouter();
@@ -150,6 +159,15 @@ export const CommunityEnvironmentDetail: React.FC<Props> = ({
           <LayoutTemplate className='size-4' />
           Use as Template
         </Button>
+      </div>
+
+      <div className='mt-8'>
+        <CommentSection
+          comments={comments}
+          postType='adversary'
+          postId={userAdversary.id}
+          currentUserId={session.data?.user?.id}
+        />
       </div>
     </>
   );

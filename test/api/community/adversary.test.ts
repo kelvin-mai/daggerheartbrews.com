@@ -26,6 +26,7 @@ const mockRows = [
       tier: 1,
     },
     users: { id: 'user-1', name: 'Alice' },
+    commentCount: 2,
   },
 ];
 
@@ -70,6 +71,7 @@ describe('GET /api/community/adversary', () => {
     expect(json.data[0]).toHaveProperty('userAdversary');
     expect(json.data[0]).toHaveProperty('adversaryPreview');
     expect(json.data[0]).toHaveProperty('user');
+    expect(json.data[0]).toHaveProperty('commentCount');
   });
 
   it('respects custom pagination params', async () => {
@@ -92,6 +94,7 @@ describe('GET /api/community/adversary', () => {
       mockRows[0].adversary_previews,
     );
     expect(json.data[0].user).toEqual(mockRows[0].users);
+    expect(json.data[0].commentCount).toBe(mockRows[0].commentCount);
   });
 
   it('handles tier filter with numeric tiers', async () => {

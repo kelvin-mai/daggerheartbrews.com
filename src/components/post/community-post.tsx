@@ -4,7 +4,7 @@ import * as React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Eye, ImageIcon, LayoutTemplate } from 'lucide-react';
+import { Eye, ImageIcon, LayoutTemplate, MessageCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
 import type {
@@ -45,6 +45,7 @@ type CommunityPostProps = React.ComponentProps<'div'> & {
   voteButton?: React.ReactNode;
   detailHref?: string;
   creatorHref?: string;
+  commentCount?: number;
 };
 
 export const CommunityPost: React.FC<CommunityPostProps> = ({
@@ -58,6 +59,7 @@ export const CommunityPost: React.FC<CommunityPostProps> = ({
   voteButton,
   detailHref,
   creatorHref,
+  commentCount,
   ...props
 }) => (
   <div
@@ -149,6 +151,35 @@ export const CommunityPost: React.FC<CommunityPostProps> = ({
           <TooltipContent>Use as Template</TooltipContent>
         </Tooltip>
       </TooltipProvider>
+      {commentCount !== undefined && (
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant='ghost'
+                size='sm'
+                className='h-8 gap-1.5 px-2'
+                {...(detailHref ? { asChild: true } : { disabled: true })}
+              >
+                {detailHref ? (
+                  <Link href={detailHref}>
+                    <MessageCircle className='size-4' />
+                    <span className='text-xs'>{commentCount}</span>
+                  </Link>
+                ) : (
+                  <>
+                    <MessageCircle className='size-4' />
+                    <span className='text-xs'>{commentCount}</span>
+                  </>
+                )}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              {commentCount === 1 ? '1 Comment' : `${commentCount} Comments`}
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      )}
     </div>
   </div>
 );
@@ -161,6 +192,7 @@ type CommunityCardProps = React.ComponentProps<'div'> & {
   onBookmarkToggle?: () => void;
   userVote?: 'up' | 'down' | null;
   onVoteToggle?: () => void;
+  commentCount?: number;
 };
 
 export const CommunityCard: React.FC<CommunityCardProps> = ({
@@ -171,6 +203,7 @@ export const CommunityCard: React.FC<CommunityCardProps> = ({
   onBookmarkToggle,
   userVote = null,
   onVoteToggle,
+  commentCount,
   ...props
 }) => {
   const { setCardDetails } = useCardActions();
@@ -262,6 +295,7 @@ export const CommunityCard: React.FC<CommunityCardProps> = ({
       detailHref={`/community/cards/${userCard.id}`}
       creatorHref={`/profile/${user.id}`}
       onUseAsTemplate={handleTemplate}
+      commentCount={commentCount}
       bookmarkButton={
         session.data?.user ? (
           <BookmarkButton
@@ -307,6 +341,7 @@ type CommunityAdversaryProps = React.ComponentProps<'div'> & {
   onBookmarkToggle?: () => void;
   userVote?: 'up' | 'down' | null;
   onVoteToggle?: () => void;
+  commentCount?: number;
 };
 
 export const CommunityAdversary: React.FC<CommunityAdversaryProps> = ({
@@ -317,6 +352,7 @@ export const CommunityAdversary: React.FC<CommunityAdversaryProps> = ({
   onBookmarkToggle,
   userVote = null,
   onVoteToggle,
+  commentCount,
   ...props
 }) => {
   const { setAdversaryDetails } = useAdversaryActions();
@@ -420,6 +456,7 @@ export const CommunityAdversary: React.FC<CommunityAdversaryProps> = ({
       detailHref={detailHref}
       creatorHref={`/profile/${user.id}`}
       onUseAsTemplate={handleTemplate}
+      commentCount={commentCount}
       bookmarkButton={
         session.data?.user ? (
           <BookmarkButton

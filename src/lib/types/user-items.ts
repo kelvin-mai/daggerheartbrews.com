@@ -32,3 +32,25 @@ export type UserAdversaryBookmark = {
   createdAt: Date;
   updatedAt: Date | null;
 };
+
+import type { User } from './auth';
+
+export type CommentWithUser<T> = { comment: T; user: User | null };
+
+export type UserCardComment = {
+  id: string;
+  userId: string | null;
+  userCardId: string;
+  body: string;
+  createdAt: Date;
+  updatedAt: Date | null;
+};
+
+export type UserAdversaryComment = {
+  id: string;
+  userId: string | null;
+  userAdversaryId: string;
+  body: string;
+  createdAt: Date;
+  updatedAt: Date | null;
+};

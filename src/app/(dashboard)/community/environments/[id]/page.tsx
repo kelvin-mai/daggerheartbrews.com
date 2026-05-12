@@ -6,9 +6,16 @@ import { db } from '@/lib/database';
 import {
   adversaryPreviews,
   userAdversaries,
+  userAdversaryComments,
   users,
 } from '@/lib/database/schema';
-import type { AdversaryDetails, User, UserAdversary } from '@/lib/types';
+import type {
+  AdversaryDetails,
+  CommentWithUser,
+  User,
+  UserAdversary,
+  UserAdversaryComment,
+} from '@/lib/types';
 
 import { CommunityEnvironmentDetail } from './client';
 
@@ -42,11 +49,26 @@ export default async function Page({ params }: Props) {
 
   if (!result?.adversary_previews) notFound();
 
+  const rawComments = await db
+    .select()
+    .from(userAdversaryComments)
+    .leftJoin(users, eq(userAdversaryComments.userId, users.id))
+    .where(eq(userAdversaryComments.userAdversaryId, id))
+    .orderBy(userAdversaryComments.createdAt);
+
+  const postComments: CommentWithUser<UserAdversaryComment>[] = rawComments.map(
+    (row) => ({
+      comment: row.user_adversary_comments as UserAdversaryComment,
+      user: row.users as User | null,
+    }),
+  );
+
   return (
     <CommunityEnvironmentDetail
       userAdversary={result.user_adversaries as UserAdversary}
       adversaryPreview={result.adversary_previews as AdversaryDetails}
       user={result.users as User}
+      comments={postComments}
     />
   );
 }

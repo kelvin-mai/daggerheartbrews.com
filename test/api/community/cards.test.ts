@@ -20,6 +20,7 @@ const mockRows = [
     },
     card_previews: { id: 'card-1', name: 'Test Card', type: 'ancestry' },
     users: { id: 'user-1', name: 'Alice' },
+    commentCount: 3,
   },
 ];
 
@@ -64,6 +65,7 @@ describe('GET /api/community/cards', () => {
     expect(json.data[0]).toHaveProperty('userCard');
     expect(json.data[0]).toHaveProperty('cardPreview');
     expect(json.data[0]).toHaveProperty('user');
+    expect(json.data[0]).toHaveProperty('commentCount');
   });
 
   it('respects custom page and page-size params', async () => {
@@ -94,6 +96,7 @@ describe('GET /api/community/cards', () => {
     expect(json.data[0].userCard).toEqual(mockRows[0].user_cards);
     expect(json.data[0].cardPreview).toEqual(mockRows[0].card_previews);
     expect(json.data[0].user).toEqual(mockRows[0].users);
+    expect(json.data[0].commentCount).toBe(mockRows[0].commentCount);
   });
 
   it('returns 500 on db error', async () => {

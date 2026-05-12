@@ -29,6 +29,7 @@ type Data = {
   userAdversary: UserAdversary;
   user: User;
   adversaryPreview: AdversaryDetails;
+  commentCount: number;
 };
 
 const predefinedRoles = [
@@ -212,6 +213,7 @@ export const CommunityAdversaries = () => {
               queryKey: ['votes', 'adversaries'],
             })
           }
+          commentCount={adversary.commentCount}
         />
       ))}
       {adversaries.length > 0 ? (

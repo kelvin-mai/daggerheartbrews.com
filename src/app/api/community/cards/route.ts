@@ -2,7 +2,12 @@ import { and, desc, count, eq, inArray, sql } from 'drizzle-orm';
 import { NextResponse, type NextRequest } from 'next/server';
 
 import { db } from '@/lib/database';
-import { cardPreviews, userCards, users } from '@/lib/database/schema';
+import {
+  cardPreviews,
+  userCardComments,
+  userCards,
+  users,
+} from '@/lib/database/schema';
 import { formatAPIError } from '@/lib/utils';
 
 export async function GET(request: NextRequest) {
@@ -39,7 +44,12 @@ export async function GET(request: NextRequest) {
     const meta = { page, pageSize, total: result.count };
 
     const data = await db
-      .select()
+      .select({
+        user_cards: userCards,
+        users: users,
+        card_previews: cardPreviews,
+        commentCount: sql<number>`(SELECT COUNT(*) FROM ${userCardComments} WHERE ${userCardComments.userCardId} = ${userCards.id})::int`,
+      })
       .from(userCards)
       .leftJoin(users, eq(userCards.userId, users.id))
       .leftJoin(cardPreviews, eq(userCards.cardPreviewId, cardPreviews.id))
@@ -62,6 +72,7 @@ export async function GET(request: NextRequest) {
           userCard: d.user_cards,
           cardPreview: d.card_previews,
           user: d.users,
+          commentCount: d.commentCount,
         })),
         meta,
       },

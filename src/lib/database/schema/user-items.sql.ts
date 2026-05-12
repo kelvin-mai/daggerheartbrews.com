@@ -1,4 +1,11 @@
-import { boolean, integer, pgTable, uuid, varchar } from 'drizzle-orm/pg-core';
+import {
+  boolean,
+  integer,
+  pgTable,
+  text,
+  uuid,
+  varchar,
+} from 'drizzle-orm/pg-core';
 
 import { timestamps, uuidPrimaryKey } from './columns.helpers';
 import { users } from './auth.sql';
@@ -75,5 +82,25 @@ export const userAdversaryVotes = pgTable('user_adversary_votes', {
     .notNull()
     .references(() => userAdversaries.id, { onDelete: 'cascade' }),
   vote: varchar('vote', { length: 4 }).notNull(),
+  ...timestamps,
+});
+
+export const userCardComments = pgTable('user_card_comments', {
+  ...uuidPrimaryKey,
+  userId: uuid('user_id').references(() => users.id, { onDelete: 'set null' }),
+  userCardId: uuid('user_card_id')
+    .notNull()
+    .references(() => userCards.id, { onDelete: 'cascade' }),
+  body: text('body').notNull(),
+  ...timestamps,
+});
+
+export const userAdversaryComments = pgTable('user_adversary_comments', {
+  ...uuidPrimaryKey,
+  userId: uuid('user_id').references(() => users.id, { onDelete: 'set null' }),
+  userAdversaryId: uuid('user_adversary_id')
+    .notNull()
+    .references(() => userAdversaries.id, { onDelete: 'cascade' }),
+  body: text('body').notNull(),
   ...timestamps,
 });

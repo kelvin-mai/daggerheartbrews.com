@@ -16,6 +16,7 @@ import { db } from '@/lib/database';
 import {
   adversaryPreviews,
   userAdversaries,
+  userAdversaryComments,
   users,
 } from '@/lib/database/schema';
 import { formatAPIError } from '@/lib/utils';
@@ -118,7 +119,12 @@ export async function GET(request: NextRequest) {
     const meta = { page, pageSize, total: result.count };
 
     const data = await db
-      .select()
+      .select({
+        user_adversaries: userAdversaries,
+        users: users,
+        adversary_previews: adversaryPreviews,
+        commentCount: sql<number>`(SELECT COUNT(*) FROM ${userAdversaryComments} WHERE ${userAdversaryComments.userAdversaryId} = ${userAdversaries.id})::int`,
+      })
       .from(userAdversaries)
       .leftJoin(users, eq(userAdversaries.userId, users.id))
       .leftJoin(
@@ -144,6 +150,7 @@ export async function GET(request: NextRequest) {
           userAdversary: d.user_adversaries,
           adversaryPreview: d.adversary_previews,
           user: d.users,
+          commentCount: d.commentCount,
         })),
         meta,
       },

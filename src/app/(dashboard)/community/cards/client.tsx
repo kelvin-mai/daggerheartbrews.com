@@ -26,7 +26,12 @@ import { CommunityCard, SortTabs, type SortMode } from '@/components/post';
 import { cardTypes } from '@/lib/types/card-creation';
 import { capitalize } from '@/lib/utils';
 
-type Data = { userCard: UserCard; user: User; cardPreview: CardDetails };
+type Data = {
+  userCard: UserCard;
+  user: User;
+  cardPreview: CardDetails;
+  commentCount: number;
+};
 
 const typeOptions: Option[] = cardTypes.map((t) => ({
   value: t,
@@ -161,6 +166,7 @@ export const CommunityCards = () => {
           onVoteToggle={() =>
             queryClient.invalidateQueries({ queryKey: ['votes', 'cards'] })
           }
+          commentCount={card.commentCount}
         />
       ))}
       {cards.length > 0 ? (

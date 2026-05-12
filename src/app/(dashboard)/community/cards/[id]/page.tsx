@@ -3,8 +3,19 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 
 import { db } from '@/lib/database';
-import { cardPreviews, userCards, users } from '@/lib/database/schema';
-import type { CardDetails, User, UserCard } from '@/lib/types';
+import {
+  cardPreviews,
+  userCardComments,
+  userCards,
+  users,
+} from '@/lib/database/schema';
+import type {
+  CardDetails,
+  CommentWithUser,
+  User,
+  UserCard,
+  UserCardComment,
+} from '@/lib/types';
 
 import { CommunityCardDetail } from './client';
 
@@ -32,11 +43,26 @@ export default async function Page({ params }: Props) {
 
   if (!result?.card_previews) notFound();
 
+  const rawComments = await db
+    .select()
+    .from(userCardComments)
+    .leftJoin(users, eq(userCardComments.userId, users.id))
+    .where(eq(userCardComments.userCardId, id))
+    .orderBy(userCardComments.createdAt);
+
+  const postComments: CommentWithUser<UserCardComment>[] = rawComments.map(
+    (row) => ({
+      comment: row.user_card_comments as UserCardComment,
+      user: row.users as User | null,
+    }),
+  );
+
   return (
     <CommunityCardDetail
       userCard={result.user_cards as UserCard}
       cardPreview={result.card_previews as CardDetails}
       user={result.users as User}
+      comments={postComments}
     />
   );
 }

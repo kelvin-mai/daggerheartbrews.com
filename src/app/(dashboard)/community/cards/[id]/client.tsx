@@ -6,13 +6,20 @@ import { useRouter } from 'next/navigation';
 import { Bookmark, ChevronLeft, LayoutTemplate } from 'lucide-react';
 import { toast } from 'sonner';
 
-import type { CardDetails, User, UserCard } from '@/lib/types';
+import type {
+  CardDetails,
+  CommentWithUser,
+  User,
+  UserCard,
+  UserCardComment,
+} from '@/lib/types';
 import { toggleCardBookmark } from '@/actions/bookmarks';
 import { toggleCardVote } from '@/actions/votes';
 import { useCardActions } from '@/store';
 import { cn } from '@/lib/utils';
 import { useSession } from '@/lib/auth/client';
 import { CardPreview } from '@/components/card-creation/preview';
+import { CommentSection } from '@/components/post/comment-section';
 import { VoteButton } from '@/components/post/vote-button';
 import { Button } from '@/components/ui/button';
 
@@ -20,12 +27,14 @@ type Props = {
   userCard: UserCard;
   cardPreview: CardDetails;
   user: User;
+  comments: CommentWithUser<UserCardComment>[];
 };
 
 export const CommunityCardDetail: React.FC<Props> = ({
   userCard,
   cardPreview,
   user,
+  comments,
 }) => {
   const { setCardDetails } = useCardActions();
   const router = useRouter();
@@ -155,6 +164,15 @@ export const CommunityCardDetail: React.FC<Props> = ({
           <LayoutTemplate className='size-4' />
           Use as Template
         </Button>
+      </div>
+
+      <div className='mt-8'>
+        <CommentSection
+          comments={comments}
+          postType='card'
+          postId={userCard.id}
+          currentUserId={session.data?.user?.id}
+        />
       </div>
     </>
   );
