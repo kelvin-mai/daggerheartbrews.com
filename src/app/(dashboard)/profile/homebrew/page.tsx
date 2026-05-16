@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { eq } from 'drizzle-orm';
+import { asc, eq } from 'drizzle-orm';
 import { Layers, Skull, Trees, Plus } from 'lucide-react';
 
 import type {
@@ -43,7 +43,8 @@ export default async function Page() {
     .select()
     .from(userCards)
     .leftJoin(cardPreviews, eq(userCards.cardPreviewId, cardPreviews.id))
-    .where(eq(userCards.userId, session.user.id));
+    .where(eq(userCards.userId, session.user.id))
+    .orderBy(asc(userCards.createdAt));
 
   const allAdversaryData = await db
     .select()
@@ -52,7 +53,8 @@ export default async function Page() {
       adversaryPreviews,
       eq(userAdversaries.adversaryPreviewId, adversaryPreviews.id),
     )
-    .where(eq(userAdversaries.userId, session.user.id));
+    .where(eq(userAdversaries.userId, session.user.id))
+    .orderBy(asc(userAdversaries.createdAt));
 
   const adversaryData = allAdversaryData.filter(
     (d) => d.adversary_previews?.type === 'adversary',

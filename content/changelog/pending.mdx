@@ -28,6 +28,8 @@ title: 'Pending'
 
 ## Fixed
 
+- Adversary feature text editor no longer shows content from a previously viewed adversary when navigating between edit pages ([#26](https://github.com/YOUR_USERNAME/daggerheart-brews/issues/26)).
+- Adversary and card lists on the homebrew page now maintain stable order after saving; updating an adversary no longer causes it to jump to the bottom of the list ([#26](https://github.com/YOUR_USERNAME/daggerheart-brews/issues/26)).
 - Uploaded images are no longer cropped to a square — the crop area now matches the card's rectangular image region.
 - Class card divider now shows the class name instead of the generic label "CLASS" ([#22](https://github.com/YOUR_USERNAME/daggerheart-brews/pull/22)).
 - Sidebar session state no longer causes a hydration mismatch on first load.
@@ -47,3 +49,6 @@ title: 'Pending'
 - Community API routes (`/api/community/cards`, `/api/community/adversary`) now accept a `sort` query param (`hot` | `new` | `top`) using a time-decay hot score computed in Postgres.
 - Added `/api/votes/cards` and `/api/votes/adversaries` read endpoints returning the current user's vote map.
 - `ResponsiveDialog` now accepts an optional `icon` prop; when provided the trigger renders as an icon-only button with a Radix tooltip, composing `TooltipTrigger asChild` over `DialogTrigger asChild`.
+- `AdversaryEditInitializer` now uses `useLayoutEffect` instead of `useEffect` so the Zustand store is populated before the browser paints, eliminating the stale-state window on navigation.
+- `RulesForm` tracks the active adversary ID via a ref and calls `editor.commands.setContent()` when the ID changes, ensuring TipTap reflects the correct adversary text after client-side navigation.
+- Homebrew page queries for `userCards` and `userAdversaries` now include `ORDER BY created_at ASC` for deterministic list ordering.

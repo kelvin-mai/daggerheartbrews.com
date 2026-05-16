@@ -13,7 +13,7 @@ export const AdversaryEditInitializer: React.FC<Props> = ({
 }) => {
   const { setAdversaryDetails, setUserAdversary } = useAdversaryActions();
 
-  React.useEffect(() => {
+  React.useLayoutEffect(() => {
     setAdversaryDetails(adversary);
     setUserAdversary(userAdversary);
   }, []);

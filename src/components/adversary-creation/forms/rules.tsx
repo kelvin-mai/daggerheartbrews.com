@@ -91,7 +91,7 @@ export const AssistedFeatureText = ({
 
 export const RulesForm = () => {
   const {
-    adversary: { text },
+    adversary: { text, id },
   } = useAdversaryStore();
   const initialFeature: AdversaryFeature = {
     name: '',
@@ -103,10 +103,19 @@ export const RulesForm = () => {
   const [feature, setFeature] = React.useState('');
   const [custom, setCustom] = React.useState<AdversaryFeature>(initialFeature);
 
+  const adversaryIdRef = React.useRef(id);
+
   const editor = useRichTextEditor({
     defaultValue: text,
     onChange: (v) => setAdversaryDetails({ text: v }),
   });
+
+  React.useLayoutEffect(() => {
+    if (editor && adversaryIdRef.current !== id) {
+      adversaryIdRef.current = id;
+      editor.commands.setContent(text || '');
+    }
+  }, [id, text, editor]);
 
   const handleSelect = (v: string) => {
     setOpen(false);
