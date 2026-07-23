@@ -1,5 +1,9 @@
 import type { CardClassOption, CardDomainOption } from '@/lib/types';
-import { downloadElementAsImage } from '@/lib/utils';
+import {
+  assertPayloadSize,
+  downloadElementAsImage,
+  parseJSONResponse,
+} from '@/lib/utils';
 import type { ZustandGet, ZustandSet } from '../types';
 import type { CardEffects, CardState, CardStore } from './types';
 
@@ -49,16 +53,21 @@ const saveCardPreview =
   (get: ZustandGet<CardStore>): CardEffects['saveCardPreview'] =>
   async () => {
     const { card, userCard } = get();
+    const body = { card, userCard };
+    assertPayloadSize(body);
     const res = await fetch(
       `/api/card-preview/${userCard?.cardPreviewId && card.id && userCard?.cardPreviewId === card.id ? card.id : ''}`,
       {
         method: 'POST',
-        body: JSON.stringify({ card, userCard }),
+        body: JSON.stringify(body),
       },
     );
-    const data = await res.json();
+    const data = await parseJSONResponse<{
+      success: boolean;
+      error?: { message: string };
+    }>(res);
     if (!data.success) {
-      throw new Error(data.error.message);
+      throw new Error(data.error?.message);
     }
   };
 
