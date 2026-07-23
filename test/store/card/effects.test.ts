@@ -4,7 +4,8 @@ import { initialState } from '@/store/card';
 import type { CardStore } from '@/store/card/types';
 import type { UserCard } from '@/lib/types';
 
-vi.mock('@/lib/utils', () => ({
+vi.mock('@/lib/utils', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/lib/utils')>()),
   downloadElementAsImage: vi.fn().mockResolvedValue(undefined),
 }));
 
@@ -164,6 +165,7 @@ describe('card/effects', () => {
       vi.stubGlobal(
         'fetch',
         vi.fn().mockResolvedValue({
+          headers: { get: () => 'application/json' },
           json: () => Promise.resolve({ success: true }),
         }),
       );
@@ -185,6 +187,7 @@ describe('card/effects', () => {
       vi.stubGlobal(
         'fetch',
         vi.fn().mockResolvedValue({
+          headers: { get: () => 'application/json' },
           json: () => Promise.resolve({ success: true }),
         }),
       );
@@ -207,6 +210,7 @@ describe('card/effects', () => {
       vi.stubGlobal(
         'fetch',
         vi.fn().mockResolvedValue({
+          headers: { get: () => 'application/json' },
           json: () =>
             Promise.resolve({
               success: false,
@@ -218,6 +222,33 @@ describe('card/effects', () => {
       const { get } = makeGet();
       const effects = createEffects(vi.fn(), get);
       await expect(effects.saveCardPreview()).rejects.toThrow('save failed');
+    });
+
+    it('throws a friendly error when the server returns a non-JSON response', async () => {
+      vi.stubGlobal(
+        'fetch',
+        vi.fn().mockResolvedValue({
+          headers: { get: () => 'text/plain' },
+          text: () => Promise.resolve('Request Entity Too Large'),
+        }),
+      );
+
+      const { get } = makeGet();
+      const effects = createEffects(vi.fn(), get);
+      await expect(effects.saveCardPreview()).rejects.toThrow(
+        'Something went wrong. Please try again.',
+      );
+    });
+
+    it('rejects before fetching when the payload is too large', async () => {
+      vi.stubGlobal('fetch', vi.fn());
+
+      const { get } = makeGet({
+        card: { ...initialState.card, text: 'a'.repeat(5 * 1024 * 1024) },
+      });
+      const effects = createEffects(vi.fn(), get);
+      await expect(effects.saveCardPreview()).rejects.toThrow('too large');
+      expect(fetch).not.toHaveBeenCalled();
     });
   });
 });

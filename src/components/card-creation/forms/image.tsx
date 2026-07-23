@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { toast } from 'sonner';
 
 import { formatBytes, useFileUpload } from '@/hooks/use-file-upload';
 import { Button } from '@/components/ui/button';
@@ -102,13 +103,17 @@ const ImageCropPreview: React.FC<ImageCropPreviewProps> = ({
   </div>
 );
 
+const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
+
 export const ImageForm = () => {
   const {
     card: { image },
   } = useCardStore();
   const { setCardDetails } = useCardActions();
-  const [{ files }, { removeFile, openFileDialog, getInputProps, addFiles }] =
-    useFileUpload({ accept: 'image/*' });
+  const [
+    { files, errors },
+    { removeFile, openFileDialog, getInputProps, addFiles },
+  ] = useFileUpload({ accept: 'image/*', maxSize: MAX_IMAGE_SIZE });
   const [file] = files;
   const hasInitialized = React.useRef(false);
 
@@ -126,6 +131,10 @@ export const ImageForm = () => {
         .catch((err) => console.error('Failed to load image:', err));
     }
   }, [image, files.length, addFiles]);
+
+  React.useEffect(() => {
+    errors.forEach((error) => toast.error(error));
+  }, [errors]);
 
   React.useEffect(() => {
     if (file?.preview) {

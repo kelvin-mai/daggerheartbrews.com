@@ -1,4 +1,8 @@
-import { downloadElementAsImage } from '@/lib/utils';
+import {
+  assertPayloadSize,
+  downloadElementAsImage,
+  parseJSONResponse,
+} from '@/lib/utils';
 import type { ZustandGet, ZustandSet } from '../types';
 import type { AdversaryEffects, AdversaryState, AdversaryStore } from './types';
 
@@ -22,21 +26,22 @@ export const createEffects = (
     }
   },
   saveAdversaryPreview: async () => {
-    try {
-      const { adversary, userAdversary } = get();
-      const res = await fetch(
-        `/api/adversary-preview/${userAdversary?.adversaryPreviewId && adversary.id && userAdversary?.adversaryPreviewId === adversary.id ? adversary.id : ''}`,
-        {
-          method: 'POST',
-          body: JSON.stringify({ adversary, userAdversary }),
-        },
-      );
-      const data = await res.json();
-      if (!data.success) {
-        throw Error(data.error.message);
-      }
-    } catch (e) {
-      throw e;
+    const { adversary, userAdversary } = get();
+    const body = { adversary, userAdversary };
+    assertPayloadSize(body);
+    const res = await fetch(
+      `/api/adversary-preview/${userAdversary?.adversaryPreviewId && adversary.id && userAdversary?.adversaryPreviewId === adversary.id ? adversary.id : ''}`,
+      {
+        method: 'POST',
+        body: JSON.stringify(body),
+      },
+    );
+    const data = await parseJSONResponse<{
+      success: boolean;
+      error?: { message: string };
+    }>(res);
+    if (!data.success) {
+      throw new Error(data.error?.message);
     }
   },
 });

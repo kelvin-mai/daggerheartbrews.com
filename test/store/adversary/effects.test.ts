@@ -4,7 +4,8 @@ import { initialState } from '@/store/adversary';
 import type { AdversaryStore } from '@/store/adversary/types';
 import type { UserAdversary } from '@/lib/types';
 
-vi.mock('@/lib/utils', () => ({
+vi.mock('@/lib/utils', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/lib/utils')>()),
   downloadElementAsImage: vi.fn().mockResolvedValue(undefined),
 }));
 
@@ -94,6 +95,7 @@ describe('adversary/effects', () => {
       vi.stubGlobal(
         'fetch',
         vi.fn().mockResolvedValue({
+          headers: { get: () => 'application/json' },
           json: () => Promise.resolve({ success: true }),
         }),
       );
@@ -115,6 +117,7 @@ describe('adversary/effects', () => {
       vi.stubGlobal(
         'fetch',
         vi.fn().mockResolvedValue({
+          headers: { get: () => 'application/json' },
           json: () => Promise.resolve({ success: true }),
         }),
       );
@@ -137,6 +140,7 @@ describe('adversary/effects', () => {
       vi.stubGlobal(
         'fetch',
         vi.fn().mockResolvedValue({
+          headers: { get: () => 'application/json' },
           json: () =>
             Promise.resolve({
               success: false,
@@ -163,6 +167,36 @@ describe('adversary/effects', () => {
       await expect(effects.saveAdversaryPreview()).rejects.toThrow(
         'network error',
       );
+    });
+
+    it('throws a friendly error when the server returns a non-JSON response', async () => {
+      vi.stubGlobal(
+        'fetch',
+        vi.fn().mockResolvedValue({
+          headers: { get: () => 'text/plain' },
+          text: () => Promise.resolve('Request Entity Too Large'),
+        }),
+      );
+
+      const { get } = makeGet();
+      const effects = createEffects(vi.fn(), get);
+      await expect(effects.saveAdversaryPreview()).rejects.toThrow(
+        'Something went wrong. Please try again.',
+      );
+    });
+
+    it('rejects before fetching when the payload is too large', async () => {
+      vi.stubGlobal('fetch', vi.fn());
+
+      const { get } = makeGet({
+        adversary: {
+          ...initialState.adversary,
+          text: 'a'.repeat(5 * 1024 * 1024),
+        },
+      });
+      const effects = createEffects(vi.fn(), get);
+      await expect(effects.saveAdversaryPreview()).rejects.toThrow('too large');
+      expect(fetch).not.toHaveBeenCalled();
     });
   });
 });
