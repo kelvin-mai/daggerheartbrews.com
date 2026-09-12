@@ -26,13 +26,13 @@ const imgClasses = (type: CardType): string => {
 const titleClasses = (type: CardType): string => {
   switch (type) {
     case 'ancestry':
-      return 'top-[2.94cqw] right-[4.12cqw] tracking-[0.59cqw] text-[3.53cqw]';
+      return 'top-[2cqw] left-[72.1cqw] flex h-[5.9cqw] w-[25.3cqw] items-center justify-center text-center tracking-[0.3cqw] text-[4.5cqw]';
     case 'community':
-      return '-top-[9.41cqw] right-[9.41cqw] tracking-[0.29cqw] text-[3.53cqw]';
+      return '-top-[9.5cqw] left-[66.5cqw] flex h-[5.23cqw] w-[24.6cqw] items-center justify-center text-center tracking-[0.1cqw] text-[4cqw]';
     case 'equipment':
-      return '-top-[9.41cqw] left-[10cqw] tracking-[0.29cqw] text-[3.53cqw]';
+      return '-top-[9.6cqw] left-[9.7cqw] flex h-[5.2cqw] w-[25cqw] items-center justify-center text-center tracking-[0.3cqw] text-[3.8cqw]';
     case 'transformation':
-      return '-top-[5.59cqw] left-[6.47cqw] tracking-[0.29cqw] text-[3.24cqw]';
+      return '-top-[5.3cqw] left-[5.5cqw] flex h-[3.58cqw] w-[33.65cqw] items-center justify-center text-center tracking-[0.2cqw] text-[3.3cqw]';
     case 'domain':
     case 'class':
     case 'subclass':
