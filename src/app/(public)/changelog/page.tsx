@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
-import { getChangelogVersions } from '@/lib/mdx';
+import { env } from '@/lib/env';
+import { getChangelogSlug, getChangelogVersions } from '@/lib/mdx';
 
 export const metadata: Metadata = {
   title: 'Changelog',
@@ -9,7 +10,9 @@ export const metadata: Metadata = {
 };
 
 export default function ChangelogPage() {
-  const versions = getChangelogVersions();
+  const versions = getChangelogVersions().filter(
+    ({ version }) => version !== 'pending' || env.ENV !== 'production',
+  );
 
   return (
     <div className='mx-auto max-w-3xl space-y-12'>
@@ -24,7 +27,7 @@ export default function ChangelogPage() {
         {versions.map(({ version, date, title }) => (
           <li key={version}>
             <Link
-              href={`/changelog/v${version}`}
+              href={`/changelog/${getChangelogSlug(version)}`}
               className='group flex items-baseline gap-3'
             >
               <span className='text-2xl font-bold group-hover:underline group-hover:underline-offset-4'>

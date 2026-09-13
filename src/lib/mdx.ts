@@ -49,6 +49,9 @@ export const getChangelogVersions = (): ChangelogFrontmatter[] => {
     });
 };
 
+export const getChangelogSlug = (version: string): string =>
+  version === 'pending' ? 'pending' : `v${version}`;
+
 export const getChangelogEntry = async (
   version: string,
   components: MDXComponents,
