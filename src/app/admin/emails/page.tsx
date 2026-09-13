@@ -24,7 +24,7 @@ export default async function EmailPreviewPage() {
         url='http://localhost:3000/reset-password?token=preview'
       />,
     ).then((html) => ({ name: 'Reset Password', html })),
-    render(<ChangelogEmail version='v1.1.0' />).then((html) => ({
+    render(<ChangelogEmail version='v1.2.0' />).then((html) => ({
       name: 'Changelog',
       html,
     })),
