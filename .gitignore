@@ -52,3 +52,6 @@ migrations/
 # submodules
 srd-source
 .gitmodules
+
+# agents
+.pipeline/
