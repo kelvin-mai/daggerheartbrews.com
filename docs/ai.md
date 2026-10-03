@@ -32,12 +32,15 @@ Runs the full pre-commit quality pipeline in order and attempts to fix any failu
 
 Steps:
 
-1. **Tests** — `pnpm run test --run`
-2. **Lint** — `pnpm run lint:fix`
-3. **Format** — `pnpm run format`
-4. **Docs** — reviews staged changes and updates any affected documentation
+1. **Test coverage** — checks changes against `main` and writes missing unit/e2e tests
+2. **Build** — `pnpm run build`
+3. **Tests** — `pnpm run test --run`
+4. **Lint** — `pnpm run lint:fix`
+5. **Format** — `pnpm run format`
+6. **Docs** — reviews staged and unstaged changes and updates any affected documentation
+7. **Changelog** — runs `/changelog` to add undocumented commits to `content/changelog/pending.mdx`
 
-Use this before committing to catch issues without needing to remember each check individually.
+It never commits. Use this before committing to catch issues without needing to remember each check individually.
 
 #### `/ship-feature <feature request>`
 
