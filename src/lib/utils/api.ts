@@ -13,9 +13,13 @@ export const formatAPIError = (error: unknown) => {
 
 // Vercel serverless functions reject request bodies over 4.5MB before they
 // reach the route handler, so we check client-side and leave some headroom.
-const MAX_REQUEST_BODY_SIZE = 4 * 1024 * 1024;
+export const MAX_REQUEST_BODY_SIZE = 4 * 1024 * 1024;
+export const PAYLOAD_OVERHEAD = 256 * 1024;
+export const MAX_IMAGE_UPLOAD_SIZE = Math.floor(
+  ((MAX_REQUEST_BODY_SIZE - PAYLOAD_OVERHEAD) * 3) / 4,
+);
 
-export const assertPayloadSize = (payload: unknown) => {
+export const assertPayloadSize = (payload: unknown): void => {
   const size = new Blob([JSON.stringify(payload)]).size;
   if (size > MAX_REQUEST_BODY_SIZE) {
     throw new Error(

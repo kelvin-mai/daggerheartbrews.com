@@ -1,5 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
 
+import { MAX_IMAGE_UPLOAD_SIZE } from '../../src/lib/utils/api';
 import { PNG_1X1 } from '../fixtures';
 
 async function useChainmailArmorAsTemplate(page: Page) {
@@ -124,5 +125,17 @@ test.describe('Card Creator – Use as Template', () => {
       page.getByRole('button', { name: 'Remove image' }),
     ).not.toBeVisible();
     await expect(page.getByRole('button', { name: 'Add Image' })).toBeVisible();
+  });
+
+  test('rejects an oversized image at upload time', async ({ page }) => {
+    await page.setInputFiles('input[aria-label="Upload image file"]', {
+      name: 'big.png',
+      mimeType: 'image/png',
+      buffer: Buffer.alloc(MAX_IMAGE_UPLOAD_SIZE + 1),
+    });
+    await expect(page.getByText(/exceeds the maximum size/)).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: 'Remove image' }),
+    ).not.toBeVisible();
   });
 });

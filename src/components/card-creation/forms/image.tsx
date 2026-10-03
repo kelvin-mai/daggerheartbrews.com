@@ -15,7 +15,7 @@ import {
 } from '@/components/common';
 import { FormContainer } from '@/components/common/form';
 import { CollapsibleContent } from '@/components/ui/collapsible';
-import { fileToBase64 } from '@/lib/utils';
+import { MAX_IMAGE_UPLOAD_SIZE, fileToBase64 } from '@/lib/utils';
 
 const createImage = (url: string): Promise<HTMLImageElement> =>
   new Promise((resolve, reject) => {
@@ -103,8 +103,6 @@ const ImageCropPreview: React.FC<ImageCropPreviewProps> = ({
   </div>
 );
 
-const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
-
 export const ImageForm = () => {
   const {
     card: { image },
@@ -113,7 +111,7 @@ export const ImageForm = () => {
   const [
     { files, errors },
     { removeFile, openFileDialog, getInputProps, addFiles },
-  ] = useFileUpload({ accept: 'image/*', maxSize: MAX_IMAGE_SIZE });
+  ] = useFileUpload({ accept: 'image/*', maxSize: MAX_IMAGE_UPLOAD_SIZE });
   const [file] = files;
   const hasInitialized = React.useRef(false);
 

@@ -3,3 +3,12 @@ version: 'pending'
 date: 'Unreleased'
 title: 'Pending'
 ---
+
+## Fixed
+
+- Card images that were too large to save are now rejected when you pick them, with a message showing the 2.81 MB limit, instead of failing later at save.
+
+## Internal
+
+- `MAX_IMAGE_UPLOAD_SIZE` in `src/lib/utils/api.ts` is now derived from `MAX_REQUEST_BODY_SIZE` (minus `PAYLOAD_OVERHEAD`, adjusted for base64), replacing the hardcoded 5MB limit in the card image form.
+- Added a Claude Code agent pipeline: `planner`, `coder`, `tester`, `reviewer` and `tech-writer` subagents in `.claude/agents/`, chained by the `/ship-feature` skill with handoffs through a git-ignored `.pipeline/` directory. Documented in `docs/ai.md`.

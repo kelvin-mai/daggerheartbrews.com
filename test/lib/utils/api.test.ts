@@ -1,5 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import {
+  MAX_IMAGE_UPLOAD_SIZE,
+  MAX_REQUEST_BODY_SIZE,
+  PAYLOAD_OVERHEAD,
   formatAPIError,
   assertPayloadSize,
   parseJSONResponse,
@@ -60,6 +63,37 @@ describe('assertPayloadSize', () => {
 
   it('throws when the payload exceeds the size limit', () => {
     const payload = { image: 'a'.repeat(5 * 1024 * 1024) };
+    expect(() => assertPayloadSize(payload)).toThrow(
+      'This is too large to save. Try uploading a smaller image.',
+    );
+  });
+});
+
+describe('MAX_IMAGE_UPLOAD_SIZE', () => {
+  it('is derived from the request body limit and overhead', () => {
+    expect(MAX_IMAGE_UPLOAD_SIZE).toBe(
+      Math.floor(((MAX_REQUEST_BODY_SIZE - PAYLOAD_OVERHEAD) * 3) / 4),
+    );
+    expect(MAX_IMAGE_UPLOAD_SIZE).toBe(2949120);
+  });
+
+  it('is less than the request body limit scaled by 3/4', () => {
+    expect(MAX_IMAGE_UPLOAD_SIZE).toBeLessThan((MAX_REQUEST_BODY_SIZE * 3) / 4);
+    expect(MAX_IMAGE_UPLOAD_SIZE).toBeLessThan(MAX_REQUEST_BODY_SIZE);
+  });
+
+  it('allows a max-size image data URL in a typical card payload', () => {
+    const image =
+      'data:image/png;base64,' +
+      'A'.repeat(4 * Math.ceil(MAX_IMAGE_UPLOAD_SIZE / 3));
+    const payload = {
+      card: { name: 'Fireball', text: 'a'.repeat(1000), image },
+    };
+    expect(() => assertPayloadSize(payload)).not.toThrow();
+  });
+
+  it('rejects a payload over the request body limit', () => {
+    const payload = { image: 'a'.repeat(MAX_REQUEST_BODY_SIZE + 1) };
     expect(() => assertPayloadSize(payload)).toThrow(
       'This is too large to save. Try uploading a smaller image.',
     );
