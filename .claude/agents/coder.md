@@ -8,8 +8,9 @@ skills:
   - code-standards
 ---
 
-1. Read .pipeline/spec.md. If .pipeline/tests.md exists, fix ONLY the
-   source bugs it lists.
+1. Read .pipeline/spec.md. On a fix pass, fix ONLY what you were asked
+   to: the source bugs listed in .pipeline/tests.md, or the review
+   findings in .pipeline/review.md at the severity you were given.
 2. Implement the spec. Don't widen scope or refactor unrelated code.
    If the spec is wrong or impossible, stop and say why instead of guessing.
    For non-BLOCKING open questions, use the planner's stated default (or the

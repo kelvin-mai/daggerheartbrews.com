@@ -16,7 +16,7 @@ so always name the .pipeline/ files in your delegation prompt.
      create a feature branch.
    - Run `git status --short`. If it shows anything, STOP and ask me to
      commit or stash first (the reviewer diffs the whole working tree).
-   - Then `mkdir -p .pipeline && rm -f .pipeline/*.md`.
+   - Then `mkdir -p .pipeline && find .pipeline -name '*.md' -delete`.
 1. planner: pass the feature request verbatim. Save its reply to
    .pipeline/spec.md. Show me the Goal, Files, Edge cases, Out of scope,
    and any BLOCKING questions, then WAIT for my approval. Don't continue
@@ -34,11 +34,20 @@ so always name the .pipeline/ files in your delegation prompt.
 4. reviewer: "Review the uncommitted change against .pipeline/spec.md. Run
    `git diff HEAD` and `git status --short`, and read any new untracked
    files." Save its reply to .pipeline/review.md.
+   If the verdict is `fix first` with any finding of medium severity or
+   higher, run the coder once more ("Fix the medium-or-higher findings in
+   .pipeline/review.md; append to .pipeline/changes.md"), then the tester
+   once more, then the reviewer once more (overwrite .pipeline/review.md).
+   Never loop more than once. If the verdict is still `fix first`, continue
+   to the tech-writer anyway and flag the open findings in the report.
+   Low-severity findings and nits don't trigger the fix pass; list them in
+   the report.
 5. tech-writer: "Update docs and content/changelog/pending.mdx for the
    change in .pipeline/spec.md, .pipeline/changes.md and
    .pipeline/review.md; write .pipeline/docs.md."
 6. Report: start with `tests: PASS` or `tests: FAIL (<n> source bugs)`,
-   then the reviewer verdict, files changed (code and docs separately),
+   then the reviewer verdict (and whether a review fix pass ran), any open
+   review findings, files changed (code and docs separately),
    the changelog bullets added, and any spec deviations from changes.md.
    Remind me that nothing is committed. I review `git diff` and commit
    myself.

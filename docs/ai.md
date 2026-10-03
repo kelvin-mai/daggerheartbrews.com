@@ -56,7 +56,7 @@ Steps:
 2. **Plan** — the `planner` writes a spec to `.pipeline/spec.md`. The pipeline **waits for your approval** (or changes) before any code is written
 3. **Implement** — the `coder` implements the spec. If it reports `blocked`, the pipeline stops
 4. **Test** — the `tester` writes and runs tests. If it finds source bugs, the coder gets one fix pass and the tester re-runs once
-5. **Review** — the `reviewer` checks the uncommitted diff against the spec
+5. **Review** — the `reviewer` checks the uncommitted diff against the spec. If it finds medium-or-higher issues, the coder gets one fix pass, then the tester and reviewer re-run once
 6. **Document** — the `tech-writer` updates affected docs and `content/changelog/pending.mdx`
 7. **Report** — test result, review verdict, files changed, changelog bullets added
 
@@ -66,13 +66,13 @@ Nothing is committed. Review `git diff` yourself, then run `/precommit` (which a
 
 Subagents are defined in `.claude/agents/`. Each runs in its own context with a fixed role, tool set, and model. `/ship-feature` chains them, but any of them can also be used on its own (e.g. "use the reviewer agent to review `git diff HEAD~3`").
 
-| Agent         | Model  | Role                                                                  | Can edit                                              | Writes                 |
-| ------------- | ------ | --------------------------------------------------------------------- | ----------------------------------------------------- | ---------------------- |
-| `planner`     | Opus   | Turns a request into a spec: files, signatures, edge cases, test plan | Nothing (read-only)                                   | spec (as its reply)    |
-| `coder`       | Sonnet | Implements the spec exactly; runs lint and `tsc`                      | `src/` and other source files                         | `.pipeline/changes.md` |
-| `tester`      | Sonnet | Writes and runs unit tests (e2e specs only if planned; not run)       | `test/`, `e2e/`                                       | `.pipeline/tests.md`   |
-| `reviewer`    | Sonnet | Reviews a diff for bugs, security, and code-standards issues          | Nothing (read-only)                                   | review (as its reply)  |
-| `tech-writer` | Sonnet | Updates existing docs and the pending changelog entry                 | `docs/`, `README.md`, `content/changelog/pending.mdx` | `.pipeline/docs.md`    |
+| Agent         | Model  | Role                                                                  | Can edit                                                                         | Writes                 |
+| ------------- | ------ | --------------------------------------------------------------------- | -------------------------------------------------------------------------------- | ---------------------- |
+| `planner`     | Opus   | Turns a request into a spec: files, signatures, edge cases, test plan | Nothing (read-only)                                                              | spec (as its reply)    |
+| `coder`       | Sonnet | Implements the spec exactly; runs lint and `tsc`                      | `src/` and other source files                                                    | `.pipeline/changes.md` |
+| `tester`      | Sonnet | Writes and runs unit tests (e2e specs only if planned; not run)       | `test/`, `e2e/`                                                                  | `.pipeline/tests.md`   |
+| `reviewer`    | Sonnet | Reviews a diff for bugs, security, and code-standards issues          | Nothing (read-only)                                                              | review (as its reply)  |
+| `tech-writer` | Sonnet | Updates existing docs and the pending changelog entry                 | `docs/`, `README.md`, code-standards `SKILL.md`, `content/changelog/pending.mdx` | `.pipeline/docs.md`    |
 
 How it fits together:
 
