@@ -23,6 +23,14 @@ export const getCard = (id: string): Card => { ... }
 export function getCard(id: string): Card { ... }
 ```
 
+### Known exceptions
+
+These are deliberate deviations. Leave them as they are.
+
+1. Framework-required function exports: `src/proxy.ts` (`proxy`), `src/instrumentation.ts` (`register`), and `src/app/**` route handlers, `generateMetadata` and default page exports.
+2. Return types may be inferred (explicit types are still welcome) in: `src/actions/*`, `src/lib/email/index.tsx`, `src/lib/mdx.ts`, `createClient` in `src/lib/database/index.ts`, store `createActions`/`createEffects`, and the store hook selectors in `src/store/*/index.ts`.
+3. Deliberate `console.log`: `devLogEmail` in `src/lib/email/index.tsx` (dev fallback when Resend isn't configured), `src/instrumentation.ts` and `src/components/common/version-logger.tsx` (both log the app version).
+
 ---
 
 ## React / Next.js
@@ -128,6 +136,6 @@ return { data: null, error: 'Not authorized' };
 - Do not add comments to code that is self-explanatory
 - Do not add error handling for impossible cases
 - Do not refactor surrounding code when fixing a targeted bug
-- Do not add `console.log` statements
+- Do not add `console.log` statements (the deliberate `console.log` exceptions under Known exceptions stay)
 - Do not create new abstractions for single-use logic
 - Do not use `// TODO` or `// FIXME` without being asked to

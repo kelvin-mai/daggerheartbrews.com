@@ -224,6 +224,22 @@ describe('card/effects', () => {
       await expect(effects.saveCardPreview()).rejects.toThrow('save failed');
     });
 
+    it('falls back to a default message when failure has no error object', async () => {
+      vi.stubGlobal(
+        'fetch',
+        vi.fn().mockResolvedValue({
+          headers: { get: () => 'application/json' },
+          json: () => Promise.resolve({ success: false }),
+        }),
+      );
+
+      const { get } = makeGet();
+      const effects = createEffects(vi.fn(), get);
+      await expect(effects.saveCardPreview()).rejects.toThrow(
+        'Something went wrong. Please try again.',
+      );
+    });
+
     it('throws a friendly error when the server returns a non-JSON response', async () => {
       vi.stubGlobal(
         'fetch',

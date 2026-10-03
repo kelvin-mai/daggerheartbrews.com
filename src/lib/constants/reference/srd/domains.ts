@@ -12,6 +12,6 @@ const domainColors = {
   valor: '#e2680e',
 };
 
-export const domainColor = (domain?: string) => {
+export const domainColor = (domain?: string): string | undefined => {
   return domain ? domainColors[domain as keyof typeof domainColors] : '#fff';
 };

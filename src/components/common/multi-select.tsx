@@ -61,7 +61,7 @@ export type MultipleSelectorRef = {
   reset: () => void;
 };
 
-export function useDebounce<T>(value: T, delay?: number): T {
+export const useDebounce = <T,>(value: T, delay?: number): T => {
   const [debouncedValue, setDebouncedValue] = React.useState<T>(value);
 
   useEffect(() => {
@@ -73,7 +73,7 @@ export function useDebounce<T>(value: T, delay?: number): T {
   }, [value, delay]);
 
   return debouncedValue;
-}
+};
 
 function transToGroupOption(options: Option[], groupBy?: string) {
   if (options.length === 0) {

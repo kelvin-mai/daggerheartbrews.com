@@ -40,6 +40,14 @@ export const getCard = (id: string): Card => { ... }
 export const getCard = (id: string) => { ... }
 ```
 
+**Known exceptions**
+
+These are deliberate deviations. Leave them as they are.
+
+1. Framework-required function exports: `src/proxy.ts` (`proxy`), `src/instrumentation.ts` (`register`), and `src/app/**` route handlers, `generateMetadata` and default page exports.
+2. Return types may be inferred (explicit types are still welcome) in: `src/actions/*`, `src/lib/email/index.tsx`, `src/lib/mdx.ts`, `createClient` in `src/lib/database/index.ts`, store `createActions`/`createEffects`, and the store hook selectors in `src/store/*/index.ts`.
+3. Deliberate `console.log`: `devLogEmail` in `src/lib/email/index.tsx` (dev fallback when Resend isn't configured), `src/instrumentation.ts` and `src/components/common/version-logger.tsx` (both log the app version).
+
 **`export const` over `export function`**
 
 Prefer arrow function syntax for exported functions and components.
@@ -207,7 +215,7 @@ Don't create a new `utils/` file for a one-off helper — colocate it or inline 
 
 - Comments on self-explanatory code
 - Error handling for cases that can't happen
-- `console.log` statements
+- `console.log` statements (except the deliberate ones listed under Known exceptions)
 - `// TODO` or `// FIXME` without prior discussion in an issue
 - New abstractions for single-use logic
 - Refactoring code that surrounds a targeted bug fix

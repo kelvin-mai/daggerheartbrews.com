@@ -156,6 +156,22 @@ describe('adversary/effects', () => {
       );
     });
 
+    it('falls back to a default message when failure has no error object', async () => {
+      vi.stubGlobal(
+        'fetch',
+        vi.fn().mockResolvedValue({
+          headers: { get: () => 'application/json' },
+          json: () => Promise.resolve({ success: false }),
+        }),
+      );
+
+      const { get } = makeGet();
+      const effects = createEffects(vi.fn(), get);
+      await expect(effects.saveAdversaryPreview()).rejects.toThrow(
+        'Something went wrong. Please try again.',
+      );
+    });
+
     it('rethrows unexpected fetch errors', async () => {
       vi.stubGlobal(
         'fetch',

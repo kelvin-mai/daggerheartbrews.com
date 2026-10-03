@@ -41,7 +41,9 @@ export const createEffects = (
       error?: { message: string };
     }>(res);
     if (!data.success) {
-      throw new Error(data.error?.message);
+      throw new Error(
+        data.error?.message ?? 'Something went wrong. Please try again.',
+      );
     }
   },
 });

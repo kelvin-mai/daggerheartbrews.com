@@ -8,10 +8,10 @@ type CollapsibleSectionTriggerProps = React.ComponentProps<
   typeof CollapsibleTrigger
 > & {};
 
-export function CollapsibleSectionTrigger({
+export const CollapsibleSectionTrigger = ({
   children,
   ...props
-}: CollapsibleSectionTriggerProps) {
+}: CollapsibleSectionTriggerProps) => {
   return (
     <CollapsibleTrigger asChild {...props}>
       <button
@@ -24,4 +24,4 @@ export function CollapsibleSectionTrigger({
       </button>
     </CollapsibleTrigger>
   );
-}
+};

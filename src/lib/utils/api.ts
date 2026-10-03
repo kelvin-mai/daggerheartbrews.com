@@ -1,4 +1,6 @@
-export const formatAPIError = (error: unknown) => {
+export const formatAPIError = (
+  error: unknown,
+): { name: string; message: string } => {
   if (error instanceof Error) {
     return {
       name: error.name,

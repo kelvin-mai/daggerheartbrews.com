@@ -1,4 +1,4 @@
-export const getBrightness = (hex: string = '#000000') => {
+export const getBrightness = (hex: string = '#000000'): number => {
   let rgb;
   if (hex[0] === '#') {
     hex = hex.substring(1);
