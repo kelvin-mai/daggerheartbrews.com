@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Lint, test and build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      # Placeholder values so env validation passes; the build never connects to the database.
+      ENV: development
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/brews
+      BETTER_AUTH_SECRET: ci-placeholder-secret
+      BETTER_AUTH_URL: http://localhost:3000
+      NEXT_TELEMETRY_DISABLED: 1
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Check formatting
+        run: pnpm exec prettier --check './src/**/*.{ts,tsx,js,jsx,md,mdx,json}'
+
+      - name: Unit tests
+        run: pnpm test --run
+
+      - name: Build
+        run: pnpm build
