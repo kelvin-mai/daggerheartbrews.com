@@ -6,7 +6,7 @@ A Next.js web application for creating and sharing homebrew content for the Dagg
 
 ## Tech Stack
 
-- **Framework**: Next.js 15 with App Router, TypeScript
+- **Framework**: Next.js 16 with App Router, TypeScript
 - **Styling**: Tailwind CSS v4
 - **Database**: PostgreSQL with Drizzle ORM (Neon serverless in production)
 - **Authentication**: Better Auth
@@ -27,6 +27,14 @@ A Next.js web application for creating and sharing homebrew content for the Dagg
 
 ## Getting Started
 
+### Prerequisites
+
+- Node.js 22.13+ (required by the pinned pnpm version)
+- pnpm, enabled through Corepack: `corepack enable` (the version is pinned in `package.json`)
+- [Docker Desktop](https://www.docker.com/get-started) or [Colima](https://github.com/abiosoft/colima) for the local PostgreSQL database
+
+No third-party accounts are needed. The database runs locally in Docker, emails are printed to the server console, and social login is hidden until you configure it.
+
 ### Quick Start (Local Development)
 
 1. **Clone and install:**
@@ -34,102 +42,62 @@ A Next.js web application for creating and sharing homebrew content for the Dagg
    ```bash
    git clone https://github.com/kelvin-mai/daggerheartbrews.com.git
    cd daggerheartbrews.com
-   npm install
+   pnpm install
    ```
 
 2. **Set up environment:**
 
    ```bash
-   cp .env.local.example .env
+   cp .env.example .env
    ```
 
-   > **Important:** If you already have a `.env.local` file, delete it — Next.js loads `.env.local` with higher priority than `.env`, which can cause unexpected connection errors.
+   The defaults work as-is with the Docker database below.
 
-3. **Start the database** (requires [Docker](https://www.docker.com/get-started)):
+   > **Important:** If you already have a `.env.local` file, delete it. Next.js loads `.env.local` with higher priority than `.env`, which can cause unexpected connection errors.
+
+3. **Start the database** (make sure Docker Desktop or Colima is running first):
 
    ```bash
    docker compose up -d
    ```
 
-   > Make sure Docker Desktop (or the Docker daemon via [Colima](https://github.com/ablemachine/colima)) is running first.
+   On first start, the container runs every file in `sql/`, creating the schema and seeding test users and sample content. See [docs/local-database-setup.md](docs/local-database-setup.md) for details.
 
 4. **Start the dev server:**
+
    ```bash
-   npm run dev
+   pnpm dev
    ```
 
-Open http://localhost:3000. Log in with `admin@test.com` / `Password1`.
+Open http://localhost:3000 and log in with `admin@test.com` / `Password1` (also available: `user@test.com` and `user2@test.com`, same password).
 
 > **Note:** Social login and email sending are disabled by default.
 > To enable them, see [.env.example](.env.example) for the full list of optional environment variables.
 
-### Prerequisites
+### SRD Source (Optional)
 
-- Node.js 20+
-- [Docker Desktop](https://www.docker.com/get-started) or [Colima](https://github.com/ablemachine/colima) (for local PostgreSQL)
-
-### Full Installation
-
-For production-like setup or when you need all features:
-
-1. Clone the repository:
+`srd-source/` is a git submodule used only by the `sync:reference:*` scripts that regenerate the SRD data in `src/lib/constants/reference/srd/`. You don't need it to run the app. If you're working on SRD data:
 
 ```bash
-git clone https://github.com/kelvin-mai/daggerheartbrews.com.git
-cd daggerheartbrews.com
+git submodule update --init
 ```
 
-2. Install dependencies:
-
-```bash
-npm install
-```
-
-3. Set up environment variables:
-
-```bash
-cp .env.example .env
-```
-
-Edit `.env` with your credentials:
-
-- **DATABASE_URL**: PostgreSQL connection string
-- **BETTER_AUTH_SECRET**: Generate with `openssl rand -base64 32`
-- **BETTER_AUTH_URL**: Your app URL (http://localhost:3000 for dev)
-- **DISCORD_CLIENT_ID/SECRET** (optional): From [Discord Developer Portal](https://discord.com/developers/applications)
-- **GOOGLE_CLIENT_ID/SECRET** (optional): From [Google Cloud Console](https://console.cloud.google.com/apis/credentials)
-- **RESEND_API_KEY** (optional): From [Resend](https://resend.com/api-keys)
-
-4. Generate and run database migrations:
-
-```bash
-npm run db:generate
-```
-
-Apply migrations manually by running the SQL files in the `sql/` directory against your database.
-
-5. Start the development server:
-
-```bash
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) to see the app.
+See [docs/srd-sync.md](docs/srd-sync.md).
 
 ## Development
 
 ### Commands
 
 ```bash
-npm run dev          # Start dev server with Turbopack
-npm run build        # Build for production
-npm start            # Start production server
-npm run lint         # Run ESLint
-npm run lint:fix     # Run ESLint with auto-fix
-npm run format       # Format code with Prettier
-npm run test         # Run unit tests with Vitest
-npm run test:e2e     # Run E2E tests with Playwright
-npm run test:e2e:ui  # Run E2E tests with Playwright UI
+pnpm dev             # Start dev server
+pnpm build           # Build for production
+pnpm start           # Start production server
+pnpm lint            # Run ESLint
+pnpm lint:fix        # Run ESLint with auto-fix
+pnpm format          # Format code with Prettier
+pnpm test            # Run unit tests with Vitest
+pnpm test:e2e        # Run E2E tests with Playwright
+pnpm test:e2e:ui     # Run E2E tests with Playwright UI
 ```
 
 For detailed testing guidance, see [docs/testing.md](docs/testing.md).
@@ -137,11 +105,11 @@ For detailed testing guidance, see [docs/testing.md](docs/testing.md).
 ### Database
 
 ```bash
-npm run db:generate           # Generate Drizzle migrations from schema
-npm run migration:generate    # Generate custom migration
+pnpm db:generate             # Generate Drizzle migrations from schema
+pnpm migration:generate      # Generate custom migration
 ```
 
-Migrations are stored in `sql/` directory with numbered prefixes.
+Migrations are stored in the `sql/` directory with numbered prefixes. The Docker container applies them automatically on first start; see [docs/local-database-setup.md](docs/local-database-setup.md) for applying new ones to an existing database.
 
 ### Project Structure
 
@@ -168,7 +136,7 @@ src/
 
 ## Contributing
 
-Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+Contributions are welcome! Please see [CONTRIBUTING.md](.github/CONTRIBUTING.md) for guidelines and [docs/contributing-code-standards.md](docs/contributing-code-standards.md) for code conventions.
 
 ## License
 

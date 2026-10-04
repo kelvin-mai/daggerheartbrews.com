@@ -16,7 +16,7 @@ The project's `docker-compose.yml` file is pre-configured to automatically run a
 The project includes a `docker-compose.yml` file configured for local development. Start the container:
 
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 
 This will:
@@ -48,7 +48,7 @@ You should see all the tables created by the migrations in the `sql/` directory.
 ### 4. Start Development
 
 ```bash
-npm run dev
+pnpm dev
 ```
 
 Your app should now connect to the local PostgreSQL database running in Docker.
@@ -58,25 +58,25 @@ Your app should now connect to the local PostgreSQL database running in Docker.
 ### Start the database
 
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 
 ### Stop the database
 
 ```bash
-docker-compose down
+docker compose down
 ```
 
 ### Stop and remove data (fresh start)
 
 ```bash
-docker-compose down -v
+docker compose down -v
 ```
 
 ### View logs
 
 ```bash
-docker-compose logs -f postgres
+docker compose logs -f db
 ```
 
 ### Connect to PostgreSQL CLI
@@ -169,7 +169,7 @@ docker ps
 Check container logs:
 
 ```bash
-docker-compose logs postgres
+docker compose logs db
 ```
 
 ### Reset Everything
@@ -177,8 +177,8 @@ docker-compose logs postgres
 To start fresh:
 
 ```bash
-docker-compose down -v
-docker-compose up -d
+docker compose down -v
+docker compose up -d
 ```
 
 **Note**: Migrations will automatically run again when the container starts fresh.
@@ -190,8 +190,8 @@ When you add new migration files to the `sql/` directory, you have two options:
 **Option 1: Restart the container (loses data)**
 
 ```bash
-docker-compose down -v
-docker-compose up -d
+docker compose down -v
+docker compose up -d
 ```
 
 **Option 2: Apply manually (preserves data)**
@@ -213,17 +213,22 @@ The `sql/` directory contains both schema migrations and seed data files. Docker
 
 ### SQL Files
 
-| File                          | Purpose                                                                |
-| ----------------------------- | ---------------------------------------------------------------------- |
-| `0000_options.sql`            | Schema: game options/reference tables                                  |
-| `0001_auth.sql`               | Schema: Better Auth tables                                             |
-| `0002_seed-options.sql`       | Seed: game options data                                                |
-| `0003_previews.sql`           | Schema: card/adversary preview tables                                  |
-| `0005_user_items.sql`         | Schema: user-created content tables                                    |
-| `0006_seed-test-users.sql`    | Seed: test user accounts                                               |
-| `0007_seed-content.sql`       | Seed: sample homebrew content                                          |
-| `0008_user-settings.sql`      | Schema: user_settings table                                            |
-| `template_neon-migration.sql` | Template: for drafting Neon migrations (always rolls back — see below) |
+| File                           | Purpose                                                                |
+| ------------------------------ | ---------------------------------------------------------------------- |
+| `0000_options.sql`             | Schema: game options/reference tables                                  |
+| `0001_auth.sql`                | Schema: Better Auth tables                                             |
+| `0002_seed-options.sql`        | Seed: game options data                                                |
+| `0003_previews.sql`            | Schema: card/adversary preview tables                                  |
+| `0005_user_items.sql`          | Schema: user-created content tables                                    |
+| `0006_seed-test-users.sql`     | Seed: test user accounts                                               |
+| `0007_seed-content.sql`        | Seed: sample homebrew content                                          |
+| `0008_user-settings.sql`       | Schema: user_settings table                                            |
+| `0009_bookmarks.sql`           | Schema: card and adversary bookmark tables                             |
+| `0010_seed-bookmarks.sql`      | Seed: sample bookmarks for the test users                              |
+| `0011_votes.sql`               | Schema: vote counts and card/adversary vote tables                     |
+| `0012_comments.sql`            | Schema: card and adversary comment tables                              |
+| `0013_seed-votes-comments.sql` | Seed: sample votes and comments                                        |
+| `template_neon-migration.sql`  | Template: for drafting Neon migrations (always rolls back — see below) |
 
 ## Testing Migrations Before Production
 
@@ -279,6 +284,6 @@ docker exec -i dhbrews_db psql -U postgres -d brews < sql/0006_seed-test-users.s
 To re-seed from scratch, restart the container with volumes removed:
 
 ```bash
-docker-compose down -v
-docker-compose up -d
+docker compose down -v
+docker compose up -d
 ```

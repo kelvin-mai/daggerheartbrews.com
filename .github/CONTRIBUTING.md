@@ -36,9 +36,10 @@ Feature suggestions are welcome! Please:
    - Update documentation as needed
 3. **Test your changes**:
    ```bash
-   npm run lint
-   npm run format
-   npm run build
+   pnpm lint
+   pnpm format
+   pnpm test --run
+   pnpm build
    ```
 4. **Commit with clear messages**:
    - Use present tense ("Add feature" not "Added feature")
@@ -47,28 +48,32 @@ Feature suggestions are welcome! Please:
 
 ## Development Setup
 
-The quickest way to get started:
+You need Node.js 22.13+, pnpm (`corepack enable`) and Docker. Then:
 
 ```bash
 git clone https://github.com/kelvin-mai/daggerheartbrews.com.git
 cd daggerheartbrews.com
-npm install
-cp .env.local.example .env
+pnpm install
+cp .env.example .env
 docker compose up -d
-npm run dev
+pnpm dev
 ```
 
-> **Tip:** If you already have a `.env.local` file, delete it first — it overrides `.env` in Next.js.
+Open http://localhost:3000 and log in with `admin@test.com` / `Password1`.
 
-No third-party accounts needed — OAuth and email are optional. See the [README.md Quick Start](../README.md#quick-start-local-development) for details.
+> **Tip:** If you already have a `.env.local` file, delete it first. It overrides `.env` in Next.js.
+
+No third-party accounts needed: the database runs in Docker, emails are printed to the console, and OAuth is optional. See the [README Quick Start](../README.md#quick-start-local-development) and [docs/local-database-setup.md](../docs/local-database-setup.md) for details.
 
 ## Project Guidelines
 
 ### Code Style
 
+See [docs/contributing-code-standards.md](../docs/contributing-code-standards.md) for the full conventions. In short:
+
 - **TypeScript**: Use strong typing, avoid `any`
-- **Formatting**: Run `npm run format` before committing
-- **Linting**: Ensure `npm run lint` passes
+- **Formatting**: Run `pnpm format` before committing
+- **Linting**: Ensure `pnpm lint` passes
 - **Components**: Follow the existing component organization pattern
 - **Naming**: Use descriptive names (prefer clarity over brevity)
 
@@ -81,7 +86,7 @@ No third-party accounts needed — OAuth and email are optional. See the [README
 
 ### Database Changes
 
-- Generate migrations with `npm run db:generate`
+- Generate migrations with `pnpm db:generate`
 - Test migrations on a clean database
 - Document schema changes in PR description
 - Never edit migration files directly
@@ -89,7 +94,7 @@ No third-party accounts needed — OAuth and email are optional. See the [README
 ### State Management
 
 - Use Zustand stores for global state
-- Follow the existing store pattern (types, actions, effects)
+- Follow the existing store pattern (types, actions, effects, plus computed when a store needs derived values)
 - Keep stores focused on specific domains
 - Document complex state logic
 
