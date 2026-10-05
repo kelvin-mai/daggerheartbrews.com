@@ -64,13 +64,15 @@ describe('adversary/actions', () => {
       const userAdversary = {
         id: 'u1',
         userId: 'user1',
-        adversary: store.state().adversary,
         createdAt: new Date(),
         updatedAt: new Date(),
-      };
-      actions.setUserAdversary(
-        userAdversary as Parameters<typeof actions.setUserAdversary>[0],
-      );
+        public: false,
+        upvotes: 0,
+        downvotes: 0,
+        cardPreviewId: 'adversary-1',
+        adversaryPreviewId: 'adversary-1',
+      } satisfies Parameters<typeof actions.setUserAdversary>[0];
+      actions.setUserAdversary(userAdversary);
       expect(store.state().userAdversary).toEqual(userAdversary);
     });
   });

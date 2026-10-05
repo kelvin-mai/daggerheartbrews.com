@@ -165,13 +165,14 @@ describe('card/actions', () => {
       const userCard = {
         id: 'u1',
         userId: 'user1',
-        card: store.state().card,
         createdAt: new Date(),
         updatedAt: new Date(),
-      };
-      actions.setUserCard(
-        userCard as Parameters<typeof actions.setUserCard>[0],
-      );
+        public: false,
+        upvotes: 0,
+        downvotes: 0,
+        cardPreviewId: 'card-1',
+      } satisfies Parameters<typeof actions.setUserCard>[0];
+      actions.setUserCard(userCard);
       expect(store.state().userCard).toEqual(userCard);
     });
 

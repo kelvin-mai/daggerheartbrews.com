@@ -28,7 +28,16 @@ type TransactionArg = Parameters<TransactionCallback>[0];
 
 type UpdateSession = Parameters<typeof updateCard>[0]['session'];
 
-const mockSession = { user: { id: 'user-1', email: 'user@example.com' } };
+const mockSession = {
+  user: {
+    id: 'user-1',
+    email: 'user@example.com',
+    name: 'Test User',
+    emailVerified: false,
+    createdAt: new Date('2026-01-01T00:00:00Z'),
+    updatedAt: new Date('2026-01-01T00:00:00Z'),
+  },
+} satisfies UpdateSession;
 
 const mockCard = { id: 'card-1', name: 'Test Card', type: 'ancestry' as const };
 const mockCardPreview = { id: 'card-1', name: 'Test Card', type: 'ancestry' };
