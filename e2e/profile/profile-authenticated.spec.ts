@@ -108,3 +108,23 @@ test.describe('User Profile Page', () => {
     await expect(page.getByText(CARD_NAME)).not.toBeVisible();
   });
 });
+
+test.describe('Profile page privacy', () => {
+  test('profile page HTML does not contain the user email', async ({
+    page,
+  }) => {
+    const email = process.env.TEST_USER_EMAIL ?? 'test@example.com';
+    await page.goto('/community/cards');
+    const href = await page
+      .locator('a[href^="/profile/"]')
+      .evaluateAll(
+        (els) =>
+          els
+            .map((el) => el.getAttribute('href') ?? '')
+            .find((h) => /^\/profile\/[0-9a-f-]{36}$/.test(h)) ?? '',
+      );
+    expect(href).not.toBe('');
+    await page.goto(href);
+    expect(await page.content()).not.toContain(email);
+  });
+});

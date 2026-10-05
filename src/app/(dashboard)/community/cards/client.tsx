@@ -12,7 +12,7 @@ import type {
   ApiResponse,
   CardDetails,
   PaginationMeta,
-  User,
+  PublicAuthor,
   UserCard,
 } from '@/lib/types';
 import {
@@ -28,7 +28,7 @@ import { capitalize } from '@/lib/utils';
 
 type Data = {
   userCard: UserCard;
-  user: User;
+  user: PublicAuthor;
   cardPreview: CardDetails;
   commentCount: number;
 };

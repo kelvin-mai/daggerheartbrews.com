@@ -10,7 +10,7 @@ import { toast } from 'sonner';
 import type {
   AdversaryDetails,
   CardDetails,
-  User,
+  PublicAuthor,
   UserAdversary,
   UserCard,
 } from '@/lib/types';
@@ -186,7 +186,7 @@ export const CommunityPost: React.FC<CommunityPostProps> = ({
 
 type CommunityCardProps = React.ComponentProps<'div'> & {
   cardPreview: CardDetails;
-  user: User;
+  user: PublicAuthor;
   userCard: UserCard;
   isBookmarked?: boolean;
   onBookmarkToggle?: () => void;
@@ -335,7 +335,7 @@ export const CommunityCard: React.FC<CommunityCardProps> = ({
 
 type CommunityAdversaryProps = React.ComponentProps<'div'> & {
   adversaryPreview: AdversaryDetails;
-  user: User;
+  user: PublicAuthor;
   userAdversary: UserAdversary;
   isBookmarked?: boolean;
   onBookmarkToggle?: () => void;

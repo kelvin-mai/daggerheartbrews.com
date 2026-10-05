@@ -8,6 +8,7 @@ import {
   userCards,
   users,
 } from '@/lib/database/schema';
+import { publicAuthor } from '@/lib/database/selections';
 import { formatAPIError } from '@/lib/utils';
 
 export async function GET(request: NextRequest) {
@@ -46,7 +47,7 @@ export async function GET(request: NextRequest) {
     const data = await db
       .select({
         user_cards: userCards,
-        users: users,
+        users: publicAuthor,
         card_previews: cardPreviews,
         commentCount: sql<number>`(SELECT COUNT(*) FROM ${userCardComments} WHERE ${userCardComments.userCardId} = ${userCards.id})::int`,
       })

@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 
 import { db } from '@/lib/database';
+import { publicAuthor } from '@/lib/database/selections';
 import {
   cardPreviews,
   userCardComments,
@@ -12,7 +13,7 @@ import {
 import type {
   CardDetails,
   CommentWithUser,
-  User,
+  PublicAuthor,
   UserCard,
   UserCardComment,
 } from '@/lib/types';
@@ -35,7 +36,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function Page({ params }: Props) {
   const { id } = await params;
   const [result] = await db
-    .select()
+    .select({
+      user_cards: userCards,
+      users: publicAuthor,
+      card_previews: cardPreviews,
+    })
     .from(userCards)
     .leftJoin(users, eq(userCards.userId, users.id))
     .leftJoin(cardPreviews, eq(userCards.cardPreviewId, cardPreviews.id))
@@ -44,7 +49,10 @@ export default async function Page({ params }: Props) {
   if (!result?.card_previews) notFound();
 
   const rawComments = await db
-    .select()
+    .select({
+      user_card_comments: userCardComments,
+      users: publicAuthor,
+    })
     .from(userCardComments)
     .leftJoin(users, eq(userCardComments.userId, users.id))
     .where(eq(userCardComments.userCardId, id))
@@ -53,7 +61,7 @@ export default async function Page({ params }: Props) {
   const postComments: CommentWithUser<UserCardComment>[] = rawComments.map(
     (row) => ({
       comment: row.user_card_comments as UserCardComment,
-      user: row.users as User | null,
+      user: row.users,
     }),
   );
 
@@ -61,7 +69,7 @@ export default async function Page({ params }: Props) {
     <CommunityCardDetail
       userCard={result.user_cards as UserCard}
       cardPreview={result.card_previews as CardDetails}
-      user={result.users as User}
+      user={result.users as PublicAuthor}
       comments={postComments}
     />
   );

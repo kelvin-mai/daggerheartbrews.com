@@ -255,3 +255,18 @@ test.describe('Community Environment Detail Page', () => {
     await expect(page.getByText(ENVIRONMENT_NAME)).not.toBeVisible();
   });
 });
+
+test.describe('Community Card Detail privacy', () => {
+  test('detail page HTML does not contain the author email', async ({
+    page,
+  }) => {
+    const email = process.env.TEST_USER_EMAIL ?? 'test@example.com';
+    await page.goto('/community/cards');
+    await getItemRow(page, CARD_NAME)
+      .getByRole('link', { name: CARD_NAME })
+      .click();
+    await expect(page).toHaveURL(/\/community\/cards\/.+/);
+    await expect(page.getByRole('heading', { name: CARD_NAME })).toBeVisible();
+    expect(await page.content()).not.toContain(email);
+  });
+});

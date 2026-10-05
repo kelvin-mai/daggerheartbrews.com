@@ -9,7 +9,7 @@ import { toast } from 'sonner';
 import type {
   CardDetails,
   CommentWithUser,
-  User,
+  PublicAuthor,
   UserCard,
   UserCardComment,
 } from '@/lib/types';
@@ -26,7 +26,7 @@ import { Button } from '@/components/ui/button';
 type Props = {
   userCard: UserCard;
   cardPreview: CardDetails;
-  user: User;
+  user: PublicAuthor;
   comments: CommentWithUser<UserCardComment>[];
 };
 

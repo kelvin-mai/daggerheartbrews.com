@@ -7,7 +7,6 @@ import { Bookmark, Layers, Printer, Skull, Trees } from 'lucide-react';
 import type {
   AdversaryDetails,
   CardDetails,
-  User,
   UserAdversary,
   UserCard,
 } from '@/lib/types';
@@ -20,8 +19,9 @@ import {
   userAdversaryBookmarks,
   userCardBookmarks,
   userCards,
+  users,
 } from '@/lib/database/schema';
-import { users } from '@/lib/database/schema/auth.sql';
+import { publicAuthor } from '@/lib/database/selections';
 import { Collapsible, CollapsibleContent } from '@/components/ui/collapsible';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
@@ -38,7 +38,12 @@ export default async function Page() {
   }
 
   const cardData = await db
-    .select()
+    .select({
+      user_card_bookmarks: userCardBookmarks,
+      user_cards: userCards,
+      card_previews: cardPreviews,
+      users: publicAuthor,
+    })
     .from(userCardBookmarks)
     .innerJoin(userCards, eq(userCardBookmarks.userCardId, userCards.id))
     .innerJoin(cardPreviews, eq(userCards.cardPreviewId, cardPreviews.id))
@@ -46,7 +51,12 @@ export default async function Page() {
     .where(eq(userCardBookmarks.userId, session.user.id));
 
   const allAdversaryData = await db
-    .select()
+    .select({
+      user_adversary_bookmarks: userAdversaryBookmarks,
+      user_adversaries: userAdversaries,
+      adversary_previews: adversaryPreviews,
+      users: publicAuthor,
+    })
     .from(userAdversaryBookmarks)
     .innerJoin(
       userAdversaries,
@@ -133,7 +143,7 @@ export default async function Page() {
                     key={data.user_card_bookmarks.id}
                     cardPreview={data.card_previews as CardDetails}
                     userCard={data.user_cards as UserCard}
-                    user={data.users as User}
+                    user={data.users}
                     isBookmarked
                   />
                 ))}
@@ -182,7 +192,7 @@ export default async function Page() {
                       data.adversary_previews as AdversaryDetails
                     }
                     userAdversary={data.user_adversaries as UserAdversary}
-                    user={data.users as User}
+                    user={data.users}
                     isBookmarked
                   />
                 ))}
@@ -231,7 +241,7 @@ export default async function Page() {
                       data.adversary_previews as AdversaryDetails
                     }
                     userAdversary={data.user_adversaries as UserAdversary}
-                    user={data.users as User}
+                    user={data.users}
                     isBookmarked
                   />
                 ))}

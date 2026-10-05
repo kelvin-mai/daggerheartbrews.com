@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 
 import { db } from '@/lib/database';
+import { publicAuthor } from '@/lib/database/selections';
 import {
   adversaryPreviews,
   cardPreviews,
@@ -15,7 +16,6 @@ import {
 import type {
   AdversaryDetails,
   CardDetails,
-  User,
   UserAdversary,
   UserCard,
 } from '@/lib/types';
@@ -36,7 +36,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function Page({ params }: Props) {
   const { id } = await params;
 
-  const [user] = await db.select().from(users).where(eq(users.id, id));
+  const [user] = await db
+    .select(publicAuthor)
+    .from(users)
+    .where(eq(users.id, id));
   if (!user) notFound();
 
   const cards = await db
@@ -66,7 +69,7 @@ export default async function Page({ params }: Props) {
 
   return (
     <UserProfile
-      user={user as User}
+      user={user}
       cards={
         cards as {
           user_cards: UserCard;

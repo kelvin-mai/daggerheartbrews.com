@@ -12,7 +12,7 @@ import type {
   AdversaryDetails,
   ApiResponse,
   PaginationMeta,
-  User,
+  PublicAuthor,
   UserAdversary,
 } from '@/lib/types';
 import {
@@ -27,7 +27,7 @@ import { capitalize } from '@/lib/utils';
 
 type Data = {
   userAdversary: UserAdversary;
-  user: User;
+  user: PublicAuthor;
   adversaryPreview: AdversaryDetails;
   commentCount: number;
 };

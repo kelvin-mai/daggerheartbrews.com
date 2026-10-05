@@ -174,6 +174,7 @@ The project uses **Drizzle ORM** with PostgreSQL.
 - Use the Drizzle query builder; no raw SQL strings in application code
 - Keep queries in server actions or server-only utility files — never in Client Components
 - Use transactions for multi-step writes
+- Whenever a user is shown to someone else, select `publicAuthor` from `src/lib/database/selections.ts` (id, name, image) instead of the full `users` row, so private columns such as email never reach the client
 
 ---
 

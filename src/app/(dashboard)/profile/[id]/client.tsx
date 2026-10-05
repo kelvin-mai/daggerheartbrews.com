@@ -8,7 +8,7 @@ import { Layers, Settings, Skull, Trees } from 'lucide-react';
 import type {
   AdversaryDetails,
   CardDetails,
-  User,
+  PublicAuthor,
   UserAdversary,
   UserCard,
 } from '@/lib/types';
@@ -32,7 +32,7 @@ type AdversaryRow = {
 };
 
 type Props = {
-  user: User;
+  user: PublicAuthor;
   cards: CardRow[];
   adversaries: AdversaryRow[];
 };

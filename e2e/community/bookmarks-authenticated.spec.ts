@@ -172,3 +172,13 @@ test.describe('Bookmarks', () => {
     await expect(page.getByText(ADVERSARY_NAME)).not.toBeVisible();
   });
 });
+
+test.describe('Bookmarks privacy', () => {
+  test('bookmarks page HTML does not contain the author email', async ({
+    page,
+  }) => {
+    const email = process.env.TEST_USER_EMAIL ?? 'test@example.com';
+    await page.goto('/profile/bookmarks');
+    expect(await page.content()).not.toContain(email);
+  });
+});

@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 
 import { db } from '@/lib/database';
+import { publicAuthor } from '@/lib/database/selections';
 import {
   adversaryPreviews,
   userAdversaries,
@@ -12,7 +13,7 @@ import {
 import type {
   AdversaryDetails,
   CommentWithUser,
-  User,
+  PublicAuthor,
   UserAdversary,
   UserAdversaryComment,
 } from '@/lib/types';
@@ -38,7 +39,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function Page({ params }: Props) {
   const { id } = await params;
   const [result] = await db
-    .select()
+    .select({
+      user_adversaries: userAdversaries,
+      users: publicAuthor,
+      adversary_previews: adversaryPreviews,
+    })
     .from(userAdversaries)
     .leftJoin(users, eq(userAdversaries.userId, users.id))
     .leftJoin(
@@ -50,7 +55,10 @@ export default async function Page({ params }: Props) {
   if (!result?.adversary_previews) notFound();
 
   const rawComments = await db
-    .select()
+    .select({
+      user_adversary_comments: userAdversaryComments,
+      users: publicAuthor,
+    })
     .from(userAdversaryComments)
     .leftJoin(users, eq(userAdversaryComments.userId, users.id))
     .where(eq(userAdversaryComments.userAdversaryId, id))
@@ -59,7 +67,7 @@ export default async function Page({ params }: Props) {
   const postComments: CommentWithUser<UserAdversaryComment>[] = rawComments.map(
     (row) => ({
       comment: row.user_adversary_comments as UserAdversaryComment,
-      user: row.users as User | null,
+      user: row.users,
     }),
   );
 
@@ -67,7 +75,7 @@ export default async function Page({ params }: Props) {
     <CommunityAdversaryDetail
       userAdversary={result.user_adversaries as UserAdversary}
       adversaryPreview={result.adversary_previews as AdversaryDetails}
-      user={result.users as User}
+      user={result.users as PublicAuthor}
       comments={postComments}
     />
   );

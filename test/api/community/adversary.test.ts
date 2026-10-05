@@ -7,6 +7,7 @@ vi.mock('@/lib/database', () => ({
 
 import { GET } from '@/app/api/community/adversary/route';
 import { db } from '@/lib/database';
+import { publicAuthor } from '@/lib/database/selections';
 
 type DbSelectResult = ReturnType<(typeof db)['select']>;
 
@@ -25,7 +26,12 @@ const mockRows = [
       subtype: 'bruiser',
       tier: 1,
     },
-    users: { id: 'user-1', name: 'Alice' },
+    users: {
+      id: 'user-1',
+      name: 'Alice',
+      image: null,
+      email: 'alice@example.com',
+    },
     commentCount: 2,
   },
 ];
@@ -266,5 +272,28 @@ describe('GET /api/community/adversary', () => {
 
     expect(res.status).toBe(201);
     expect(json.success).toBe(true);
+  });
+
+  it('selects only the public author columns', async () => {
+    setupDb(1, mockRows);
+
+    await GET(makeReq());
+
+    const selection = vi.mocked(db.select).mock.calls[1][0] as unknown as {
+      users: unknown;
+    };
+    expect(selection.users).toBe(publicAuthor);
+    expect(Object.keys(publicAuthor)).toEqual(['id', 'name', 'image']);
+  });
+
+  it('returns a null user when the author row is missing', async () => {
+    setupDb(1, [{ ...mockRows[0], users: null }]);
+
+    const res = await GET(makeReq());
+    const json = await res.json();
+
+    expect(res.status).toBe(201);
+    expect(json.success).toBe(true);
+    expect(json.data[0].user).toBeNull();
   });
 });

@@ -19,6 +19,7 @@ import {
   userAdversaryComments,
   users,
 } from '@/lib/database/schema';
+import { publicAuthor } from '@/lib/database/selections';
 import { formatAPIError } from '@/lib/utils';
 
 export async function GET(request: NextRequest) {
@@ -121,7 +122,7 @@ export async function GET(request: NextRequest) {
     const data = await db
       .select({
         user_adversaries: userAdversaries,
-        users: users,
+        users: publicAuthor,
         adversary_previews: adversaryPreviews,
         commentCount: sql<number>`(SELECT COUNT(*) FROM ${userAdversaryComments} WHERE ${userAdversaryComments.userAdversaryId} = ${userAdversaries.id})::int`,
       })
