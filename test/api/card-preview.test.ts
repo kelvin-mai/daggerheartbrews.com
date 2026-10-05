@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { NextRequest } from 'next/server';
+import { z } from 'zod';
 
 vi.mock('@/lib/auth', () => ({
   auth: { api: { getSession: vi.fn() } },
@@ -121,5 +122,27 @@ describe('POST /api/card-preview', () => {
     );
 
     expect(res.status).toBe(413);
+  });
+
+  it('returns 400 ValidationError when insertCard rejects with a ZodError', async () => {
+    vi.mocked(auth.api.getSession).mockResolvedValueOnce(
+      mockSession as unknown as GetSessionResult,
+    );
+    vi.mocked(limitCardInserts).mockResolvedValueOnce(undefined);
+    const result = z
+      .object({ level: z.number().int() })
+      .safeParse({ level: 1.5 });
+    const zodError = result.success ? new Error('unreachable') : result.error;
+    vi.mocked(insertCard).mockRejectedValueOnce(zodError);
+
+    const res = await POST(makeReq({ card: { name: 'x', type: 'bogus' } }));
+    const json = await res.json();
+
+    expect(res.status).toBe(400);
+    expect(json.success).toBe(false);
+    expect(json.error).toEqual({
+      name: 'ValidationError',
+      message: 'Invalid request body',
+    });
   });
 });

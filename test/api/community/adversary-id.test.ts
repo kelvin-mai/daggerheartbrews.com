@@ -47,7 +47,7 @@ describe('PUT /api/community/adversary/[id]', () => {
   it('returns 500 when there is no session', async () => {
     vi.mocked(auth.api.getSession).mockResolvedValueOnce(null);
 
-    const res = await PUT(makeReq({ card: { tier: 2 } }), { params });
+    const res = await PUT(makeReq({ public: true }), { params });
     const json = await res.json();
 
     expect(res.status).toBe(500);
@@ -65,7 +65,7 @@ describe('PUT /api/community/adversary/[id]', () => {
       returning: vi.fn().mockResolvedValue([]),
     } as unknown as DbUpdateResult);
 
-    const res = await PUT(makeReq({ card: { tier: 2 } }), { params });
+    const res = await PUT(makeReq({ public: true }), { params });
     const json = await res.json();
 
     expect(res.status).toBe(404);
@@ -82,7 +82,7 @@ describe('PUT /api/community/adversary/[id]', () => {
       returning: vi.fn().mockResolvedValue([mockUserAdversary]),
     } as unknown as DbUpdateResult);
 
-    const res = await PUT(makeReq({ card: { tier: 2 } }), { params });
+    const res = await PUT(makeReq({ public: true }), { params });
     const json = await res.json();
 
     expect(res.status).toBe(202);
@@ -100,11 +100,90 @@ describe('PUT /api/community/adversary/[id]', () => {
       returning: vi.fn().mockRejectedValue(new Error('DB write failed')),
     } as unknown as DbUpdateResult);
 
-    const res = await PUT(makeReq({ card: { tier: 2 } }), { params });
+    const res = await PUT(makeReq({ public: true }), { params });
     const json = await res.json();
 
     expect(res.status).toBe(500);
     expect(json.success).toBe(false);
+  });
+});
+
+describe('PUT /api/community/adversary/[id] validation', () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  const mockOwned = () => {
+    const set = vi.fn().mockReturnThis();
+    vi.mocked(db.update).mockReturnValue({
+      set,
+      where: vi.fn().mockReturnThis(),
+      returning: vi.fn().mockResolvedValue([mockUserAdversary]),
+    } as unknown as DbUpdateResult);
+    return set;
+  };
+
+  it.each([
+    ['upvotes', { public: true, upvotes: 999 }],
+    ['userId', { public: true, userId: 'other' }],
+    ['preview id', { public: true, adversaryPreviewId: 'x' }],
+  ])('returns 400 and does not update for extra key (%s)', async (_, body) => {
+    vi.mocked(auth.api.getSession).mockResolvedValueOnce(
+      mockSession as unknown as GetSessionResult,
+    );
+
+    const res = await PUT(makeReq(body), { params });
+    const json = await res.json();
+
+    expect(res.status).toBe(400);
+    expect(json.success).toBe(false);
+    expect(db.update).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ['non-boolean public', { public: 'yes' }],
+    ['empty body', {}],
+  ])('returns 400 for %s', async (_, body) => {
+    vi.mocked(auth.api.getSession).mockResolvedValueOnce(
+      mockSession as unknown as GetSessionResult,
+    );
+
+    const res = await PUT(makeReq(body), { params });
+    const json = await res.json();
+
+    expect(res.status).toBe(400);
+    expect(json.success).toBe(false);
+    expect(db.update).not.toHaveBeenCalled();
+  });
+
+  it('returns 202 and sets only public and updatedAt', async () => {
+    vi.mocked(auth.api.getSession).mockResolvedValueOnce(
+      mockSession as unknown as GetSessionResult,
+    );
+    const set = mockOwned();
+
+    const res = await PUT(makeReq({ public: false }), { params });
+    const json = await res.json();
+
+    expect(res.status).toBe(202);
+    expect(json.success).toBe(true);
+    expect(set).toHaveBeenCalledWith({
+      public: false,
+      updatedAt: expect.any(Date),
+    });
+    expect(Object.keys(set.mock.calls[0][0]).sort()).toEqual([
+      'public',
+      'updatedAt',
+    ]);
+  });
+
+  it('returns 500 Unauthorized before parsing an invalid body', async () => {
+    vi.mocked(auth.api.getSession).mockResolvedValueOnce(null);
+
+    const res = await PUT(makeReq({ public: 'yes' }), { params });
+    const json = await res.json();
+
+    expect(res.status).toBe(500);
+    expect(json.error.message).toBe('Unauthorized');
+    expect(db.update).not.toHaveBeenCalled();
   });
 });
 

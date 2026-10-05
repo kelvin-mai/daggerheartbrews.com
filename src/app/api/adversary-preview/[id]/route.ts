@@ -1,7 +1,7 @@
 import { headers } from 'next/headers';
 import { NextResponse, type NextRequest } from 'next/server';
+import { ZodError } from 'zod';
 
-import type { AdversaryDetails } from '@/lib/types';
 import { auth } from '@/lib/auth';
 import {
   formatAPIError,
@@ -16,7 +16,7 @@ export async function POST(
 ) {
   try {
     const id = (await params).id;
-    const body = await readJSONBody<{ adversary: AdversaryDetails }>(req);
+    const body = await readJSONBody<{ adversary: unknown }>(req);
     const session = await auth.api.getSession({
       headers: await headers(),
     });
@@ -35,6 +35,15 @@ export async function POST(
     }
     return NextResponse.json({ success: true, data }, { status: 202 });
   } catch (e) {
+    if (e instanceof ZodError) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: { name: 'ValidationError', message: 'Invalid request body' },
+        },
+        { status: 400 },
+      );
+    }
     return NextResponse.json(
       {
         success: false,

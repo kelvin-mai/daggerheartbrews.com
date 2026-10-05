@@ -11,6 +11,7 @@ title: 'Pending'
 - Saving a card or adversary now checks on the server that you own it, and shows a "Not found" message otherwise.
 - Saves that are too large are now also rejected by the server, with a message suggesting a smaller image.
 - Community pages, profiles and bookmarks no longer include other users' email addresses and other private account details.
+- Changing a post's visibility and saving cards or adversaries now only accept the fields the editor can change, and anything else is rejected.
 
 ## Internal
 
@@ -20,3 +21,5 @@ title: 'Pending'
 - Added explicit return types to `formatAPIError`, `getBrightness`, `getBaseUrl`, `capitalize` and the SRD `domainColor` (now `string | undefined`, behaviour unchanged), and converted `cn`, `QueryProvider`, `useDebounce` and `CollapsibleSectionTrigger` to `export const` arrow functions.
 - Documented known exceptions to the code standards (framework-required exports, inferred return types, deliberate `console.log`) in `.claude/skills/code-standards/SKILL.md` and `docs/contributing-code-standards.md`.
 - Added the shared `publicAuthor` selection in `src/lib/database/selections.ts` and a `PublicAuthor` type; queries that show a user to others now return only `id`, `name` and `image`. Documented in the code standards.
+- Replaced `'use server'` in `src/actions/user-items.ts` with `import 'server-only'`, and added Zod schemas that allow-list the fields written on card and adversary preview saves and on community visibility updates. Added the `server-only` package (mocked in `test/setup.ts`).
+- Documented when to use `import 'server-only'` versus `'use server'` in the code standards.

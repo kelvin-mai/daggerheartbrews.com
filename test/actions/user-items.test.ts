@@ -1,7 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { ZodError } from 'zod';
 
 vi.mock('sanitize-html', () => ({
-  default: vi.fn((html: string) => html),
+  default: vi.fn((html: string) => `clean:${html}`),
 }));
 
 vi.mock('@/lib/database', () => ({
@@ -263,6 +264,232 @@ describe('user-items', () => {
       expect(previewSet).toMatchObject({
         name: 'mockAdversary'.length ? mockAdversary.name : '',
       });
+    });
+  });
+});
+
+describe('user-items preview validation', () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  const extras = {
+    id: 'evil-id',
+    createdAt: 'x',
+    userId: 'other',
+    source: 'srd',
+    features: [],
+  };
+  const cardInput = { name: 'Card', type: 'domain', text: '<b>hi</b>' };
+  const advInput = { name: 'Adv', type: 'standard', text: '<b>hi</b>' };
+  const forbidden = ['id', 'createdAt', 'userId', 'source', 'features'];
+
+  const makeInsertTx = (rows: unknown[]) => {
+    const values = vi.fn().mockReturnThis();
+    const returning = vi
+      .fn()
+      .mockResolvedValueOnce([{ id: 'p-1' }])
+      .mockResolvedValueOnce(rows);
+    const tx = { insert: vi.fn().mockReturnValue({ values, returning }) };
+    vi.mocked(db.transaction).mockImplementation((fn) =>
+      fn(tx as unknown as TransactionArg),
+    );
+    vi.mocked(db.select).mockReturnValue(makeSelectChain([]));
+    return { tx, values };
+  };
+
+  const makeUpdateTx = (owned: unknown[]) => {
+    const set = vi.fn().mockReturnThis();
+    const returning = vi
+      .fn()
+      .mockResolvedValueOnce(owned)
+      .mockResolvedValueOnce([{ id: 'p-1' }]);
+    const tx = {
+      update: vi.fn().mockReturnValue({
+        set,
+        where: vi.fn().mockReturnThis(),
+        returning,
+      }),
+    };
+    vi.mocked(db.transaction).mockImplementation((fn) =>
+      fn(tx as unknown as TransactionArg),
+    );
+    return { tx, set };
+  };
+
+  const session = mockSession as unknown as UpdateSession;
+
+  it('strips extra keys from updateCard set', async () => {
+    const { set } = makeUpdateTx([mockUserCard]);
+    await updateCard({
+      id: 'card-1',
+      body: { card: { ...cardInput, ...extras } },
+      session,
+    });
+    const arg = set.mock.calls[1][0];
+    for (const key of forbidden) expect(arg).not.toHaveProperty(key);
+    expect(arg).toMatchObject({ name: 'Card', type: 'domain' });
+  });
+
+  it('strips extra keys from insertCard values', async () => {
+    const { values } = makeInsertTx([mockUserCard]);
+    await insertCard({
+      body: { card: { ...cardInput, ...extras } },
+      session,
+    });
+    const arg = values.mock.calls[0][0];
+    for (const key of forbidden) expect(arg).not.toHaveProperty(key);
+  });
+
+  it('strips extra keys from updateAdversary set', async () => {
+    const { set } = makeUpdateTx([mockUserAdversary]);
+    await updateAdversary({
+      id: 'adv-1',
+      body: { adversary: { ...advInput, ...extras } },
+      session,
+    });
+    const arg = set.mock.calls[1][0];
+    for (const key of forbidden) expect(arg).not.toHaveProperty(key);
+  });
+
+  it('strips extra keys from insertAdversary values', async () => {
+    const { values } = makeInsertTx([mockUserAdversary]);
+    await insertAdversary({
+      body: { adversary: { ...advInput, ...extras } },
+      session,
+    });
+    const arg = values.mock.calls[0][0];
+    for (const key of forbidden) expect(arg).not.toHaveProperty(key);
+  });
+
+  it('accepts null optional fields from a database row', async () => {
+    const { set } = makeUpdateTx([mockUserCard]);
+    await expect(
+      updateCard({
+        id: 'card-1',
+        body: {
+          card: {
+            ...cardInput,
+            image: null,
+            artist: null,
+            level: null,
+            thresholds: null,
+            domainSecondary: null,
+            handsEnabled: null,
+          },
+        },
+        session,
+      }),
+    ).resolves.not.toBeNull();
+    expect(set).toHaveBeenCalledTimes(2);
+
+    makeUpdateTx([mockUserAdversary]);
+    await expect(
+      updateAdversary({
+        id: 'adv-1',
+        body: {
+          adversary: {
+            ...advInput,
+            subtype: null,
+            hp: null,
+            thresholds: null,
+            potential: null,
+          },
+        },
+        session,
+      }),
+    ).resolves.not.toBeNull();
+  });
+
+  it('produces the same card column set on insert and update', async () => {
+    const input = {
+      ...cardInput,
+      level: 2,
+      thresholds: [1, 2],
+      ...extras,
+    };
+    const { values } = makeInsertTx([mockUserCard]);
+    await insertCard({ body: { card: input }, session });
+    const { set } = makeUpdateTx([mockUserCard]);
+    await updateCard({ id: 'card-1', body: { card: input }, session });
+    expect(Object.keys(set.mock.calls[1][0]).sort()).toEqual(
+      Object.keys(values.mock.calls[0][0]).sort(),
+    );
+  });
+
+  it('produces the same adversary column set on insert and update', async () => {
+    const input = { ...advInput, hp: 5, thresholds: [1, 2], ...extras };
+    const { values } = makeInsertTx([mockUserAdversary]);
+    await insertAdversary({
+      body: { adversary: input },
+      session,
+    });
+    const { set } = makeUpdateTx([mockUserAdversary]);
+    await updateAdversary({
+      id: 'adv-1',
+      body: { adversary: input },
+      session,
+    });
+    expect(Object.keys(set.mock.calls[1][0]).sort()).toEqual(
+      Object.keys(values.mock.calls[0][0]).sort(),
+    );
+  });
+
+  it('sanitizes text on insert and update', async () => {
+    const { values } = makeInsertTx([mockUserCard]);
+    await insertCard({ body: { card: cardInput }, session });
+    expect(values.mock.calls[0][0].text).toBe('clean:<b>hi</b>');
+
+    const { set } = makeUpdateTx([mockUserCard]);
+    await updateCard({ id: 'card-1', body: { card: cardInput }, session });
+    expect(set.mock.calls[1][0].text).toBe('clean:<b>hi</b>');
+  });
+
+  it('turns missing or null text into a sanitized empty string', async () => {
+    const { values } = makeInsertTx([mockUserAdversary]);
+    await insertAdversary({
+      body: { adversary: { name: 'Adv', type: 'standard' } },
+      session,
+    });
+    expect(values.mock.calls[0][0].text).toBe('clean:');
+
+    const { set } = makeUpdateTx([mockUserCard]);
+    await updateCard({
+      id: 'card-1',
+      body: { card: { name: 'Card', type: 'domain', text: null } },
+      session,
+    });
+    expect(set.mock.calls[1][0].text).toBe('clean:');
+  });
+
+  describe('invalid input rejects with ZodError before any db call', () => {
+    it.each([
+      ['card type outside cardTypes', { name: 'C', type: 'bogus' }],
+      ['non-integer level', { ...cardInput, level: 1.5 }],
+      ['missing name', { type: 'domain' }],
+      ['malformed thresholds', { ...cardInput, thresholds: [1] }],
+    ])('insertCard and updateCard: %s', async (_, card) => {
+      await expect(
+        insertCard({ body: { card }, session }),
+      ).rejects.toBeInstanceOf(ZodError);
+      await expect(
+        updateCard({ id: 'card-1', body: { card }, session }),
+      ).rejects.toBeInstanceOf(ZodError);
+      expect(db.select).not.toHaveBeenCalled();
+      expect(db.transaction).not.toHaveBeenCalled();
+    });
+
+    it.each([
+      ['non-string type', { name: 'A', type: 1 }],
+      ['non-integer hp', { ...advInput, hp: 2.5 }],
+      ['non-object body', 'nope'],
+    ])('insertAdversary and updateAdversary: %s', async (_, adversary) => {
+      await expect(
+        insertAdversary({ body: { adversary }, session }),
+      ).rejects.toBeInstanceOf(ZodError);
+      await expect(
+        updateAdversary({ id: 'adv-1', body: { adversary }, session }),
+      ).rejects.toBeInstanceOf(ZodError);
+      expect(db.select).not.toHaveBeenCalled();
+      expect(db.transaction).not.toHaveBeenCalled();
     });
   });
 });

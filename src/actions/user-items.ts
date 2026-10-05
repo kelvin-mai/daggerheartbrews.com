@@ -1,7 +1,8 @@
-'use server';
+import 'server-only';
 
 import { and, count, eq } from 'drizzle-orm';
 import sanitizeHtml from 'sanitize-html';
+import { z } from 'zod';
 
 import { db } from '@/lib/database';
 import {
@@ -11,7 +12,65 @@ import {
   userCards,
   userSettings,
 } from '@/lib/database/schema';
-import type { AdversaryDetails, CardDetails, User } from '@/lib/types';
+import type { User } from '@/lib/types';
+import { cardTypes } from '@/lib/types/card-creation';
+
+const thresholds = z.tuple([z.number(), z.number()]).nullish();
+const int = z.number().int().nullish();
+const str = z.string().nullish();
+const flag = z.boolean().nullish();
+
+const cardPreviewSchema = z.object({
+  name: z.string(),
+  type: z.enum(cardTypes),
+  image: str,
+  text: str,
+  artist: str,
+  credits: str,
+  subtype: str,
+  subtitle: str,
+  level: int,
+  stress: int,
+  evasion: int,
+  thresholds,
+  thresholdsEnabled: flag,
+  tier: int,
+  tierEnabled: flag,
+  hands: int,
+  handsEnabled: flag,
+  armor: int,
+  armorEnabled: flag,
+  domainPrimary: str,
+  domainPrimaryColor: str,
+  domainPrimaryIcon: str,
+  domainSecondary: str,
+  domainSecondaryColor: str,
+  domainSecondaryIcon: str,
+});
+
+const adversaryPreviewSchema = z.object({
+  name: z.string(),
+  type: z.string(),
+  subtype: str,
+  image: str,
+  artist: str,
+  credits: str,
+  tier: int,
+  description: str,
+  subDescription: str,
+  experience: str,
+  text: str,
+  difficulty: str,
+  hp: int,
+  stress: int,
+  thresholds,
+  attack: str,
+  weapon: str,
+  distance: str,
+  damageType: str,
+  damageAmount: str,
+  potential: str,
+});
 
 export const limitCardInserts = async ({
   session,
@@ -33,18 +92,18 @@ export const insertCard = async ({
   body,
   session,
 }: {
-  body: { card: CardDetails };
+  body: { card: unknown };
   session: { user: User };
 }) => {
+  const parsed = cardPreviewSchema.parse(body.card);
   const [prefs] = await db
     .select({ defaultVisibility: userSettings.defaultVisibility })
     .from(userSettings)
     .where(eq(userSettings.userId, session.user.id));
   return await db.transaction(async (tx) => {
-    const { id: _id, ...insertCard } = body.card;
     const [card] = await tx
       .insert(cardPreviews)
-      .values({ ...insertCard, text: sanitizeHtml(insertCard.text || '') })
+      .values({ ...parsed, text: sanitizeHtml(parsed.text ?? '') })
       .returning();
     const [userCard] = await tx
       .insert(userCards)
@@ -64,9 +123,10 @@ export const updateCard = async ({
   session,
 }: {
   id: string;
-  body: { card: CardDetails };
+  body: { card: unknown };
   session: { user: User };
 }) => {
+  const parsed = cardPreviewSchema.parse(body.card);
   return await db.transaction(async (tx) => {
     const [userCard] = await tx
       .update(userCards)
@@ -81,10 +141,9 @@ export const updateCard = async ({
     if (!userCard) {
       return null;
     }
-    const { id: _id, ...updateCard } = body.card;
     const [card] = await tx
       .update(cardPreviews)
-      .set({ ...updateCard, text: sanitizeHtml(updateCard.text || '') })
+      .set({ ...parsed, text: sanitizeHtml(parsed.text ?? '') })
       .where(eq(cardPreviews.id, userCard.cardPreviewId))
       .returning();
     return { card, userCard };
@@ -111,21 +170,18 @@ export const insertAdversary = async ({
   body,
   session,
 }: {
-  body: { adversary: AdversaryDetails };
+  body: { adversary: unknown };
   session: { user: User };
 }) => {
+  const parsed = adversaryPreviewSchema.parse(body.adversary);
   const [prefs] = await db
     .select({ defaultVisibility: userSettings.defaultVisibility })
     .from(userSettings)
     .where(eq(userSettings.userId, session.user.id));
   return await db.transaction(async (tx) => {
-    const { id: _id, ...insertAdversary } = body.adversary;
     const [adversary] = await tx
       .insert(adversaryPreviews)
-      .values({
-        ...insertAdversary,
-        text: sanitizeHtml(insertAdversary.text || ''),
-      })
+      .values({ ...parsed, text: sanitizeHtml(parsed.text ?? '') })
       .returning();
     const [userAdversary] = await tx
       .insert(userAdversaries)
@@ -145,9 +201,10 @@ export const updateAdversary = async ({
   session,
 }: {
   id: string;
-  body: { adversary: AdversaryDetails };
+  body: { adversary: unknown };
   session: { user: User };
 }) => {
+  const parsed = adversaryPreviewSchema.parse(body.adversary);
   return await db.transaction(async (tx) => {
     const [userAdversary] = await tx
       .update(userAdversaries)
@@ -162,13 +219,9 @@ export const updateAdversary = async ({
     if (!userAdversary) {
       return null;
     }
-    const { id: _id, ...updateAdversary } = body.adversary;
     const [adversary] = await tx
       .update(adversaryPreviews)
-      .set({
-        ...updateAdversary,
-        text: sanitizeHtml(updateAdversary.text || ''),
-      })
+      .set({ ...parsed, text: sanitizeHtml(parsed.text ?? '') })
       .where(eq(adversaryPreviews.id, userAdversary.adversaryPreviewId))
       .returning();
     return { adversary, userAdversary };

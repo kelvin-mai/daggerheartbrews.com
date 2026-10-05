@@ -281,16 +281,14 @@ describe('comments/createAdversaryComment', () => {
 
     vi.mocked(db.insert).mockReturnValueOnce({
       values: vi.fn().mockReturnThis(),
-      returning: vi
-        .fn()
-        .mockResolvedValueOnce([
-          {
-            id: COMMENT_ID,
-            userId: 'user-1',
-            userAdversaryId: ADVERSARY_ID,
-            body: 'Nice env',
-          },
-        ]),
+      returning: vi.fn().mockResolvedValueOnce([
+        {
+          id: COMMENT_ID,
+          userId: 'user-1',
+          userAdversaryId: ADVERSARY_ID,
+          body: 'Nice env',
+        },
+      ]),
     } as unknown as DbInsertResult);
 
     vi.mocked(db.select).mockReturnValueOnce(

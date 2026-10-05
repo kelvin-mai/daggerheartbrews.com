@@ -89,6 +89,7 @@ These are deliberate deviations. Leave them as they are.
 - Validate input with Zod at the action boundary before any DB call
 - Return a typed result object `{ data, error }` — never throw to the client
 - Use `revalidatePath` / `revalidateTag` to invalidate cache after mutations
+- Modules only called from server code use `import 'server-only'`; `'use server'` is only for actions the UI calls, and each must read the session itself, never take it as an argument
 
 ```ts
 // preferred return shape

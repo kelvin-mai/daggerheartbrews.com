@@ -1,12 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { headers } from 'next/headers';
 import { and, eq } from 'drizzle-orm';
+import { z, ZodError } from 'zod';
 
-import type { CardDetails } from '@/lib/types';
 import { db } from '@/lib/database';
 import { formatAPIError } from '@/lib/utils';
 import { cardPreviews, userCards } from '@/lib/database/schema';
 import { auth } from '@/lib/auth';
+
+const visibilitySchema = z.object({ public: z.boolean() }).strict();
 
 export async function PUT(
   req: NextRequest,
@@ -14,16 +16,17 @@ export async function PUT(
 ) {
   try {
     const id = (await params).id;
-    const body: { card: Partial<CardDetails> } = await req.json();
+    const body: unknown = await req.json();
     const session = await auth.api.getSession({
       headers: await headers(),
     });
     if (!session?.user) {
       throw new Error('Unauthorized');
     }
+    const { public: isPublic } = visibilitySchema.parse(body);
     const [userCard] = await db
       .update(userCards)
-      .set({ ...body, updatedAt: new Date() })
+      .set({ public: isPublic, updatedAt: new Date() })
       .where(and(eq(userCards.id, id), eq(userCards.userId, session.user.id)))
       .returning();
     if (!userCard) {
@@ -43,6 +46,12 @@ export async function PUT(
       { status: 202 },
     );
   } catch (e) {
+    if (e instanceof ZodError) {
+      return NextResponse.json(
+        { success: false, error: formatAPIError(e) },
+        { status: 400 },
+      );
+    }
     return NextResponse.json(
       {
         success: false,
