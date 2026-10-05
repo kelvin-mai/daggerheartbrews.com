@@ -1,6 +1,6 @@
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 
 import type { CardDetails, UserCard } from '@/lib/types';
 import { db } from '@/lib/database';
@@ -39,7 +39,12 @@ export default async function Page() {
       .from(userCardBookmarks)
       .innerJoin(userCards, eq(userCardBookmarks.userCardId, userCards.id))
       .innerJoin(cardPreviews, eq(userCards.cardPreviewId, cardPreviews.id))
-      .where(eq(userCardBookmarks.userId, session.user.id)),
+      .where(
+        and(
+          eq(userCardBookmarks.userId, session.user.id),
+          eq(userCards.public, true),
+        ),
+      ),
   ]);
 
   const ownCards: PrintableCard[] = ownData

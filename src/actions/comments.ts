@@ -7,6 +7,7 @@ import { z } from 'zod';
 
 import { auth } from '@/lib/auth';
 import { db } from '@/lib/database';
+import { getPublicAdversaryType, isPublicCard } from '@/lib/community';
 import {
   adversaryPreviews,
   userAdversaries,
@@ -38,6 +39,10 @@ export const createCardComment = async (input: {
     const { userCardId, body } = cardCommentSchema.parse(input);
     const session = await auth.api.getSession({ headers: await headers() });
     if (!session?.user) return { data: null, error: 'Unauthorized' };
+
+    if (!(await isPublicCard(userCardId))) {
+      return { data: null, error: 'Not found' };
+    }
 
     const [comment] = await db
       .insert(userCardComments)
@@ -96,22 +101,16 @@ export const createAdversaryComment = async (input: {
     const session = await auth.api.getSession({ headers: await headers() });
     if (!session?.user) return { data: null, error: 'Unauthorized' };
 
+    const type = await getPublicAdversaryType(userAdversaryId);
+    if (type === null) return { data: null, error: 'Not found' };
+
     const [comment] = await db
       .insert(userAdversaryComments)
       .values({ userId: session.user.id, userAdversaryId, body })
       .returning();
 
-    const [adversary] = await db
-      .select({ type: adversaryPreviews.type })
-      .from(userAdversaries)
-      .leftJoin(
-        adversaryPreviews,
-        eq(userAdversaries.adversaryPreviewId, adversaryPreviews.id),
-      )
-      .where(eq(userAdversaries.id, userAdversaryId));
-
     const path =
-      adversary?.type === 'environment'
+      type === 'environment'
         ? `/community/environments/${userAdversaryId}`
         : `/community/adversaries/${userAdversaryId}`;
 

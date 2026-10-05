@@ -90,6 +90,7 @@ These are deliberate deviations. Leave them as they are.
 - Return a typed result object `{ data, error }` — never throw to the client
 - Use `revalidatePath` / `revalidateTag` to invalidate cache after mutations
 - Modules only called from server code use `import 'server-only'`; `'use server'` is only for actions the UI calls, and each must read the session itself, never take it as an argument
+- Actions that write to another user's item check `isPublicCard` / `getPublicAdversaryType` from `src/lib/community.ts` first
 
 ```ts
 // preferred return shape

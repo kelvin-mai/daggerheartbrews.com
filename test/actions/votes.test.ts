@@ -13,12 +13,18 @@ vi.mock('@/lib/database', () => ({
   },
 }));
 
+vi.mock('@/lib/community', () => ({
+  isPublicCard: vi.fn(),
+  getPublicAdversaryType: vi.fn(),
+}));
+
 vi.mock('next/headers', () => ({
   headers: vi.fn().mockResolvedValue(new Headers()),
 }));
 
 import { toggleCardVote, toggleAdversaryVote } from '@/actions/votes';
 import { auth } from '@/lib/auth';
+import { getPublicAdversaryType, isPublicCard } from '@/lib/community';
 import { db } from '@/lib/database';
 import { headers } from 'next/headers';
 
@@ -60,6 +66,8 @@ const makeCounterUpdateChain = (upvotes: number, downvotes: number) => {
 beforeEach(() => {
   vi.resetAllMocks();
   vi.mocked(headers).mockResolvedValue(new Headers());
+  vi.mocked(isPublicCard).mockResolvedValue(true);
+  vi.mocked(getPublicAdversaryType).mockResolvedValue('adversary');
 });
 
 // ---------------------------------------------------------------------------
@@ -354,5 +362,68 @@ describe('votes/toggleAdversaryVote', () => {
 
     expect(result.data).toBeNull();
     expect(result.error).toBe('Failed to update vote');
+  });
+});
+
+describe('votes/visibility', () => {
+  it('toggleCardVote returns Not found for a private or missing card without writing', async () => {
+    vi.mocked(auth.api.getSession).mockResolvedValueOnce(
+      mockSession as unknown as GetSessionResult,
+    );
+    vi.mocked(isPublicCard).mockResolvedValueOnce(false);
+
+    const result = await toggleCardVote({ userCardId: CARD_ID, vote: 'up' });
+
+    expect(result).toEqual({ data: null, error: 'Not found' });
+    expect(db.select).not.toHaveBeenCalled();
+    expect(db.insert).not.toHaveBeenCalled();
+    expect(db.update).not.toHaveBeenCalled();
+    expect(db.delete).not.toHaveBeenCalled();
+  });
+
+  it('toggleCardVote checks the session before visibility', async () => {
+    vi.mocked(auth.api.getSession).mockResolvedValueOnce(null);
+    vi.mocked(isPublicCard).mockResolvedValueOnce(false);
+
+    const result = await toggleCardVote({ userCardId: CARD_ID, vote: 'up' });
+
+    expect(result.error).toBe('Unauthorized');
+  });
+
+  it('toggleAdversaryVote returns Not found for a private or missing adversary without writing', async () => {
+    vi.mocked(auth.api.getSession).mockResolvedValueOnce(
+      mockSession as unknown as GetSessionResult,
+    );
+    vi.mocked(getPublicAdversaryType).mockResolvedValueOnce(null);
+
+    const result = await toggleAdversaryVote({
+      userAdversaryId: ADVERSARY_ID,
+      vote: 'down',
+    });
+
+    expect(result).toEqual({ data: null, error: 'Not found' });
+    expect(db.select).not.toHaveBeenCalled();
+    expect(db.insert).not.toHaveBeenCalled();
+    expect(db.update).not.toHaveBeenCalled();
+    expect(db.delete).not.toHaveBeenCalled();
+  });
+
+  it('toggleAdversaryVote treats an empty type as public', async () => {
+    vi.mocked(auth.api.getSession).mockResolvedValueOnce(
+      mockSession as unknown as GetSessionResult,
+    );
+    vi.mocked(getPublicAdversaryType).mockResolvedValueOnce('');
+    vi.mocked(db.select).mockReturnValueOnce(makeSelectChain([]));
+    vi.mocked(db.insert).mockReturnValueOnce({
+      values: vi.fn().mockResolvedValueOnce(undefined),
+    } as unknown as DbInsertResult);
+    vi.mocked(db.update).mockReturnValueOnce(makeCounterUpdateChain(1, 0));
+
+    const result = await toggleAdversaryVote({
+      userAdversaryId: ADVERSARY_ID,
+      vote: 'up',
+    });
+
+    expect(result.error).toBeNull();
   });
 });

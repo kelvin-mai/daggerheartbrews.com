@@ -12,6 +12,11 @@ vi.mock('@/lib/database', () => ({
   },
 }));
 
+vi.mock('@/lib/community', () => ({
+  isPublicCard: vi.fn(),
+  getPublicAdversaryType: vi.fn(),
+}));
+
 vi.mock('next/headers', () => ({
   headers: vi.fn().mockResolvedValue(new Headers()),
 }));
@@ -27,6 +32,7 @@ import {
   deleteAdversaryComment,
 } from '@/actions/comments';
 import { auth } from '@/lib/auth';
+import { getPublicAdversaryType, isPublicCard } from '@/lib/community';
 import { db } from '@/lib/database';
 import { headers } from 'next/headers';
 import { revalidatePath } from 'next/cache';
@@ -52,6 +58,8 @@ const makeSelectChain = (resolveValue: unknown) =>
 beforeEach(() => {
   vi.resetAllMocks();
   vi.mocked(headers).mockResolvedValue(new Headers());
+  vi.mocked(isPublicCard).mockResolvedValue(true);
+  vi.mocked(getPublicAdversaryType).mockResolvedValue('adversary');
 });
 
 // ─────────────────────────────────────────────
@@ -258,9 +266,7 @@ describe('comments/createAdversaryComment', () => {
       returning: vi.fn().mockResolvedValueOnce([mockComment]),
     } as unknown as DbInsertResult);
 
-    vi.mocked(db.select).mockReturnValueOnce(
-      makeSelectChain([{ type: 'adversary' }]),
-    );
+    vi.mocked(getPublicAdversaryType).mockResolvedValueOnce('adversary');
 
     const result = await createAdversaryComment({
       userAdversaryId: ADVERSARY_ID,
@@ -291,9 +297,7 @@ describe('comments/createAdversaryComment', () => {
       ]),
     } as unknown as DbInsertResult);
 
-    vi.mocked(db.select).mockReturnValueOnce(
-      makeSelectChain([{ type: 'environment' }]),
-    );
+    vi.mocked(getPublicAdversaryType).mockResolvedValueOnce('environment');
 
     const result = await createAdversaryComment({
       userAdversaryId: ADVERSARY_ID,
@@ -399,5 +403,76 @@ describe('comments/deleteAdversaryComment', () => {
 
     expect(result.data).toBeNull();
     expect(result.error).toBe('Failed to delete comment');
+  });
+});
+
+describe('comments/visibility', () => {
+  it('createCardComment returns Not found and inserts nothing for a private card', async () => {
+    vi.mocked(auth.api.getSession).mockResolvedValueOnce(
+      mockSession as unknown as GetSessionResult,
+    );
+    vi.mocked(isPublicCard).mockResolvedValueOnce(false);
+
+    const result = await createCardComment({ userCardId: CARD_ID, body: 'hi' });
+
+    expect(result).toEqual({ data: null, error: 'Not found' });
+    expect(db.insert).not.toHaveBeenCalled();
+    expect(revalidatePath).not.toHaveBeenCalled();
+  });
+
+  it('createAdversaryComment returns Not found and inserts nothing for a private adversary', async () => {
+    vi.mocked(auth.api.getSession).mockResolvedValueOnce(
+      mockSession as unknown as GetSessionResult,
+    );
+    vi.mocked(getPublicAdversaryType).mockResolvedValueOnce(null);
+
+    const result = await createAdversaryComment({
+      userAdversaryId: ADVERSARY_ID,
+      body: 'hi',
+    });
+
+    expect(result).toEqual({ data: null, error: 'Not found' });
+    expect(db.insert).not.toHaveBeenCalled();
+    expect(revalidatePath).not.toHaveBeenCalled();
+  });
+
+  it('deleteCardComment still works when the card is now private', async () => {
+    vi.mocked(auth.api.getSession).mockResolvedValueOnce(
+      mockSession as unknown as GetSessionResult,
+    );
+    vi.mocked(isPublicCard).mockResolvedValue(false);
+    vi.mocked(db.select).mockReturnValueOnce(
+      makeSelectChain([
+        { id: COMMENT_ID, userId: 'user-1', userCardId: CARD_ID },
+      ]),
+    );
+    vi.mocked(db.delete).mockReturnValueOnce({
+      where: vi.fn().mockResolvedValueOnce(undefined),
+    } as unknown as DbDeleteResult);
+
+    const result = await deleteCardComment({ commentId: COMMENT_ID });
+
+    expect(result).toEqual({ data: { commentId: COMMENT_ID }, error: null });
+  });
+
+  it('deleteAdversaryComment still works when the adversary is now private', async () => {
+    vi.mocked(auth.api.getSession).mockResolvedValueOnce(
+      mockSession as unknown as GetSessionResult,
+    );
+    vi.mocked(getPublicAdversaryType).mockResolvedValue(null);
+    vi.mocked(db.select)
+      .mockReturnValueOnce(
+        makeSelectChain([
+          { id: COMMENT_ID, userId: 'user-1', userAdversaryId: ADVERSARY_ID },
+        ]),
+      )
+      .mockReturnValueOnce(makeSelectChain([{ type: 'environment' }]));
+    vi.mocked(db.delete).mockReturnValueOnce({
+      where: vi.fn().mockResolvedValueOnce(undefined),
+    } as unknown as DbDeleteResult);
+
+    const result = await deleteAdversaryComment({ commentId: COMMENT_ID });
+
+    expect(result).toEqual({ data: { commentId: COMMENT_ID }, error: null });
   });
 });

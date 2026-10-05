@@ -153,11 +153,20 @@ Tests that require a logged-in user are split into their own `*-authenticated.sp
 
 3. Authenticated spec files load that saved session via `storageState`, so every test starts already logged in.
 
+All authenticated specs share that one test user, so the `chromium-authenticated` project runs on a single worker (`workers: 1` in `playwright.config.ts`). Keep each spec's setup and cleanup inside a serial `describe`, and delete anything it creates.
+
 When writing authenticated tests, import helpers from `fixtures.ts` using a path relative to the spec file's location:
 
 ```typescript
 import { getItemRow } from '../../fixtures'; // from e2e/card/create/
 ```
+
+Available helpers:
+
+- `getItemRow(page, name)`: the list row for an item by its title
+- `gotoHomebrew(page)`: opens `/profile/homebrew` and waits for the page to settle, so the row menus respond to clicks
+- `toggleVisibility(page, row)`: toggles an item between public and draft and waits for the save to finish
+- `TEST_USER`: the test user's email and password
 
 ### What to E2E Test
 

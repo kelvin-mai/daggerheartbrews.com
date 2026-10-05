@@ -6,6 +6,7 @@ import { z } from 'zod';
 
 import { auth } from '@/lib/auth';
 import { db } from '@/lib/database';
+import { getPublicAdversaryType, isPublicCard } from '@/lib/community';
 import {
   userAdversaries,
   userAdversaryVotes,
@@ -41,6 +42,9 @@ export const toggleCardVote = async (input: {
     const session = await auth.api.getSession({ headers: await headers() });
     if (!session?.user) {
       return { data: null, error: 'Unauthorized' };
+    }
+    if (!(await isPublicCard(userCardId))) {
+      return { data: null, error: 'Not found' };
     }
 
     const [existing] = await db
@@ -120,6 +124,9 @@ export const toggleAdversaryVote = async (input: {
     const session = await auth.api.getSession({ headers: await headers() });
     if (!session?.user) {
       return { data: null, error: 'Unauthorized' };
+    }
+    if ((await getPublicAdversaryType(userAdversaryId)) === null) {
+      return { data: null, error: 'Not found' };
     }
 
     const [existing] = await db

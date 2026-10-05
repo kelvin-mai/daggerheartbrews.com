@@ -7,6 +7,7 @@ import { z } from 'zod';
 
 import { auth } from '@/lib/auth';
 import { db } from '@/lib/database';
+import { getPublicAdversaryType, isPublicCard } from '@/lib/community';
 import {
   userAdversaryBookmarks,
   userCardBookmarks,
@@ -42,6 +43,9 @@ export const toggleCardBookmark = async (input: {
       revalidatePath('/profile/bookmarks');
       return { data: { bookmarked: false }, error: null };
     }
+    if (!(await isPublicCard(userCardId))) {
+      return { data: null, error: 'Not found' };
+    }
     await db
       .insert(userCardBookmarks)
       .values({ userId: session.user.id, userCardId });
@@ -76,6 +80,9 @@ export const toggleAdversaryBookmark = async (input: {
         .where(eq(userAdversaryBookmarks.id, existing.id));
       revalidatePath('/profile/bookmarks');
       return { data: { bookmarked: false }, error: null };
+    }
+    if ((await getPublicAdversaryType(userAdversaryId)) === null) {
+      return { data: null, error: 'Not found' };
     }
     await db
       .insert(userAdversaryBookmarks)

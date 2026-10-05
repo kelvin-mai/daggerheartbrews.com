@@ -12,11 +12,13 @@ title: 'Pending'
 - Saves that are too large are now also rejected by the server, with a message suggesting a smaller image.
 - Community pages, profiles and bookmarks no longer include other users' email addresses and other private account details.
 - Changing a post's visibility and saving cards or adversaries now only accept the fields the editor can change, and anything else is rejected.
+- Cards and adversaries made private no longer appear in other users' bookmarks or print sheets, and can't be voted on, commented on or bookmarked.
+- Adversary and environment links now only open the matching kind.
 
 ## Internal
 
 - `MAX_IMAGE_UPLOAD_SIZE` in `src/lib/utils/api.ts` is now derived from `MAX_REQUEST_BODY_SIZE` (minus `PAYLOAD_OVERHEAD`, adjusted for base64), replacing the hardcoded 5MB limit in the card image form.
-- Added a Claude Code agent pipeline: `planner`, `coder`, `tester`, `reviewer` and `tech-writer` subagents in `.claude/agents/`, chained by the `/ship-feature` skill with handoffs through a git-ignored `.pipeline/` directory. Documented in `docs/ai.md`.
+- Added a Claude Code agent pipeline: `planner`, `coder`, `tester`, `reviewer` and `tech-writer` subagents in `.claude/agents/`, chained by the `/ship-feature` skill with handoffs through a git-ignored `.pipeline/` directory, including one review fix pass when the reviewer finds medium-or-higher issues. Documented in `docs/ai.md`.
 - Moved the `@types/react` and `@types/react-dom` overrides from the `pnpm` field in `package.json` to `pnpm-workspace.yaml`, since pnpm 11 no longer reads the former.
 - Added explicit return types to `formatAPIError`, `getBrightness`, `getBaseUrl`, `capitalize` and the SRD `domainColor` (now `string | undefined`, behaviour unchanged), and converted `cn`, `QueryProvider`, `useDebounce` and `CollapsibleSectionTrigger` to `export const` arrow functions.
 - Documented known exceptions to the code standards (framework-required exports, inferred return types, deliberate `console.log`) in `.claude/skills/code-standards/SKILL.md` and `docs/contributing-code-standards.md`.
@@ -24,3 +26,7 @@ title: 'Pending'
 - Replaced `'use server'` in `src/actions/user-items.ts` with `import 'server-only'`, and added Zod schemas that allow-list the fields written on card and adversary preview saves and on community visibility updates. Added the `server-only` package (mocked in `test/setup.ts`).
 - Documented when to use `import 'server-only'` versus `'use server'` in the code standards.
 - The admin area now only works when running the app locally in development, for the configured admin account (`ADMIN_USER_EMAIL`). `getUsers` now returns `{ data, error }`, and `ADMIN_DATABASE_URL` is only used in development. Documented in `docs/local-database-setup.md`.
+- Added `src/lib/community.ts` (server-only) with `isPublicCard` and `getPublicAdversaryType`, used by the vote, comment and bookmark actions before writing; the bookmarks and print pages now filter on `public`, and the adversary and environment detail pages filter on `adversary_previews.type`.
+- Added a GitHub Actions CI workflow (`.github/workflows/ci.yml`) that runs lint, a Prettier check, unit tests and the build on pull requests and pushes to `main`, plus bug report and feature request issue forms and a pull request template.
+- Updated the onboarding docs (README, `.github/CONTRIBUTING.md`, `docs/local-database-setup.md`, `.env.example`) for pnpm, Node 22.13+, the Docker database defaults and the optional `srd-source` submodule, and fixed the Docker Compose healthcheck.
+- Fixed flaky and outdated e2e specs: new `gotoHomebrew` and `toggleVisibility` helpers in `e2e/fixtures.ts`, the `chromium-authenticated` project now runs on one worker since its specs share a test user, and the privacy checks view pages as a signed-out visitor. Added unit tests for `src/proxy.ts`. Documented in `docs/testing.md`.

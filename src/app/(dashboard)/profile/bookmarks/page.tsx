@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { Bookmark, Layers, Printer, Skull, Trees } from 'lucide-react';
 
 import type {
@@ -48,7 +48,12 @@ export default async function Page() {
     .innerJoin(userCards, eq(userCardBookmarks.userCardId, userCards.id))
     .innerJoin(cardPreviews, eq(userCards.cardPreviewId, cardPreviews.id))
     .innerJoin(users, eq(userCards.userId, users.id))
-    .where(eq(userCardBookmarks.userId, session.user.id));
+    .where(
+      and(
+        eq(userCardBookmarks.userId, session.user.id),
+        eq(userCards.public, true),
+      ),
+    );
 
   const allAdversaryData = await db
     .select({
@@ -67,7 +72,12 @@ export default async function Page() {
       eq(userAdversaries.adversaryPreviewId, adversaryPreviews.id),
     )
     .innerJoin(users, eq(userAdversaries.userId, users.id))
-    .where(eq(userAdversaryBookmarks.userId, session.user.id));
+    .where(
+      and(
+        eq(userAdversaryBookmarks.userId, session.user.id),
+        eq(userAdversaries.public, true),
+      ),
+    );
 
   const adversaryData = allAdversaryData.filter(
     (d) => d.adversary_previews.type === 'adversary',

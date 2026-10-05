@@ -152,6 +152,7 @@ All server actions live in `src/actions/`. They follow a consistent pattern:
 2. **Return `{ data, error }`** — never throw to the client
 3. **Call `revalidatePath` or `revalidateTag`** after any mutation
 4. **Use the right server marker.** Modules only called from server code use `import 'server-only'`; `'use server'` is only for actions the UI calls, and each must read the session itself, never take it as an argument
+5. **Check visibility before writing to another user's item.** Call `isPublicCard` / `getPublicAdversaryType` from `src/lib/community.ts` first
 
 ```ts
 // correct

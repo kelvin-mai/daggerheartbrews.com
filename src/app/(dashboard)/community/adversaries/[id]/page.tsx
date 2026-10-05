@@ -31,7 +31,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       adversaryPreviews,
       eq(userAdversaries.adversaryPreviewId, adversaryPreviews.id),
     )
-    .where(and(eq(userAdversaries.id, id), eq(userAdversaries.public, true)));
+    .where(
+      and(
+        eq(userAdversaries.id, id),
+        eq(userAdversaries.public, true),
+        eq(adversaryPreviews.type, 'adversary'),
+      ),
+    );
   const name = result?.name ?? 'Community Adversary';
   return { title: `${name} — Community Adversaries` };
 }
@@ -50,7 +56,13 @@ export default async function Page({ params }: Props) {
       adversaryPreviews,
       eq(userAdversaries.adversaryPreviewId, adversaryPreviews.id),
     )
-    .where(and(eq(userAdversaries.id, id), eq(userAdversaries.public, true)));
+    .where(
+      and(
+        eq(userAdversaries.id, id),
+        eq(userAdversaries.public, true),
+        eq(adversaryPreviews.type, 'adversary'),
+      ),
+    );
 
   if (!result?.adversary_previews) notFound();
 

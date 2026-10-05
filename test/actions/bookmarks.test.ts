@@ -12,6 +12,11 @@ vi.mock('@/lib/database', () => ({
   },
 }));
 
+vi.mock('@/lib/community', () => ({
+  isPublicCard: vi.fn(),
+  getPublicAdversaryType: vi.fn(),
+}));
+
 vi.mock('next/headers', () => ({
   headers: vi.fn().mockResolvedValue(new Headers()),
 }));
@@ -25,6 +30,7 @@ import {
   toggleCardBookmark,
 } from '@/actions/bookmarks';
 import { auth } from '@/lib/auth';
+import { getPublicAdversaryType, isPublicCard } from '@/lib/community';
 import { db } from '@/lib/database';
 import { headers } from 'next/headers';
 import { revalidatePath } from 'next/cache';
@@ -49,6 +55,8 @@ const makeSelectChain = (resolveValue: unknown) =>
 beforeEach(() => {
   vi.resetAllMocks();
   vi.mocked(headers).mockResolvedValue(new Headers());
+  vi.mocked(isPublicCard).mockResolvedValue(true);
+  vi.mocked(getPublicAdversaryType).mockResolvedValue('adversary');
 });
 
 describe('bookmarks/toggleCardBookmark', () => {
@@ -200,5 +208,75 @@ describe('bookmarks/toggleAdversaryBookmark', () => {
 
     expect(result.data).toBeNull();
     expect(result.error).toBe('Failed to update bookmark');
+  });
+});
+
+describe('bookmarks/visibility', () => {
+  it('toggleCardBookmark returns Not found and inserts nothing for a private card', async () => {
+    vi.mocked(auth.api.getSession).mockResolvedValueOnce(
+      mockSession as unknown as GetSessionResult,
+    );
+    vi.mocked(db.select).mockReturnValueOnce(makeSelectChain([]));
+    vi.mocked(isPublicCard).mockResolvedValueOnce(false);
+
+    const result = await toggleCardBookmark({ userCardId: CARD_ID });
+
+    expect(result).toEqual({ data: null, error: 'Not found' });
+    expect(db.insert).not.toHaveBeenCalled();
+    expect(revalidatePath).not.toHaveBeenCalled();
+  });
+
+  it('toggleCardBookmark removes an existing bookmark without checking visibility', async () => {
+    vi.mocked(auth.api.getSession).mockResolvedValueOnce(
+      mockSession as unknown as GetSessionResult,
+    );
+    vi.mocked(db.select).mockReturnValueOnce(
+      makeSelectChain([{ id: BOOKMARK_ID }]),
+    );
+    vi.mocked(db.delete).mockReturnValueOnce({
+      where: vi.fn().mockResolvedValue(undefined),
+    } as unknown as DbDeleteResult);
+    vi.mocked(isPublicCard).mockResolvedValue(false);
+
+    const result = await toggleCardBookmark({ userCardId: CARD_ID });
+
+    expect(result).toEqual({ data: { bookmarked: false }, error: null });
+    expect(db.delete).toHaveBeenCalledTimes(1);
+  });
+
+  it('toggleAdversaryBookmark returns Not found and inserts nothing for a private adversary', async () => {
+    vi.mocked(auth.api.getSession).mockResolvedValueOnce(
+      mockSession as unknown as GetSessionResult,
+    );
+    vi.mocked(db.select).mockReturnValueOnce(makeSelectChain([]));
+    vi.mocked(getPublicAdversaryType).mockResolvedValueOnce(null);
+
+    const result = await toggleAdversaryBookmark({
+      userAdversaryId: ADVERSARY_ID,
+    });
+
+    expect(result).toEqual({ data: null, error: 'Not found' });
+    expect(db.insert).not.toHaveBeenCalled();
+    expect(revalidatePath).not.toHaveBeenCalled();
+  });
+
+  it('toggleAdversaryBookmark removes an existing bookmark without checking visibility', async () => {
+    vi.mocked(auth.api.getSession).mockResolvedValueOnce(
+      mockSession as unknown as GetSessionResult,
+    );
+    vi.mocked(db.select).mockReturnValueOnce(
+      makeSelectChain([{ id: BOOKMARK_ID }]),
+    );
+    vi.mocked(db.delete).mockReturnValueOnce({
+      where: vi.fn().mockResolvedValue(undefined),
+    } as unknown as DbDeleteResult);
+    vi.mocked(getPublicAdversaryType).mockResolvedValue(null);
+
+    const result = await toggleAdversaryBookmark({
+      userAdversaryId: ADVERSARY_ID,
+    });
+
+    expect(result).toEqual({ data: { bookmarked: false }, error: null });
+    expect(db.delete).toHaveBeenCalledTimes(1);
   });
 });
