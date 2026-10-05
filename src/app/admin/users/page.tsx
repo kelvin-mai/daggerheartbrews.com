@@ -21,7 +21,11 @@ export default function UsersPage() {
 
   const { data, isLoading } = useQuery({
     queryKey: ['admin', 'users', page],
-    queryFn: () => getUsers(page),
+    queryFn: async () => {
+      const { data, error } = await getUsers(page);
+      if (error || !data) throw new Error(error ?? 'Failed to load users');
+      return data;
+    },
     placeholderData: (prev) => prev,
   });
 

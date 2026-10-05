@@ -2,6 +2,7 @@
 
 import { count } from 'drizzle-orm';
 
+import { isAdmin } from '@/lib/admin';
 import { adminDb as db } from '@/lib/database/admin';
 import { users } from '@/lib/database/schema';
 
@@ -24,7 +25,11 @@ export type GetUsersResult = {
   pageCount: number;
 };
 
-export const getUsers = async (page: number = 1): Promise<GetUsersResult> => {
+export const getUsers = async (
+  page: number = 1,
+): Promise<{ data: GetUsersResult | null; error: string | null }> => {
+  if (!(await isAdmin())) return { data: null, error: 'Not found' };
+
   const offset = (page - 1) * PAGE_SIZE;
 
   const [rows, [{ value: total }]] = await Promise.all([
@@ -44,10 +49,13 @@ export const getUsers = async (page: number = 1): Promise<GetUsersResult> => {
   ]);
 
   return {
-    data: rows,
-    total,
-    page,
-    pageSize: PAGE_SIZE,
-    pageCount: Math.ceil(total / PAGE_SIZE),
+    data: {
+      data: rows,
+      total,
+      page,
+      pageSize: PAGE_SIZE,
+      pageCount: Math.ceil(total / PAGE_SIZE),
+    },
+    error: null,
   };
 };

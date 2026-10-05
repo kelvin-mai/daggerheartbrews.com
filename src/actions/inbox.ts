@@ -2,6 +2,7 @@
 
 import { z } from 'zod';
 
+import { isAdmin } from '@/lib/admin';
 import { env } from '@/lib/env';
 import { sendReplyEmail } from '@/lib/email';
 
@@ -43,6 +44,7 @@ export const listReceivedEmails = async ({
   data: ReceivedEmail[] | null;
   error: string | null;
 }> => {
+  if (!(await isAdmin())) return { data: null, error: 'Not found' };
   if (!env.RESEND_API_KEY) {
     return { data: null, error: 'Resend not configured' };
   }
@@ -78,6 +80,7 @@ export const listReceivedEmails = async ({
 export const getReceivedEmail = async (
   id: string,
 ): Promise<{ data: ReceivedEmailDetail | null; error: string | null }> => {
+  if (!(await isAdmin())) return { data: null, error: 'Not found' };
   if (!env.RESEND_API_KEY) {
     return { data: null, error: 'Resend not configured' };
   }
@@ -113,6 +116,7 @@ const replySchema = z.object({
 export const replyToEmail = async (
   params: z.infer<typeof replySchema>,
 ): Promise<{ error: string | null }> => {
+  if (!(await isAdmin())) return { error: 'Not found' };
   if (!env.RESEND_API_KEY) {
     return { error: 'Resend not configured' };
   }

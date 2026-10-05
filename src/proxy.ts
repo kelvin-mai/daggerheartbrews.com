@@ -2,6 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSessionCookie } from 'better-auth/cookies';
 
 export async function proxy(request: NextRequest) {
+  if (
+    process.env.NODE_ENV !== 'development' &&
+    request.nextUrl.pathname.startsWith('/admin')
+  ) {
+    return NextResponse.rewrite(new URL('/404', request.url), { status: 404 });
+  }
+
   const session = getSessionCookie(request);
 
   if (!session) {

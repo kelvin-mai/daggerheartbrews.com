@@ -273,6 +273,14 @@ The template wraps all statements in `BEGIN; ... ROLLBACK;`. This means:
 | `user@test.com`  | Regular user |
 | `user2@test.com` | Regular user |
 
+### Admin Area
+
+The admin area (`/admin` and its server actions) only works when running locally with `pnpm dev`. It is disabled in production builds, so never set `NODE_ENV=development` on a deployment.
+
+- Sign in as the account whose email matches `ADMIN_USER_EMAIL` (for example `admin@test.com` with the seed data). If `ADMIN_USER_EMAIL` is unset, nobody has access.
+- That account must exist in the local database (`DATABASE_URL`), since sessions are checked there.
+- `ADMIN_DATABASE_URL` is optional and only used in development, to point the admin tools at a different database.
+
 ### Applying Seed Files Manually
 
 If you need to apply a seed file to a running container without resetting the database:

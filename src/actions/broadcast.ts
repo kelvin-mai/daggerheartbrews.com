@@ -1,5 +1,6 @@
 'use server';
 
+import { isAdmin } from '@/lib/admin';
 import { adminDb } from '@/lib/database/admin';
 import { users } from '@/lib/database/schema';
 import { resend } from '@/lib/email';
@@ -11,6 +12,7 @@ export const getSyncableUsers = async (): Promise<{
   data: SyncableUser[] | null;
   error: string | null;
 }> => {
+  if (!(await isAdmin())) return { data: null, error: 'Not found' };
   if (!env.RESEND_AUDIENCE_ID) {
     return { data: null, error: 'RESEND_AUDIENCE_ID is not configured' };
   }
@@ -26,6 +28,7 @@ export const syncContact = async (
   email: string,
   name: string,
 ): Promise<SyncContactResult> => {
+  if (!(await isAdmin())) return { success: false, error: 'Not found' };
   if (!resend) {
     return { success: false, error: 'Resend not configured' };
   }
@@ -54,6 +57,7 @@ export type ListAudiencesResult = {
 };
 
 export const listAudiences = async (): Promise<ListAudiencesResult> => {
+  if (!(await isAdmin())) return { data: null, error: 'Not found' };
   if (!resend) {
     return { data: null, error: 'Resend not configured' };
   }
@@ -78,6 +82,7 @@ export type CreateAudienceResult = {
 export const createAudience = async (
   name: string,
 ): Promise<CreateAudienceResult> => {
+  if (!(await isAdmin())) return { data: null, error: 'Not found' };
   if (!resend) {
     return { data: null, error: 'Resend not configured' };
   }
@@ -103,6 +108,7 @@ export type SendBroadcastResult = {
 export const sendBroadcast = async (
   params: SendBroadcastParams,
 ): Promise<SendBroadcastResult> => {
+  if (!(await isAdmin())) return { data: null, error: 'Not found' };
   if (!env.RESEND_AUDIENCE_ID) {
     return { data: null, error: 'RESEND_AUDIENCE_ID is not configured' };
   }

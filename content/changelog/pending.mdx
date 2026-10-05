@@ -23,3 +23,4 @@ title: 'Pending'
 - Added the shared `publicAuthor` selection in `src/lib/database/selections.ts` and a `PublicAuthor` type; queries that show a user to others now return only `id`, `name` and `image`. Documented in the code standards.
 - Replaced `'use server'` in `src/actions/user-items.ts` with `import 'server-only'`, and added Zod schemas that allow-list the fields written on card and adversary preview saves and on community visibility updates. Added the `server-only` package (mocked in `test/setup.ts`).
 - Documented when to use `import 'server-only'` versus `'use server'` in the code standards.
+- The admin area now only works when running the app locally in development, for the configured admin account (`ADMIN_USER_EMAIL`). `getUsers` now returns `{ data, error }`, and `ADMIN_DATABASE_URL` is only used in development. Documented in `docs/local-database-setup.md`.

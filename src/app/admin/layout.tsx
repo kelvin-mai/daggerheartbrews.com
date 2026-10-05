@@ -1,4 +1,3 @@
-import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
 
 import { AppSidebar } from '@/components/layout';
@@ -8,21 +7,14 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from '@/components/ui/sidebar';
-import { auth } from '@/lib/auth';
+import { isAdmin } from '@/lib/admin';
 
 export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const session = await auth.api.getSession({ headers: await headers() });
-
-  if (
-    process.env.NODE_ENV !== 'development' &&
-    (!session || session.user.email !== process.env.ADMIN_USER_EMAIL)
-  ) {
-    notFound();
-  }
+  if (!(await isAdmin())) notFound();
 
   return (
     <SidebarProvider>

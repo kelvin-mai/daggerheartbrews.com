@@ -111,6 +111,10 @@ pnpm migration:generate      # Generate custom migration
 
 Migrations are stored in the `sql/` directory with numbered prefixes. The Docker container applies them automatically on first start; see [docs/local-database-setup.md](docs/local-database-setup.md) for applying new ones to an existing database.
 
+### Admin Area
+
+The admin area only works under `pnpm dev`, for the account matching `ADMIN_USER_EMAIL`. Never set `NODE_ENV=development` on a deployment. See [docs/local-database-setup.md](docs/local-database-setup.md#admin-area) for requirements.
+
 ### Project Structure
 
 ```
