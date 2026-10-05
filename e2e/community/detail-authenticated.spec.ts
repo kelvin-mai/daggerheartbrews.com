@@ -1,6 +1,11 @@
 import { test, expect } from '@playwright/test';
 
-import { getItemRow } from '../fixtures';
+import {
+  gotoHomebrew,
+  getItemRow,
+  TEST_USER,
+  toggleVisibility,
+} from '../fixtures';
 
 const CARD_NAME = 'E2E Detail Card';
 const ADVERSARY_NAME = 'E2E Detail Adversary';
@@ -17,8 +22,7 @@ test.describe('Community Card Detail Page', () => {
     await page.waitForURL(/\/profile\/homebrew/);
 
     const row = getItemRow(page, CARD_NAME);
-    await row.getByRole('button', { name: 'More actions' }).click();
-    await page.getByRole('menuitem', { name: 'Toggle Visibility' }).click();
+    await toggleVisibility(page, row);
     await expect(row.getByText('Public')).toBeVisible();
   });
 
@@ -95,14 +99,34 @@ test.describe('Community Card Detail Page', () => {
       .getByRole('link', { name: CARD_NAME })
       .click();
     await expect(page).toHaveURL(/\/community\/cards\/.+/);
-    const creatorLink = page.locator('a[href^="/profile/"]');
+    const creatorLink = page.getByRole('main').locator('a[href^="/profile/"]');
     await expect(creatorLink).toBeVisible();
     await creatorLink.click();
     await expect(page).toHaveURL(/\/profile\/.+/);
   });
 
+  test('detail page does not expose the author email to other viewers', async ({
+    page,
+    browser,
+  }) => {
+    await page.goto('/community/cards');
+    await getItemRow(page, CARD_NAME)
+      .getByRole('link', { name: CARD_NAME })
+      .click();
+    await expect(page).toHaveURL(/\/community\/cards\/.+/);
+
+    const guestContext = await browser.newContext({
+      storageState: { cookies: [], origins: [] },
+    });
+    const guest = await guestContext.newPage();
+    await guest.goto(page.url());
+    await expect(guest.getByRole('heading', { name: CARD_NAME })).toBeVisible();
+    expect(await guest.content()).not.toContain(TEST_USER.email);
+    await guestContext.close();
+  });
+
   test('cleanup: delete the test card', async ({ page }) => {
-    await page.goto('/profile/homebrew');
+    await gotoHomebrew(page);
     const row = getItemRow(page, CARD_NAME);
     await row.getByRole('button', { name: 'More actions' }).click();
     await page.getByRole('menuitem', { name: 'Delete' }).click();
@@ -121,8 +145,7 @@ test.describe('Community Adversary Detail Page', () => {
     await page.waitForURL(/\/profile\/homebrew/);
 
     const row = getItemRow(page, ADVERSARY_NAME);
-    await row.getByRole('button', { name: 'More actions' }).click();
-    await page.getByRole('menuitem', { name: 'Toggle Visibility' }).click();
+    await toggleVisibility(page, row);
     await expect(row.getByText('Public')).toBeVisible();
   });
 
@@ -144,7 +167,7 @@ test.describe('Community Adversary Detail Page', () => {
       .click();
     await expect(page).toHaveURL(/\/community\/adversaries\/.+/);
     await expect(
-      page.getByRole('heading', { name: ADVERSARY_NAME }),
+      page.getByRole('heading', { name: ADVERSARY_NAME, level: 1 }),
     ).toBeVisible();
   });
 
@@ -174,7 +197,7 @@ test.describe('Community Adversary Detail Page', () => {
   });
 
   test('cleanup: delete the test adversary', async ({ page }) => {
-    await page.goto('/profile/homebrew');
+    await gotoHomebrew(page);
     const row = getItemRow(page, ADVERSARY_NAME);
     await row.getByRole('button', { name: 'More actions' }).click();
     await page.getByRole('menuitem', { name: 'Delete' }).click();
@@ -195,8 +218,7 @@ test.describe('Community Environment Detail Page', () => {
     await page.waitForURL(/\/profile\/homebrew/);
 
     const row = getItemRow(page, ENVIRONMENT_NAME);
-    await row.getByRole('button', { name: 'More actions' }).click();
-    await page.getByRole('menuitem', { name: 'Toggle Visibility' }).click();
+    await toggleVisibility(page, row);
     await expect(row.getByText('Public')).toBeVisible();
   });
 
@@ -218,7 +240,7 @@ test.describe('Community Environment Detail Page', () => {
       .click();
     await expect(page).toHaveURL(/\/community\/environments\/.+/);
     await expect(
-      page.getByRole('heading', { name: ENVIRONMENT_NAME }),
+      page.getByRole('heading', { name: ENVIRONMENT_NAME, level: 1 }),
     ).toBeVisible();
   });
 
@@ -248,25 +270,10 @@ test.describe('Community Environment Detail Page', () => {
   });
 
   test('cleanup: delete the test environment', async ({ page }) => {
-    await page.goto('/profile/homebrew');
+    await gotoHomebrew(page);
     const row = getItemRow(page, ENVIRONMENT_NAME);
     await row.getByRole('button', { name: 'More actions' }).click();
     await page.getByRole('menuitem', { name: 'Delete' }).click();
     await expect(page.getByText(ENVIRONMENT_NAME)).not.toBeVisible();
-  });
-});
-
-test.describe('Community Card Detail privacy', () => {
-  test('detail page HTML does not contain the author email', async ({
-    page,
-  }) => {
-    const email = process.env.TEST_USER_EMAIL ?? 'test@example.com';
-    await page.goto('/community/cards');
-    await getItemRow(page, CARD_NAME)
-      .getByRole('link', { name: CARD_NAME })
-      .click();
-    await expect(page).toHaveURL(/\/community\/cards\/.+/);
-    await expect(page.getByRole('heading', { name: CARD_NAME })).toBeVisible();
-    expect(await page.content()).not.toContain(email);
   });
 });

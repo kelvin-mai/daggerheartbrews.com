@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-import { getItemRow } from '../fixtures';
+import { gotoHomebrew, getItemRow, toggleVisibility } from '../fixtures';
 
 const CARD_NAME = 'E2E Comment Card';
 const COMMENT_BODY = 'This is a test comment for E2E.';
@@ -16,8 +16,7 @@ test.describe('Community Card Comments', () => {
     await page.waitForURL(/\/profile\/homebrew/);
 
     const row = getItemRow(page, CARD_NAME);
-    await row.getByRole('button', { name: 'More actions' }).click();
-    await page.getByRole('menuitem', { name: 'Toggle Visibility' }).click();
+    await toggleVisibility(page, row);
     await expect(row.getByText('Public')).toBeVisible();
   });
 
@@ -48,7 +47,9 @@ test.describe('Community Card Comments', () => {
   test('comment count badge shows on community card list', async ({ page }) => {
     await page.goto('/community/cards');
     const row = getItemRow(page, CARD_NAME);
-    await expect(row.getByRole('button', { name: '1 Comment' })).toBeVisible();
+    await expect(
+      row.getByRole('link', { name: '1', exact: true }),
+    ).toBeVisible();
   });
 
   test('sort toggle switches to newest order', async ({ page }) => {
@@ -85,7 +86,7 @@ test.describe('Community Card Comments', () => {
   });
 
   test('cleanup: delete the test card', async ({ page }) => {
-    await page.goto('/profile/homebrew');
+    await gotoHomebrew(page);
     const row = getItemRow(page, CARD_NAME);
     await row.getByRole('button', { name: 'More actions' }).click();
     await page.getByRole('menuitem', { name: 'Delete' }).click();

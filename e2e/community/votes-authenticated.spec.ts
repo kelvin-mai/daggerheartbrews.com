@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-import { getItemRow } from '../fixtures';
+import { gotoHomebrew, getItemRow, toggleVisibility } from '../fixtures';
 
 const CARD_NAME = 'E2E Vote Card';
 const ADVERSARY_NAME = 'E2E Vote Adversary';
@@ -21,8 +21,7 @@ test.describe('Community Card Votes', () => {
     await page.waitForURL(/\/profile\/homebrew/);
 
     const row = getItemRow(page, CARD_NAME);
-    await row.getByRole('button', { name: 'More actions' }).click();
-    await page.getByRole('menuitem', { name: 'Toggle Visibility' }).click();
+    await toggleVisibility(page, row);
     await expect(row.getByText('Public')).toBeVisible();
   });
 
@@ -79,7 +78,7 @@ test.describe('Community Card Votes', () => {
     await communityRow.getByRole('button', { name: 'Upvote' }).click();
     await expect(getScore(communityRow)).toHaveText('0');
 
-    await page.goto('/profile/homebrew');
+    await gotoHomebrew(page);
     const row = getItemRow(page, CARD_NAME);
     await row.getByRole('button', { name: 'More actions' }).click();
     await page.getByRole('menuitem', { name: 'Delete' }).click();
@@ -102,8 +101,7 @@ test.describe('Community Adversary Votes', () => {
     await page.waitForURL(/\/profile\/homebrew/);
 
     const row = getItemRow(page, ADVERSARY_NAME);
-    await row.getByRole('button', { name: 'More actions' }).click();
-    await page.getByRole('menuitem', { name: 'Toggle Visibility' }).click();
+    await toggleVisibility(page, row);
     await expect(row.getByText('Public')).toBeVisible();
   });
 
@@ -147,7 +145,7 @@ test.describe('Community Adversary Votes', () => {
     await communityRow.getByRole('button', { name: 'Downvote' }).click();
     await expect(getScore(communityRow)).toHaveText('0');
 
-    await page.goto('/profile/homebrew');
+    await gotoHomebrew(page);
     const row = getItemRow(page, ADVERSARY_NAME);
     await row.getByRole('button', { name: 'More actions' }).click();
     await page.getByRole('menuitem', { name: 'Delete' }).click();

@@ -1,6 +1,11 @@
 import { test, expect } from '@playwright/test';
 
-import { getItemRow } from '../fixtures';
+import {
+  gotoHomebrew,
+  getItemRow,
+  TEST_USER,
+  toggleVisibility,
+} from '../fixtures';
 
 const CARD_NAME = 'E2E Profile Card';
 
@@ -15,8 +20,7 @@ test.describe('User Profile Page', () => {
     await page.waitForURL(/\/profile\/homebrew/);
 
     const row = getItemRow(page, CARD_NAME);
-    await row.getByRole('button', { name: 'More actions' }).click();
-    await page.getByRole('menuitem', { name: 'Toggle Visibility' }).click();
+    await toggleVisibility(page, row);
     await expect(row.getByText('Public')).toBeVisible();
   });
 
@@ -41,7 +45,9 @@ test.describe('User Profile Page', () => {
       .filter({ hasNotText: CARD_NAME });
     await creatorLink.click();
     await expect(page).toHaveURL(/\/profile\/.+/);
-    await expect(page.getByRole('link', { name: 'Settings' })).toBeVisible();
+    await expect(
+      page.getByRole('main').getByRole('link', { name: 'Settings' }),
+    ).toBeVisible();
   });
 
   test('Settings button on own profile navigates to /profile', async ({
@@ -53,7 +59,10 @@ test.describe('User Profile Page', () => {
       .filter({ hasNotText: CARD_NAME })
       .click();
     await expect(page).toHaveURL(/\/profile\/.+/);
-    await page.getByRole('link', { name: 'Settings' }).click();
+    await page
+      .getByRole('main')
+      .getByRole('link', { name: 'Settings' })
+      .click();
     await expect(page).toHaveURL('/profile');
   });
 
@@ -100,31 +109,32 @@ test.describe('User Profile Page', () => {
     await unauthContext.close();
   });
 
+  test('profile page does not expose the user email to other viewers', async ({
+    page,
+    browser,
+  }) => {
+    await page.goto('/community/cards');
+    const href = await getItemRow(page, CARD_NAME)
+      .locator('a[href^="/profile/"]')
+      .filter({ hasNotText: CARD_NAME })
+      .getAttribute('href');
+    expect(href).toMatch(/^\/profile\/.+/);
+
+    const guestContext = await browser.newContext({
+      storageState: { cookies: [], origins: [] },
+    });
+    const guest = await guestContext.newPage();
+    await guest.goto(href!);
+    await expect(guest.getByText(CARD_NAME)).toBeVisible();
+    expect(await guest.content()).not.toContain(TEST_USER.email);
+    await guestContext.close();
+  });
+
   test('cleanup: delete the test card', async ({ page }) => {
-    await page.goto('/profile/homebrew');
+    await gotoHomebrew(page);
     const row = getItemRow(page, CARD_NAME);
     await row.getByRole('button', { name: 'More actions' }).click();
     await page.getByRole('menuitem', { name: 'Delete' }).click();
     await expect(page.getByText(CARD_NAME)).not.toBeVisible();
-  });
-});
-
-test.describe('Profile page privacy', () => {
-  test('profile page HTML does not contain the user email', async ({
-    page,
-  }) => {
-    const email = process.env.TEST_USER_EMAIL ?? 'test@example.com';
-    await page.goto('/community/cards');
-    const href = await page
-      .locator('a[href^="/profile/"]')
-      .evaluateAll(
-        (els) =>
-          els
-            .map((el) => el.getAttribute('href') ?? '')
-            .find((h) => /^\/profile\/[0-9a-f-]{36}$/.test(h)) ?? '',
-      );
-    expect(href).not.toBe('');
-    await page.goto(href);
-    expect(await page.content()).not.toContain(email);
   });
 });

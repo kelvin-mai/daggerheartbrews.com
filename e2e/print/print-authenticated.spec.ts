@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-import { getItemRow } from '../fixtures';
+import { gotoHomebrew, getItemRow } from '../fixtures';
 
 const CARD_NAME = 'E2E Print Card';
 
@@ -19,7 +19,7 @@ test.describe('Print Sheet', () => {
   });
 
   test('print page is accessible from the sidebar', async ({ page }) => {
-    await page.goto('/profile/homebrew');
+    await gotoHomebrew(page);
     await page.getByRole('link', { name: 'Print' }).click();
     await expect(page).toHaveURL('/profile/print');
     await expect(page.getByRole('heading', { name: 'Print' })).toBeVisible();
@@ -81,7 +81,7 @@ test.describe('Print Sheet', () => {
   });
 
   test('cleanup: delete the test card', async ({ page }) => {
-    await page.goto('/profile/homebrew');
+    await gotoHomebrew(page);
     // Loop to handle stale cards left by prior failed runs
     let remaining = await getItemRow(page, CARD_NAME).count();
     while (remaining > 0) {

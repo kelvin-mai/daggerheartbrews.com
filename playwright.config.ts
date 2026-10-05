@@ -44,6 +44,8 @@ export default defineConfig({
       },
       testMatch: authenticatedSpecs,
       dependencies: ['setup'],
+      // All authenticated specs share one test user, so run them one at a time
+      workers: 1,
     },
   ],
   webServer: {

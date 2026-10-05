@@ -1,4 +1,4 @@
-import { type Page } from '@playwright/test';
+import { expect, type Locator, type Page } from '@playwright/test';
 
 export const PNG_1X1 = Buffer.from(
   'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVQI12NgAAIABQ' +
@@ -24,4 +24,21 @@ export function getItemRow(page: Page, name: string) {
     .locator('.truncate.font-medium')
     .filter({ hasText: name })
     .locator('xpath=../../..');
+}
+
+export async function gotoHomebrew(page: Page) {
+  await page.goto('/profile/homebrew');
+  await page.waitForLoadState('networkidle');
+}
+
+export async function toggleVisibility(page: Page, row: Locator) {
+  await row.getByRole('button', { name: 'More actions' }).click();
+  const [res] = await Promise.all([
+    page.waitForResponse(
+      (r) =>
+        r.request().method() === 'PUT' && r.url().includes('/api/community/'),
+    ),
+    page.getByRole('menuitem', { name: 'Toggle Visibility' }).click(),
+  ]);
+  expect(res.ok()).toBe(true);
 }

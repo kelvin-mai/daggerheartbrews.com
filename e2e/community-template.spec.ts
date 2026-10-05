@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-import { getItemRow } from './fixtures';
+import { gotoHomebrew, getItemRow, toggleVisibility } from './fixtures';
 
 const COMMUNITY_CARD = 'E2E Community Card Template';
 const COMMUNITY_ADVERSARY = 'E2E Community Adversary Template';
@@ -18,8 +18,7 @@ test.describe('Community Cards – Use as Template', () => {
     await page.waitForURL(/\/profile\/homebrew/);
 
     const row = getItemRow(page, COMMUNITY_CARD);
-    await row.getByRole('button', { name: 'More actions' }).click();
-    await page.getByRole('menuitem', { name: 'Toggle Visibility' }).click();
+    await toggleVisibility(page, row);
     await expect(row.getByText('Public')).toBeVisible();
   });
 
@@ -37,7 +36,7 @@ test.describe('Community Cards – Use as Template', () => {
   });
 
   test('cleanup: delete the test community card', async ({ page }) => {
-    await page.goto('/profile/homebrew');
+    await gotoHomebrew(page);
     const row = getItemRow(page, COMMUNITY_CARD);
     await row.getByRole('button', { name: 'More actions' }).click();
     await page.getByRole('menuitem', { name: 'Delete' }).click();
@@ -58,8 +57,7 @@ test.describe('Community Adversaries – Use as Template', () => {
     await page.waitForURL(/\/profile\/homebrew/);
 
     const row = getItemRow(page, COMMUNITY_ADVERSARY);
-    await row.getByRole('button', { name: 'More actions' }).click();
-    await page.getByRole('menuitem', { name: 'Toggle Visibility' }).click();
+    await toggleVisibility(page, row);
     await expect(row.getByText('Public')).toBeVisible();
   });
 
@@ -77,7 +75,7 @@ test.describe('Community Adversaries – Use as Template', () => {
   });
 
   test('cleanup: delete the test community adversary', async ({ page }) => {
-    await page.goto('/profile/homebrew');
+    await gotoHomebrew(page);
     const row = getItemRow(page, COMMUNITY_ADVERSARY);
     await row.getByRole('button', { name: 'More actions' }).click();
     await page.getByRole('menuitem', { name: 'Delete' }).click();

@@ -1,9 +1,16 @@
 import { test, expect } from '@playwright/test';
 
-import { getItemRow } from '../fixtures';
+import {
+  gotoHomebrew,
+  getItemRow,
+  TEST_USER,
+  toggleVisibility,
+} from '../fixtures';
 
 const CARD_NAME = 'E2E Bookmark Card';
 const ADVERSARY_NAME = 'E2E Bookmark Adversary';
+const SEEDED_CARD_NAME = 'Thornborn';
+const SEEDED_AUTHOR_EMAIL = 'admin@test.com';
 
 test.describe('Bookmarks', () => {
   test.describe.configure({ mode: 'serial' });
@@ -20,8 +27,7 @@ test.describe('Bookmarks', () => {
     await page.waitForURL(/\/profile\/homebrew/);
 
     const row = getItemRow(page, CARD_NAME);
-    await row.getByRole('button', { name: 'More actions' }).click();
-    await page.getByRole('menuitem', { name: 'Toggle Visibility' }).click();
+    await toggleVisibility(page, row);
     await expect(row.getByText('Public')).toBeVisible();
   });
 
@@ -37,8 +43,7 @@ test.describe('Bookmarks', () => {
     await page.waitForURL(/\/profile\/homebrew/);
 
     const row = getItemRow(page, ADVERSARY_NAME);
-    await row.getByRole('button', { name: 'More actions' }).click();
-    await page.getByRole('menuitem', { name: 'Toggle Visibility' }).click();
+    await toggleVisibility(page, row);
     await expect(row.getByText('Public')).toBeVisible();
   });
 
@@ -51,7 +56,7 @@ test.describe('Bookmarks', () => {
   });
 
   test('bookmarks page is accessible from the sidebar', async ({ page }) => {
-    await page.goto('/profile/homebrew');
+    await gotoHomebrew(page);
     await page.getByRole('link', { name: 'Bookmarks' }).click();
     await expect(page).toHaveURL('/profile/bookmarks');
     await expect(
@@ -93,7 +98,7 @@ test.describe('Bookmarks', () => {
   test('card bookmark state persists after navigating away and back', async ({
     page,
   }) => {
-    await page.goto('/profile/homebrew');
+    await gotoHomebrew(page);
     await page.goto('/community/cards');
     const row = getItemRow(page, CARD_NAME);
     await expect(
@@ -111,6 +116,28 @@ test.describe('Bookmarks', () => {
     await page.reload();
     await expect(page.getByText(CARD_NAME)).not.toBeVisible();
     await expect(page.getByText('No bookmarked cards')).toBeVisible();
+  });
+
+  test("bookmarks page does not expose other authors' emails", async ({
+    page,
+  }) => {
+    test.skip(TEST_USER.email === SEEDED_AUTHOR_EMAIL);
+    await page.goto('/community/cards');
+    const row = getItemRow(page, SEEDED_CARD_NAME);
+    await row.getByRole('button', { name: 'Add bookmark' }).click();
+    await expect(
+      row.getByRole('button', { name: 'Remove bookmark' }),
+    ).toBeVisible();
+
+    await page.goto('/profile/bookmarks');
+    const bookmarked = getItemRow(page, SEEDED_CARD_NAME);
+    await expect(bookmarked).toBeVisible();
+    expect(await page.content()).not.toContain(SEEDED_AUTHOR_EMAIL);
+
+    await bookmarked.getByRole('button', { name: 'Remove bookmark' }).click();
+    await expect(
+      bookmarked.getByRole('button', { name: 'Add bookmark' }),
+    ).toBeVisible();
   });
 
   test('bookmark button is visible on the community adversaries page', async ({
@@ -157,7 +184,7 @@ test.describe('Bookmarks', () => {
   });
 
   test('cleanup: delete the test card', async ({ page }) => {
-    await page.goto('/profile/homebrew');
+    await gotoHomebrew(page);
     const row = getItemRow(page, CARD_NAME);
     await row.getByRole('button', { name: 'More actions' }).click();
     await page.getByRole('menuitem', { name: 'Delete' }).click();
@@ -165,20 +192,10 @@ test.describe('Bookmarks', () => {
   });
 
   test('cleanup: delete the test adversary', async ({ page }) => {
-    await page.goto('/profile/homebrew');
+    await gotoHomebrew(page);
     const row = getItemRow(page, ADVERSARY_NAME);
     await row.getByRole('button', { name: 'More actions' }).click();
     await page.getByRole('menuitem', { name: 'Delete' }).click();
     await expect(page.getByText(ADVERSARY_NAME)).not.toBeVisible();
-  });
-});
-
-test.describe('Bookmarks privacy', () => {
-  test('bookmarks page HTML does not contain the author email', async ({
-    page,
-  }) => {
-    const email = process.env.TEST_USER_EMAIL ?? 'test@example.com';
-    await page.goto('/profile/bookmarks');
-    expect(await page.content()).not.toContain(email);
   });
 });

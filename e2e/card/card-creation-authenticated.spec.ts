@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-import { getItemRow } from '../fixtures';
+import { getItemRow, toggleVisibility } from '../fixtures';
 
 async function createCard(
   page: Parameters<typeof getItemRow>[0],
@@ -75,12 +75,10 @@ test.describe('Card Creation – Authenticated', () => {
     const row = getItemRow(page, name);
     await expect(row.getByText('Draft')).toBeVisible();
 
-    await row.getByRole('button', { name: 'More actions' }).click();
-    await page.getByRole('menuitem', { name: 'Toggle Visibility' }).click();
+    await toggleVisibility(page, row);
     await expect(row.getByText('Public')).toBeVisible();
 
-    await row.getByRole('button', { name: 'More actions' }).click();
-    await page.getByRole('menuitem', { name: 'Toggle Visibility' }).click();
+    await toggleVisibility(page, row);
     await expect(row.getByText('Draft')).toBeVisible();
 
     await deleteCard(page, name);

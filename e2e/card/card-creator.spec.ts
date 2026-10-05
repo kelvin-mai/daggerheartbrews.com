@@ -8,9 +8,12 @@ async function useChainmailArmorAsTemplate(page: Page) {
   await expect(
     page.getByText('Chainmail Armor', { exact: true }),
   ).toBeVisible();
-  await page.getByRole('button', { name: 'More actions' }).first().click();
-  await page.getByRole('menuitem', { name: 'Use as Template' }).click();
-  await expect(page).toHaveURL(/\/card\/create\?template=true/);
+  await expect(async () => {
+    await page.getByRole('button', { name: 'Use as Template' }).first().click();
+    await expect(page).toHaveURL(/\/card\/create\?template=true/, {
+      timeout: 2000,
+    });
+  }).toPass();
   await expect(page.getByText('Basic Details')).toBeVisible();
 }
 
@@ -128,6 +131,8 @@ test.describe('Card Creator – Use as Template', () => {
   });
 
   test('rejects an oversized image at upload time', async ({ page }) => {
+    await page.goto('/card/create');
+    await expect(page.getByText('Basic Details')).toBeVisible();
     await page.setInputFiles('input[aria-label="Upload image file"]', {
       name: 'big.png',
       mimeType: 'image/png',

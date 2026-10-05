@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-import { getItemRow } from '../fixtures';
+import { gotoHomebrew, getItemRow, toggleVisibility } from '../fixtures';
 
 const ENVIRONMENT_NAME = 'E2E Community Environment';
 
@@ -22,8 +22,7 @@ test.describe('Community Environments', () => {
     await page.waitForURL(/\/profile\/homebrew/);
 
     const row = getItemRow(page, ENVIRONMENT_NAME);
-    await row.getByRole('button', { name: 'More actions' }).click();
-    await page.getByRole('menuitem', { name: 'Toggle Visibility' }).click();
+    await toggleVisibility(page, row);
     await expect(row.getByText('Public')).toBeVisible();
   });
 
@@ -43,7 +42,7 @@ test.describe('Community Environments', () => {
 
   test('environments page is accessible from the sidebar', async ({ page }) => {
     await page.goto('/community/cards');
-    await page.getByRole('link', { name: 'Environments' }).click();
+    await page.locator('a[href="/community/environments"]').click();
     await expect(page).toHaveURL('/community/environments');
     await expect(
       page.getByRole('heading', { name: 'Community Environments' }),
@@ -108,7 +107,7 @@ test.describe('Community Environments', () => {
   test('environment appears in the Environments section on the homebrew page', async ({
     page,
   }) => {
-    await page.goto('/profile/homebrew');
+    await gotoHomebrew(page);
     await expect(getItemRow(page, ENVIRONMENT_NAME)).toBeVisible();
     await expect(page.getByText('No environments yet')).not.toBeVisible();
   });
@@ -116,7 +115,7 @@ test.describe('Community Environments', () => {
   test('environment does not appear in the Adversaries section on the homebrew page', async ({
     page,
   }) => {
-    await page.goto('/profile/homebrew');
+    await gotoHomebrew(page);
     const adversariesSection = page
       .locator('.group\\/collapsible')
       .filter({ hasText: 'Adversaries' });
@@ -126,7 +125,7 @@ test.describe('Community Environments', () => {
   });
 
   test('cleanup: delete the test environment', async ({ page }) => {
-    await page.goto('/profile/homebrew');
+    await gotoHomebrew(page);
     const row = getItemRow(page, ENVIRONMENT_NAME);
     await row.getByRole('button', { name: 'More actions' }).click();
     await page.getByRole('menuitem', { name: 'Delete' }).click();
