@@ -17,6 +17,7 @@ vi.mock('next/headers', () => ({
 
 import { POST } from '@/app/api/adversary-preview/[id]/route';
 import { auth } from '@/lib/auth';
+import { MAX_REQUEST_BODY_SIZE } from '@/lib/utils';
 import {
   limitAdversaryInserts,
   insertAdversary,
@@ -24,25 +25,27 @@ import {
 } from '@/actions/user-items';
 
 type GetSessionResult = Awaited<ReturnType<typeof auth.api.getSession>>;
-type InsertAdversaryResult = Awaited<ReturnType<typeof insertAdversary>>;
 type UpdateAdversaryResult = Awaited<ReturnType<typeof updateAdversary>>;
 
 const mockSession = { user: { id: 'user-1', email: 'user@example.com' } };
-const mockAdversary = { id: 'adv-1', name: 'Test Adversary', type: 'standard' };
+const mockAdversary = { id: 'adv-1', name: 'Test', type: 'standard' };
 const mockUserAdversary = {
-  id: 'ua-1',
+  id: 'u-1',
   userId: 'user-1',
   adversaryPreviewId: 'adv-1',
 };
 
 const params = Promise.resolve({ id: 'adv-1' });
 
-const makeReq = (body: unknown) =>
+const makeReq = (body: unknown, headers: Record<string, string> = {}) =>
   new NextRequest('http://localhost/api/adversary-preview/adv-1', {
     method: 'POST',
-    body: JSON.stringify(body),
-    headers: { 'content-type': 'application/json' },
+    body: typeof body === 'string' ? body : JSON.stringify(body),
+    headers: { 'content-type': 'application/json', ...headers },
   });
+
+const oversized = () =>
+  JSON.stringify({ adversary: { image: 'a'.repeat(MAX_REQUEST_BODY_SIZE) } });
 
 describe('POST /api/adversary-preview/[id]', () => {
   beforeEach(() => vi.clearAllMocks());
@@ -56,9 +59,10 @@ describe('POST /api/adversary-preview/[id]', () => {
     expect(res.status).toBe(500);
     expect(json.success).toBe(false);
     expect(json.error.message).toBe('Unauthorized');
+    expect(updateAdversary).not.toHaveBeenCalled();
   });
 
-  it('calls updateAdversary when userAdversary belongs to the session user and returns 202', async () => {
+  it('updates and returns 202 when no userAdversary is sent', async () => {
     vi.mocked(auth.api.getSession).mockResolvedValueOnce(
       mockSession as unknown as GetSessionResult,
     );
@@ -67,59 +71,112 @@ describe('POST /api/adversary-preview/[id]', () => {
       userAdversary: mockUserAdversary,
     } as unknown as UpdateAdversaryResult);
 
-    const res = await POST(
-      makeReq({ adversary: mockAdversary, userAdversary: mockUserAdversary }),
-      { params },
-    );
+    const res = await POST(makeReq({ adversary: mockAdversary }), { params });
     const json = await res.json();
 
     expect(res.status).toBe(202);
     expect(json.success).toBe(true);
-    expect(updateAdversary).toHaveBeenCalledWith(
-      expect.objectContaining({ id: 'adv-1', session: mockSession }),
-    );
+    expect(json.data.adversary).toEqual(mockAdversary);
+    expect(updateAdversary).toHaveBeenCalledWith({
+      id: 'adv-1',
+      body: { adversary: mockAdversary },
+      session: mockSession,
+    });
     expect(insertAdversary).not.toHaveBeenCalled();
   });
 
-  it('calls insertAdversary when userAdversary belongs to a different user and returns 201', async () => {
+  it.each(['user-1', 'other-user'])(
+    'ignores a spoofed userAdversary.userId (%s) and always calls updateAdversary',
+    async (userId) => {
+      vi.mocked(auth.api.getSession).mockResolvedValueOnce(
+        mockSession as unknown as GetSessionResult,
+      );
+      vi.mocked(updateAdversary).mockResolvedValueOnce(null);
+
+      const res = await POST(
+        makeReq({
+          adversary: mockAdversary,
+          userAdversary: { ...mockUserAdversary, userId },
+        }),
+        { params },
+      );
+
+      expect(res.status).toBe(404);
+      expect(updateAdversary).toHaveBeenCalledWith({
+        id: 'adv-1',
+        body: expect.objectContaining({ adversary: mockAdversary }),
+        session: mockSession,
+      });
+      expect(insertAdversary).not.toHaveBeenCalled();
+      expect(limitAdversaryInserts).not.toHaveBeenCalled();
+    },
+  );
+
+  it('returns 404 with no insert when updateAdversary resolves null', async () => {
     vi.mocked(auth.api.getSession).mockResolvedValueOnce(
       mockSession as unknown as GetSessionResult,
     );
-    vi.mocked(limitAdversaryInserts).mockResolvedValueOnce(undefined);
-    vi.mocked(insertAdversary).mockResolvedValueOnce({
-      adversary: mockAdversary,
-      userAdversary: mockUserAdversary,
-    } as unknown as InsertAdversaryResult);
+    vi.mocked(updateAdversary).mockResolvedValueOnce(null);
 
-    const res = await POST(
-      makeReq({
-        adversary: mockAdversary,
-        userAdversary: { ...mockUserAdversary, userId: 'other-user' },
-      }),
-      { params },
-    );
+    const res = await POST(makeReq({ adversary: mockAdversary }), { params });
     const json = await res.json();
 
-    expect(res.status).toBe(201);
-    expect(json.success).toBe(true);
-    expect(insertAdversary).toHaveBeenCalled();
+    expect(res.status).toBe(404);
+    expect(json).toEqual({
+      success: false,
+      error: { name: 'NotFound', message: 'Not found' },
+    });
+    expect(insertAdversary).not.toHaveBeenCalled();
+  });
+
+  it('returns 413 and does not update when the body is over the limit', async () => {
+    vi.mocked(auth.api.getSession).mockResolvedValue(
+      mockSession as unknown as GetSessionResult,
+    );
+
+    const res = await POST(makeReq(oversized()), { params });
+    const json = await res.json();
+
+    expect(res.status).toBe(413);
+    expect(json).toEqual({
+      success: false,
+      error: {
+        name: 'PayloadTooLargeError',
+        message: 'This is too large to save. Try uploading a smaller image.',
+      },
+    });
     expect(updateAdversary).not.toHaveBeenCalled();
   });
 
-  it('calls insertAdversary when body has no userAdversary and returns 201', async () => {
-    vi.mocked(auth.api.getSession).mockResolvedValueOnce(
+  it('returns 413 when content-length is over the limit', async () => {
+    const res = await POST(
+      makeReq(
+        { adversary: mockAdversary },
+        { 'content-length': String(MAX_REQUEST_BODY_SIZE + 1) },
+      ),
+      { params },
+    );
+
+    expect(res.status).toBe(413);
+    expect(updateAdversary).not.toHaveBeenCalled();
+  });
+
+  it('returns 413 for an oversized body with no session', async () => {
+    vi.mocked(auth.api.getSession).mockResolvedValue(null);
+
+    const res = await POST(makeReq(oversized()), { params });
+
+    expect(res.status).toBe(413);
+  });
+
+  it('returns 500 for malformed JSON under the limit', async () => {
+    vi.mocked(auth.api.getSession).mockResolvedValue(
       mockSession as unknown as GetSessionResult,
     );
-    vi.mocked(limitAdversaryInserts).mockResolvedValueOnce(undefined);
-    vi.mocked(insertAdversary).mockResolvedValueOnce({
-      adversary: mockAdversary,
-      userAdversary: mockUserAdversary,
-    } as unknown as InsertAdversaryResult);
 
-    const res = await POST(makeReq({ adversary: mockAdversary }), { params });
-    await res.json();
+    const res = await POST(makeReq('{nope'), { params });
 
-    expect(res.status).toBe(201);
-    expect(insertAdversary).toHaveBeenCalled();
+    expect(res.status).toBe(500);
+    expect(updateAdversary).not.toHaveBeenCalled();
   });
 });

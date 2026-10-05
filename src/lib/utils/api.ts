@@ -30,6 +30,25 @@ export const assertPayloadSize = (payload: unknown): void => {
   }
 };
 
+export class PayloadTooLargeError extends Error {
+  constructor() {
+    super('This is too large to save. Try uploading a smaller image.');
+    this.name = 'PayloadTooLargeError';
+  }
+}
+
+export const readJSONBody = async <T>(req: Request): Promise<T> => {
+  const length = req.headers.get('content-length');
+  if (length !== null && Number(length) > MAX_REQUEST_BODY_SIZE) {
+    throw new PayloadTooLargeError();
+  }
+  const text = await req.text();
+  if (new TextEncoder().encode(text).byteLength > MAX_REQUEST_BODY_SIZE) {
+    throw new PayloadTooLargeError();
+  }
+  return JSON.parse(text);
+};
+
 export const parseJSONResponse = async <T>(res: Response): Promise<T> => {
   const contentType = res.headers.get('content-type');
   if (!contentType?.includes('application/json')) {

@@ -3,12 +3,16 @@ import { headers } from 'next/headers';
 
 import type { AdversaryDetails } from '@/lib/types';
 import { auth } from '@/lib/auth';
-import { formatAPIError } from '@/lib/utils';
+import {
+  formatAPIError,
+  PayloadTooLargeError,
+  readJSONBody,
+} from '@/lib/utils';
 import { insertAdversary, limitAdversaryInserts } from '@/actions/user-items';
 
 export async function POST(req: NextRequest) {
   try {
-    const body: { adversary: AdversaryDetails } = await req.json();
+    const body = await readJSONBody<{ adversary: AdversaryDetails }>(req);
     const session = await auth.api.getSession({
       headers: await headers(),
     });
@@ -21,7 +25,7 @@ export async function POST(req: NextRequest) {
   } catch (e) {
     return NextResponse.json(
       { success: false, error: formatAPIError(e) },
-      { status: 500 },
+      { status: e instanceof PayloadTooLargeError ? 413 : 500 },
     );
   }
 }

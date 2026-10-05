@@ -25,6 +25,8 @@ type DbSelectResult = ReturnType<(typeof db)['select']>;
 type TransactionCallback = Parameters<(typeof db)['transaction']>[0];
 type TransactionArg = Parameters<TransactionCallback>[0];
 
+type UpdateSession = Parameters<typeof updateCard>[0]['session'];
+
 const mockSession = { user: { id: 'user-1', email: 'user@example.com' } };
 
 const mockCard = { id: 'card-1', name: 'Test Card', type: 'ancestry' as const };
@@ -100,28 +102,63 @@ describe('user-items', () => {
   });
 
   describe('updateCard', () => {
-    it('updates card preview and user card in a transaction', async () => {
-      const txMock = {
-        update: vi.fn().mockReturnValue({
-          set: vi.fn().mockReturnThis(),
-          where: vi.fn().mockReturnThis(),
-          returning: vi
-            .fn()
-            .mockResolvedValueOnce([mockCardPreview])
-            .mockResolvedValueOnce([mockUserCard]),
-        }),
+    const makeTx = (owned: unknown[]) => {
+      const set = vi.fn().mockReturnThis();
+      const where = vi.fn().mockReturnThis();
+      const returning = vi
+        .fn()
+        .mockResolvedValueOnce(owned)
+        .mockResolvedValueOnce([mockCardPreview]);
+      const tx = {
+        update: vi.fn().mockReturnValue({ set, where, returning }),
       };
       vi.mocked(db.transaction).mockImplementation((fn) =>
-        fn(txMock as unknown as TransactionArg),
+        fn(tx as unknown as TransactionArg),
       );
+      return { tx, set, where };
+    };
+
+    it('updates the owned user row first, then the preview', async () => {
+      const { tx } = makeTx([mockUserCard]);
 
       const result = await updateCard({
         id: 'card-1',
         body: { card: mockCard },
-        session: mockSession,
+        session: mockSession as unknown as UpdateSession,
       });
-      expect(result).toEqual({ card: mockCardPreview, userCard: mockUserCard });
-      expect(txMock.update).toHaveBeenCalledTimes(2);
+      expect(result).toEqual({
+        card: mockCardPreview,
+        userCard: mockUserCard,
+      });
+      expect(tx.update).toHaveBeenCalledTimes(2);
+    });
+
+    it('returns null without touching the preview when not owned', async () => {
+      const { tx } = makeTx([]);
+
+      const result = await updateCard({
+        id: 'card-1',
+        body: { card: mockCard },
+        session: mockSession as unknown as UpdateSession,
+      });
+      expect(result).toBeNull();
+      expect(tx.update).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not pass id to the preview set', async () => {
+      const { set } = makeTx([mockUserCard]);
+
+      await updateCard({
+        id: 'card-1',
+        body: { card: { ...mockCard, id: 'other-id' } },
+        session: mockSession as unknown as UpdateSession,
+      });
+      expect(set).toHaveBeenCalledTimes(2);
+      const previewSet = set.mock.calls[1][0];
+      expect(previewSet).not.toHaveProperty('id');
+      expect(previewSet).toMatchObject({
+        name: 'mockCard'.length ? mockCard.name : '',
+      });
     });
   });
 
@@ -169,31 +206,63 @@ describe('user-items', () => {
   });
 
   describe('updateAdversary', () => {
-    it('updates adversary preview and user adversary in a transaction', async () => {
-      const txMock = {
-        update: vi.fn().mockReturnValue({
-          set: vi.fn().mockReturnThis(),
-          where: vi.fn().mockReturnThis(),
-          returning: vi
-            .fn()
-            .mockResolvedValueOnce([mockAdversaryPreview])
-            .mockResolvedValueOnce([mockUserAdversary]),
-        }),
+    const makeTx = (owned: unknown[]) => {
+      const set = vi.fn().mockReturnThis();
+      const where = vi.fn().mockReturnThis();
+      const returning = vi
+        .fn()
+        .mockResolvedValueOnce(owned)
+        .mockResolvedValueOnce([mockAdversaryPreview]);
+      const tx = {
+        update: vi.fn().mockReturnValue({ set, where, returning }),
       };
       vi.mocked(db.transaction).mockImplementation((fn) =>
-        fn(txMock as unknown as TransactionArg),
+        fn(tx as unknown as TransactionArg),
       );
+      return { tx, set, where };
+    };
+
+    it('updates the owned user row first, then the preview', async () => {
+      const { tx } = makeTx([mockUserAdversary]);
 
       const result = await updateAdversary({
         id: 'adv-1',
         body: { adversary: mockAdversary },
-        session: mockSession,
+        session: mockSession as unknown as UpdateSession,
       });
       expect(result).toEqual({
         adversary: mockAdversaryPreview,
         userAdversary: mockUserAdversary,
       });
-      expect(txMock.update).toHaveBeenCalledTimes(2);
+      expect(tx.update).toHaveBeenCalledTimes(2);
+    });
+
+    it('returns null without touching the preview when not owned', async () => {
+      const { tx } = makeTx([]);
+
+      const result = await updateAdversary({
+        id: 'adv-1',
+        body: { adversary: mockAdversary },
+        session: mockSession as unknown as UpdateSession,
+      });
+      expect(result).toBeNull();
+      expect(tx.update).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not pass id to the preview set', async () => {
+      const { set } = makeTx([mockUserAdversary]);
+
+      await updateAdversary({
+        id: 'adv-1',
+        body: { adversary: { ...mockAdversary, id: 'other-id' } },
+        session: mockSession as unknown as UpdateSession,
+      });
+      expect(set).toHaveBeenCalledTimes(2);
+      const previewSet = set.mock.calls[1][0];
+      expect(previewSet).not.toHaveProperty('id');
+      expect(previewSet).toMatchObject({
+        name: 'mockAdversary'.length ? mockAdversary.name : '',
+      });
     });
   });
 });

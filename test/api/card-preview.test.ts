@@ -16,6 +16,7 @@ vi.mock('next/headers', () => ({
 
 import { POST } from '@/app/api/card-preview/route';
 import { auth } from '@/lib/auth';
+import { MAX_REQUEST_BODY_SIZE } from '@/lib/utils';
 import { limitCardInserts, insertCard } from '@/actions/user-items';
 
 type GetSessionResult = Awaited<ReturnType<typeof auth.api.getSession>>;
@@ -93,5 +94,32 @@ describe('POST /api/card-preview', () => {
 
     expect(res.status).toBe(500);
     expect(json.success).toBe(false);
+  });
+
+  it('returns 413 and does not insert when the body is over the limit', async () => {
+    vi.mocked(auth.api.getSession).mockResolvedValue(
+      mockSession as unknown as GetSessionResult,
+    );
+
+    const res = await POST(
+      makeReq({ card: { image: 'a'.repeat(MAX_REQUEST_BODY_SIZE) } }),
+    );
+    const json = await res.json();
+
+    expect(res.status).toBe(413);
+    expect(json.success).toBe(false);
+    expect(json.error.name).toBe('PayloadTooLargeError');
+    expect(limitCardInserts).not.toHaveBeenCalled();
+    expect(insertCard).not.toHaveBeenCalled();
+  });
+
+  it('returns 413 for an oversized body with no session', async () => {
+    vi.mocked(auth.api.getSession).mockResolvedValue(null);
+
+    const res = await POST(
+      makeReq({ card: { image: 'a'.repeat(MAX_REQUEST_BODY_SIZE) } }),
+    );
+
+    expect(res.status).toBe(413);
   });
 });

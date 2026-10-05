@@ -68,11 +68,6 @@ export const updateCard = async ({
   session: { user: User };
 }) => {
   return await db.transaction(async (tx) => {
-    const [card] = await tx
-      .update(cardPreviews)
-      .set({ ...body.card, text: sanitizeHtml(body.card.text || '') })
-      .where(eq(cardPreviews.id, id))
-      .returning();
     const [userCard] = await tx
       .update(userCards)
       .set({ updatedAt: new Date() })
@@ -82,6 +77,15 @@ export const updateCard = async ({
           eq(userCards.cardPreviewId, id),
         ),
       )
+      .returning();
+    if (!userCard) {
+      return null;
+    }
+    const { id: _id, ...updateCard } = body.card;
+    const [card] = await tx
+      .update(cardPreviews)
+      .set({ ...updateCard, text: sanitizeHtml(updateCard.text || '') })
+      .where(eq(cardPreviews.id, userCard.cardPreviewId))
       .returning();
     return { card, userCard };
   });
@@ -145,11 +149,6 @@ export const updateAdversary = async ({
   session: { user: User };
 }) => {
   return await db.transaction(async (tx) => {
-    const [adversary] = await tx
-      .update(adversaryPreviews)
-      .set({ ...body.adversary, text: sanitizeHtml(body.adversary.text || '') })
-      .where(eq(adversaryPreviews.id, id))
-      .returning();
     const [userAdversary] = await tx
       .update(userAdversaries)
       .set({ updatedAt: new Date() })
@@ -159,6 +158,18 @@ export const updateAdversary = async ({
           eq(userAdversaries.adversaryPreviewId, id),
         ),
       )
+      .returning();
+    if (!userAdversary) {
+      return null;
+    }
+    const { id: _id, ...updateAdversary } = body.adversary;
+    const [adversary] = await tx
+      .update(adversaryPreviews)
+      .set({
+        ...updateAdversary,
+        text: sanitizeHtml(updateAdversary.text || ''),
+      })
+      .where(eq(adversaryPreviews.id, userAdversary.adversaryPreviewId))
       .returning();
     return { adversary, userAdversary };
   });

@@ -16,6 +16,7 @@ vi.mock('next/headers', () => ({
 
 import { POST } from '@/app/api/adversary-preview/route';
 import { auth } from '@/lib/auth';
+import { MAX_REQUEST_BODY_SIZE } from '@/lib/utils';
 import { limitAdversaryInserts, insertAdversary } from '@/actions/user-items';
 
 type GetSessionResult = Awaited<ReturnType<typeof auth.api.getSession>>;
@@ -83,5 +84,32 @@ describe('POST /api/adversary-preview', () => {
     expect(res.status).toBe(500);
     expect(json.success).toBe(false);
     expect(json.error.message).toBe('Insert limit met for current user');
+  });
+
+  it('returns 413 and does not insert when the body is over the limit', async () => {
+    vi.mocked(auth.api.getSession).mockResolvedValue(
+      mockSession as unknown as GetSessionResult,
+    );
+
+    const res = await POST(
+      makeReq({ adversary: { image: 'a'.repeat(MAX_REQUEST_BODY_SIZE) } }),
+    );
+    const json = await res.json();
+
+    expect(res.status).toBe(413);
+    expect(json.success).toBe(false);
+    expect(json.error.name).toBe('PayloadTooLargeError');
+    expect(limitAdversaryInserts).not.toHaveBeenCalled();
+    expect(insertAdversary).not.toHaveBeenCalled();
+  });
+
+  it('returns 413 for an oversized body with no session', async () => {
+    vi.mocked(auth.api.getSession).mockResolvedValue(null);
+
+    const res = await POST(
+      makeReq({ adversary: { image: 'a'.repeat(MAX_REQUEST_BODY_SIZE) } }),
+    );
+
+    expect(res.status).toBe(413);
   });
 });

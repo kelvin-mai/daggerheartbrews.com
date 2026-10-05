@@ -3,12 +3,16 @@ import { headers } from 'next/headers';
 
 import type { CardDetails } from '@/lib/types';
 import { auth } from '@/lib/auth';
-import { formatAPIError } from '@/lib/utils';
+import {
+  formatAPIError,
+  PayloadTooLargeError,
+  readJSONBody,
+} from '@/lib/utils';
 import { insertCard, limitCardInserts } from '@/actions/user-items';
 
 export async function POST(req: NextRequest) {
   try {
-    const body: { card: CardDetails } = await req.json();
+    const body = await readJSONBody<{ card: CardDetails }>(req);
     const session = await auth.api.getSession({
       headers: await headers(),
     });
@@ -21,9 +25,7 @@ export async function POST(req: NextRequest) {
   } catch (e) {
     return NextResponse.json(
       { success: false, error: formatAPIError(e) },
-      {
-        status: 500,
-      },
+      { status: e instanceof PayloadTooLargeError ? 413 : 500 },
     );
   }
 }

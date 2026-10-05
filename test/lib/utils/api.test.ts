@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import {
   MAX_IMAGE_UPLOAD_SIZE,
   MAX_REQUEST_BODY_SIZE,
@@ -6,6 +6,8 @@ import {
   formatAPIError,
   assertPayloadSize,
   parseJSONResponse,
+  PayloadTooLargeError,
+  readJSONBody,
 } from '@/lib/utils/api';
 
 describe('formatAPIError', () => {
@@ -129,6 +131,102 @@ describe('parseJSONResponse', () => {
 
     await expect(parseJSONResponse(res)).rejects.toThrow(
       'Something went wrong. Please try again.',
+    );
+  });
+});
+
+describe('readJSONBody', () => {
+  const message = 'This is too large to save. Try uploading a smaller image.';
+
+  const jsonOfSize = (bytes: number, filler = 'a') => {
+    const base = JSON.stringify({ v: '' });
+    const fillerBytes = new TextEncoder().encode(filler).byteLength;
+    const count = Math.floor((bytes - base.length) / fillerBytes);
+    const text = JSON.stringify({ v: filler.repeat(count) });
+    return text + ' '.repeat(bytes - new TextEncoder().encode(text).byteLength);
+  };
+
+  const makeReq = (text: string, headers?: Record<string, string>) =>
+    new Request('http://localhost/x', { method: 'POST', body: text, headers });
+
+  it('parses a valid body', async () => {
+    await expect(
+      readJSONBody(makeReq(JSON.stringify({ card: { name: 'a' } }))),
+    ).resolves.toEqual({ card: { name: 'a' } });
+  });
+
+  it('throws before reading the body when content-length is over the limit', async () => {
+    const text = vi.fn();
+    const req = {
+      headers: new Headers({
+        'content-length': String(MAX_REQUEST_BODY_SIZE + 1),
+      }),
+      text,
+    } as unknown as Request;
+
+    await expect(readJSONBody(req)).rejects.toBeInstanceOf(
+      PayloadTooLargeError,
+    );
+    expect(text).not.toHaveBeenCalled();
+  });
+
+  it('uses the shared message and name', async () => {
+    const req = makeReq(jsonOfSize(MAX_REQUEST_BODY_SIZE + 1));
+    const error = await readJSONBody(req).catch((e: unknown) => e);
+    expect(error).toBeInstanceOf(PayloadTooLargeError);
+    expect((error as Error).message).toBe(message);
+    expect((error as Error).name).toBe('PayloadTooLargeError');
+  });
+
+  it('throws when content-length is missing and the body is over the limit', async () => {
+    const req = makeReq(jsonOfSize(MAX_REQUEST_BODY_SIZE + 1));
+    expect(req.headers.get('content-length')).toBeNull();
+    await expect(readJSONBody(req)).rejects.toBeInstanceOf(
+      PayloadTooLargeError,
+    );
+  });
+
+  it('throws when content-length is understated and the body is over the limit', async () => {
+    const req = {
+      headers: new Headers({ 'content-length': '10' }),
+      text: () => Promise.resolve(jsonOfSize(MAX_REQUEST_BODY_SIZE + 1)),
+    } as unknown as Request;
+    await expect(readJSONBody(req)).rejects.toBeInstanceOf(
+      PayloadTooLargeError,
+    );
+  });
+
+  it('accepts a body of exactly the limit', async () => {
+    const text = jsonOfSize(MAX_REQUEST_BODY_SIZE);
+    expect(new TextEncoder().encode(text).byteLength).toBe(
+      MAX_REQUEST_BODY_SIZE,
+    );
+    await expect(readJSONBody(makeReq(text))).resolves.toMatchObject({});
+  });
+
+  it('rejects a body one byte over the limit', async () => {
+    const text = jsonOfSize(MAX_REQUEST_BODY_SIZE + 1);
+    await expect(readJSONBody(makeReq(text))).rejects.toBeInstanceOf(
+      PayloadTooLargeError,
+    );
+  });
+
+  it('counts multibyte characters as bytes', async () => {
+    const text = JSON.stringify({
+      v: '\u20ac'.repeat(Math.ceil(MAX_REQUEST_BODY_SIZE / 3)),
+    });
+    expect(text.length).toBeLessThan(MAX_REQUEST_BODY_SIZE);
+    expect(new TextEncoder().encode(text).byteLength).toBeGreaterThan(
+      MAX_REQUEST_BODY_SIZE,
+    );
+    await expect(readJSONBody(makeReq(text))).rejects.toBeInstanceOf(
+      PayloadTooLargeError,
+    );
+  });
+
+  it('throws a SyntaxError for malformed JSON under the limit', async () => {
+    await expect(readJSONBody(makeReq('{nope'))).rejects.toBeInstanceOf(
+      SyntaxError,
     );
   });
 });
