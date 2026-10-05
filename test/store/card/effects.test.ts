@@ -11,7 +11,7 @@ vi.mock('@/lib/utils', async (importOriginal) => ({
 
 import { downloadElementAsImage } from '@/lib/utils';
 
-const makeGet = (overrides: Partial<CardStore> = () => {}) => {
+const makeGet = (overrides: Partial<CardStore> = {}) => {
   const setOptions = vi.fn();
   const setLoading = vi.fn();
 
