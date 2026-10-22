@@ -14,6 +14,7 @@ title: 'Pending'
 - Changing a post's visibility and saving cards or adversaries now only accept the fields the editor can change, and anything else is rejected.
 - Cards and adversaries made private no longer appear in other users' bookmarks or print sheets, and can't be voted on, commented on or bookmarked.
 - Adversary and environment links now only open the matching kind.
+- Generating a PDF on the print page no longer gets stuck on "Generating preview…" and then shows nothing, and an error message now appears if generation fails.
 
 ## Internal
 
@@ -30,3 +31,5 @@ title: 'Pending'
 - Added a GitHub Actions CI workflow (`.github/workflows/ci.yml`) that runs lint, a Prettier check, unit tests and the build on pull requests and pushes to `main`, plus bug report and feature request issue forms and a pull request template.
 - Updated the onboarding docs (README, `.github/CONTRIBUTING.md`, `docs/local-database-setup.md`, `.env.example`) for pnpm, Node 22.13+, the Docker database defaults and the optional `srd-source` submodule, and fixed the Docker Compose healthcheck.
 - Fixed flaky and outdated e2e specs: new `gotoHomebrew` and `toggleVisibility` helpers in `e2e/fixtures.ts`, the `chromium-authenticated` project now runs on one worker since its specs share a test user, and the privacy checks view pages as a signed-out visitor. Added unit tests for `src/proxy.ts`. Documented in `docs/testing.md`.
+- Added a `pnpm typecheck` script (`tsc --noEmit`) and a type check step to the CI workflow, and completed the test fixtures in the user-items and card/adversary store tests so they type-check.
+- `captureElementAsDataUrl` in `src/lib/utils/images.ts` now switches lazy images to eager before waiting on them, since lazy `next/image` elements in the off-screen print capture container never loaded and stalled PDF generation until the 15s timeout. The print store's `generatePdf` now shows a toast on failure. Added `test/lib/utils/images.test.ts`.

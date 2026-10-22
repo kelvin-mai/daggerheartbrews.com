@@ -13,6 +13,7 @@ const waitForImages = (element: HTMLElement): Promise<void> =>
     Array.from(element.querySelectorAll('img')).map(
       (img) =>
         new Promise<void>((resolve) => {
+          if (img.loading === 'lazy') img.loading = 'eager';
           if (img.complete) {
             resolve();
             return;

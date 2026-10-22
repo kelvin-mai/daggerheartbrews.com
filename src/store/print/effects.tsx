@@ -1,3 +1,5 @@
+import { toast } from 'sonner';
+
 import { captureElementAsDataUrl } from '@/lib/utils';
 import type { ZustandGet, ZustandSet } from '../types';
 import type { PrintEffects, PrintState, PrintStore } from './types';
@@ -30,6 +32,7 @@ const generatePdf =
       set({ pdfSnapshot: { images, cutLines }, capturing: false });
     } catch {
       set({ capturing: false });
+      toast.error('Failed to generate PDF. Please try again.');
     }
   };
 

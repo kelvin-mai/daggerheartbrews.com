@@ -10,6 +10,10 @@ vi.mock('@/lib/utils', () => ({
     .mockResolvedValue('data:image/png;base64,abc'),
 }));
 
+vi.mock('sonner', () => ({
+  toast: { error: vi.fn() },
+}));
+
 vi.mock('@react-pdf/renderer', () => ({
   pdf: vi.fn(() => ({ toBlob: vi.fn().mockResolvedValue(new Blob(['pdf'])) })),
 }));
@@ -18,6 +22,7 @@ vi.mock('@/app/(dashboard)/profile/print/pdf-document', () => ({
   PdfDocument: () => null,
 }));
 
+import { toast } from 'sonner';
 import { captureElementAsDataUrl } from '@/lib/utils';
 
 const initialState: PrintState = {
@@ -131,6 +136,9 @@ describe('print/effects', () => {
         (c) => 'pdfSnapshot' in c && c.pdfSnapshot !== undefined,
       );
       expect(didSetSnapshot).toBe(false);
+      expect(toast.error).toHaveBeenCalledWith(
+        'Failed to generate PDF. Please try again.',
+      );
     });
 
     it('resets capturing: false when the overall generation times out', async () => {
